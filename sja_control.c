@@ -15,6 +15,7 @@
 // #include "../include/main.h"
 // #include "../include/sja1000.h"
 
+/* Macros low level hw. control */
 #define sja_bus_out()     SJA_BUS_DIR = BUSOUT
 #define sja_bus_in()      SJA_BUS_DIR = BUSIN
 #define sja_control_out() SJA_CTRL_DIR |= 0xF0
@@ -28,15 +29,25 @@
 #define sja_wr_high()  SJA_CTRL_PORT |= (1 << SJA_WR_PIN)
 #define sja_wr_low()   SJA_CTRL_PORT &= ~(1 << SJA_WR_PIN)
 
-/* Macros low level hw. control */
-
 #define can_disable_irq() GICR &= ~(1 << SJA_INT_BIT)
 #define can_enable_irq()  GICR |= (1 << SJA_INT_BIT)
 
 unsigned char can_read_reg(unsigned char address)
 {
-  unsigned char address_to_read;
-  //return chip->read_register(address_to_read);
+  sja_rd_high();
+  sja_wr_high();
+  sja_cs_high();
+  
+  sja_ale_high();
+  
+  SJA_BUS_DIR = BUS_OUT;
+  SJA_BUS_PORT = address;
+  _delay_us(1);
+  sja_ale_low();
+  _delay_us(1);
+  
+  
+  return chip->read_register(address_to_read);
 }
 
 

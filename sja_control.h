@@ -24,8 +24,8 @@
 #define SJA_INT_PIN 2   /* AVR pin for SJA INT pin */
 #define SJA_INT_BIT 5   /* Bit in AVR GICR register to control interrupt */
 
-#define BUSOUT    0xff   /* AVR pin for SJA ALE pin */
-#define BUSIN     0x00   /* AVR pin for SJA ALE pin */
+#define BUS_OUT    0xff   /* AVR pin for SJA ALE pin */
+#define BUS_IN     0x00   /* AVR pin for SJA ALE pin */
 #define CTRL_OUT  (1 << SJA_ALE_PIN)|(1 << SJA_CS_PIN)\ 
                   |(1 << SJA_RD_PIN)|(1 << SJA_WR_PIN)
 
