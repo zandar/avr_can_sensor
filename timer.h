@@ -6,10 +6,10 @@
  Date:      2010/10/13
 */
 
-#include <avr/io.h>
+#ifndef F_CPU
+#define F_CPU 8000000 /** clock frequency in Hz*/
+#endif
 
-#define C_CPU 8000000 /** clock frequency in Hz*/
-
-void time0_ms(unsigned int delay);
-void time0_us(unsigned int delay);
-void time1_ms(unsigned int delay);
+void timer0_delay_ms(unsigned int delay);
+void timer0_delay_us(unsigned int delay);
+void timer1_delay_ms(unsigned int delay);

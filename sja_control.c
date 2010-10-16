@@ -1,35 +1,44 @@
-/**
- Title  :   SJA1000 with ATmega16 control library
- Author:    Michal Vokac
- File:      sja_control.c
- Version:   1.0
- Date:      2010/10/13       
-*/
+/* sja_control.c
+ * AVR CAN-bus driver.
+ * Written by Michal Vokac
+ * email: vokac.m@gmail.com
+ * This software is released under the GPL-License.
+ * Version avrCAN-0.1 16/10/2010
+ */
 
 #include <avr/io.h>
 #include "sja_control.h"
-#include "timer.h"
+#include <util/delay.h>
 
-#define sja_bus_out() SJA_BUS_DIRECTION = 0xFF
-#define sja_bus_in() SJA_BUS_DIRECTION = 0x00
-#define sja_control_out() SJA_CONTROL_DIRECTION |= 0xF0
+// #include "../include/can.h"
+// #include "../include/can_sysdep.h"
+// #include "../include/main.h"
+// #include "../include/sja1000.h"
 
-#define sja_ale_high() SJA_CONTROL_PORT |= (1 << SJA_ALE_PIN)
-#define sja_ale_low()  SJA_CONTROL_PORT &= ~(1 << SJA_ALE_PIN)
-#define sja_cs_high()  SJA_CONTROL_PORT |= (1 << SJA_CS_PIN)
-#define sja_cs_low()   SJA_CONTROL_PORT |= (1 << SJA_CS_PIN)
-#define sja_rd_high()  SJA_CONTROL_PORT |= (1 << SJA_RD_PIN)
-#define sja_rd_low()   SJA_CONTROL_PORT |= (1 << SJA_RD_PIN)
-#define sja_wr_high()  SJA_CONTROL_PORT |= (1 << SJA_WR_PIN)
-#define sja_wr_low()   SJA_CONTROL_PORT |= (1 << SJA_WR_PIN)
+#define sja_bus_out()     SJA_BUS_DIR = BUSOUT
+#define sja_bus_in()      SJA_BUS_DIR = BUSIN
+#define sja_control_out() SJA_CTRL_DIR |= 0xF0
 
-/**
-  SJA controler initialization
-*/
-char sja_init()
+#define sja_ale_high() SJA_CTRL_PORT |= (1 << SJA_ALE_PIN)
+#define sja_ale_low()  SJA_CTRL_PORT &= ~(1 << SJA_ALE_PIN)
+#define sja_cs_high()  SJA_CTRL_PORT |= (1 << SJA_CS_PIN)
+#define sja_cs_low()   SJA_CTRL_PORT &= ~(1 << SJA_CS_PIN)
+#define sja_rd_high()  SJA_CTRL_PORT |= (1 << SJA_RD_PIN)
+#define sja_rd_low()   SJA_CTRL_PORT &= ~(1 << SJA_RD_PIN)
+#define sja_wr_high()  SJA_CTRL_PORT |= (1 << SJA_WR_PIN)
+#define sja_wr_low()   SJA_CTRL_PORT &= ~(1 << SJA_WR_PIN)
+
+/* Macros low level hw. control */
+
+#define can_disable_irq() GICR &= ~(1 << SJA_INT_BIT)
+#define can_enable_irq()  GICR |= (1 << SJA_INT_BIT)
+
+unsigned char can_read_reg(unsigned char address)
 {
-  sja_control_out();
-  
-  return 0;
-
+  unsigned char address_to_read;
+  //return chip->read_register(address_to_read);
 }
+
+
+
+
