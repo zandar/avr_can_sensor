@@ -7,49 +7,77 @@
  */
 
 #include <avr/io.h>
-#include "sja_control.h"
 #include <util/delay.h>
+
+#ifndef _SJA_CONTROL_H
+#define _SJA_CONTROL_H
+#include "sja_control.h"
+#endif
 
 // #include "../include/can.h"
 // #include "../include/can_sysdep.h"
 // #include "../include/main.h"
 // #include "../include/sja1000.h"
 
-/* Macros low level hw. control */
-#define sja_bus_out()     SJA_BUS_DIR = BUSOUT
-#define sja_bus_in()      SJA_BUS_DIR = BUSIN
-#define sja_control_out() SJA_CTRL_DIR |= 0xF0
-
-#define sja_ale_high() SJA_CTRL_PORT |= (1 << SJA_ALE_PIN)
-#define sja_ale_low()  SJA_CTRL_PORT &= ~(1 << SJA_ALE_PIN)
-#define sja_cs_high()  SJA_CTRL_PORT |= (1 << SJA_CS_PIN)
-#define sja_cs_low()   SJA_CTRL_PORT &= ~(1 << SJA_CS_PIN)
-#define sja_rd_high()  SJA_CTRL_PORT |= (1 << SJA_RD_PIN)
-#define sja_rd_low()   SJA_CTRL_PORT &= ~(1 << SJA_RD_PIN)
-#define sja_wr_high()  SJA_CTRL_PORT |= (1 << SJA_WR_PIN)
-#define sja_wr_low()   SJA_CTRL_PORT &= ~(1 << SJA_WR_PIN)
-
-#define can_disable_irq() GICR &= ~(1 << SJA_INT_BIT)
-#define can_enable_irq()  GICR |= (1 << SJA_INT_BIT)
-
-unsigned char can_read_reg(unsigned char address)
+static void sja_write_address(unsigned char address)
 {
-  sja_rd_high();
-  sja_wr_high();
-  sja_cs_high();
-  
-  sja_ale_high();
-  
-  SJA_BUS_DIR = BUS_OUT;
-  SJA_BUS_PORT = address;
+  sja_ale_low;
+  sja_rd_high;
+  sja_wr_high;
+  sja_cs_high;
+  sja_ale_high;
+  sja_bus_write(address);
   _delay_us(1);
-  sja_ale_low();
+  sja_ale_low;
   _delay_us(1);
-  
-  
-  return chip->read_register(address_to_read);
 }
 
+static unsigned char sja_read_register(unsigned char address)
+{
+  unsigned char data;
+  
+  sja_write_address(address);
+  sja_cs_low;
+  sja_rd_low;
+  sja_bus_read;
+  _delay_us(1);
+  data = SJA_BUS_DATA;
+  sja_rd_high;
+  sja_cs_high;
+  
+  return data;
+}
 
+static void sja_write_register(unsigned char data,unsigned char address)
+{
+  sja_write_address(address);
+  sja_cs_low;
+  sja_wr_low;
+  sja_bus_write(data);
+  _delay_us(1);
+  sja_wr_high;
+  sja_cs_high;
+  _delay_us(1);
+}
+
+unsigned char can_read_reg(unsigned char address)
+{ 
+  return sja_read_register(address);
+}
+
+void can_write_reg(unsigned char data,unsigned char address)
+{
+  sja_write_register(data,address);
+}
+
+void can_enable_irq()
+{
+  sja_enable_irq;
+}
+
+void can_disable_irq()
+{
+  sja_disable_irq;
+}
 
 

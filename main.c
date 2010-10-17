@@ -8,23 +8,38 @@
 
 #include <avr/io.h>
 #include <avr/interrupt.h>
+#include "display.h"
 #include "lcd.h"
-#include "avr_sja1000.h"
 
+#define _AVR_SJA1000_H
+#define _AVR_MAIN_H
+#define _SJA_CONTROL_H
+
+#include "avr_sja1000.h"
+#include "avr_main.h"
+
+struct canchip_t chip;
 
 /*
  *  MAIN
  */
 int main(void)
 {
+  sei();      // globalni povoleni preruseni
+  
   lcd_init(LCD_DISP_ON);
   
-  sei();			// globalni povoleni preruseni
+  lcd_puts_line(0,"CAN senzor");
   
-  lcd_puts_line(0,"CAN senzor");    
+  chip.baudrate = 1000000;
+  chip.clock = 16000000;
+  chip.sja_cdr_reg = 0;
+  chip.sja_ocr_reg = 0;
+  
+  sja1000_chip_config(&chip);
   
   while(1) {
-  ;
+    
   }
   
   return 0;

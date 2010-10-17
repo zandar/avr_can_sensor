@@ -1,5 +1,5 @@
 /* sja1000.h -> avr_sja1000.h
- * Library forLinux CAN-bus device driver -> AVR CAN-bus driver.
+ * Library for Linux CAN-bus device driver -> AVR CAN-bus driver.
  * Written by Arnaud Westenberg email:arnaud@wanadoo.nl
  * Rewritten for new CAN queues by Pavel Pisa - OCERA team member
  * email:pisa@cmp.felk.cvut.cz
@@ -8,6 +8,7 @@
  * This software is released under the GPL-License.
  * Version lincan-0.3  17 Jun 2004 -> avrCAN-0.1 16/10/2010
  */
+
 
 /* BasicCAN mode address map */
 #define SJACR     0x00  /* Control register */
@@ -43,13 +44,17 @@
 #define SJARXDAT6 0x1c
 #define SJARXDAT7 0x1d  /* Last data byte */
 
+/* Flags for baud_rate function */
+#define BTR1_SAM (1<<1)
 
-int sja1000_enable_configuration(struct canchip_t *chip);
-// int sja1000_disable_configuration(struct canchip_t *chip);
-// int sja1000_chip_config(struct canchip_t *chip);
-// int sja1000_standard_mask(struct canchip_t *chip, unsigned short code, unsigned short mask);
-// int sja1000_baud_rate(struct canchip_t *chip, int rate, int clock, int sjw, 
-//             int sampl_pt, int flags);
+
+char sja1000_enable_configuration();
+char sja1000_disable_configuration();
+char sja1000_chip_config(struct canchip_t *chip);
+char sja1000_standard_mask(unsigned short code, unsigned short mask);
+char sja1000_baud_rate(unsigned long rate, unsigned long clock, unsigned char sjw, 
+            unsigned char sampl_pt, unsigned char flags);
+
 // int sja1000_pre_read_config(struct canchip_t *chip, struct msgobj_t *obj);
 // int sja1000_pre_write_config(struct canchip_t *chip, struct msgobj_t *obj, 
 //               struct canmsg_t *msg);
@@ -62,6 +67,7 @@ int sja1000_enable_configuration(struct canchip_t *chip);
 // int sja1000_stop_chip(struct canchip_t *chip);
 // int sja1000_irq_handler(int irq, struct canchip_t *chip);
 // int sja1000_fill_chipspecops(struct canchip_t *chip);
+
 
 /* Command register */
 enum sja1000_BASIC_CMR {
@@ -140,4 +146,9 @@ enum sja1000_OCR {
 enum sja1000_BASIC_ID0 {
   sjaID0_RTR = 1 << 4,  // Remote request
   sjaID0_DLC_M = (1 << 4)-1 // Length Mask
+};
+
+enum timing_BTR1 {
+  MAX_TSEG1 = 15,
+  MAX_TSEG2 = 7
 };

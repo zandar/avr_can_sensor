@@ -16,7 +16,7 @@ override LDFLAGS= -Wl,-Map,$(APP).map
 
 PROJ=AVR_CAN_proj
 
-SRCS= main.c lcd.c sja_control.c timer.c
+SRCS= main.c lcd.c display.c sja_control.c avr_sja1000.c
 OBJS:=$(SRCS:.c=.o)
 
 

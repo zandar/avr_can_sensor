@@ -10,188 +10,181 @@
  * Version avrCAN-0.1  16/10/2010
  */
 
-#include "avr_sja1000.h"
-#include "sja_control.h"
+#include "display.h"
 #include <util/delay.h>
+
+#ifndef _AVR_SJA1000_H
+#define _AVR_SJA1000_H
+#include "avr_sja1000.h"
+#endif
+
+#ifndef _AVR_MAIN_H
+#define _AVR_MAIN_H
+#include "avr_main.h"
+#endif
+
+#ifndef _SJA_CONTROL_H
+#define _SJA_CONTROL_H
+#include "sja_control.h"
+#endif
 
 // #include "../include/can.h"
 // #include "../include/can_sysdep.h"
-#include "avr_main.h"
 // #include "../include/sja1000.h"
 
-void sja1000_irq_read_handler(struct canchip_t *chip, struct msgobj_t *obj);
-void sja1000_irq_write_handler(struct canchip_t *chip, struct msgobj_t *obj);
+// void sja1000_irq_read_handler(struct canchip_t *chip, struct msgobj_t *obj);
+// void sja1000_irq_write_handler(struct canchip_t *chip, struct msgobj_t *obj);
 
-int sja1000_enable_configuration(struct canchip_t *chip)
+char sja1000_enable_configuration()
 {
   unsigned char i = 0;
-  char flags;
+  unsigned char flags;
 
-  can_disable_irq();  // zakaze preruseni procesoru od sja
+  can_disable_irq();  /* disable AVR interrupt from SJA */
 
-  flags = can_read_reg(SJACR); // cteni control registru 
+  flags = can_read_reg(SJACR); /* read control register */
 
-  while ((!(flags & sjaCR_RR)) && (i<=10)) {  // pokud cteni registru neprojde pokus se jeste 10x
-    can_write_reg(chip,flags|sjaCR_RR,SJACR);
+  while ((!(flags & sjaCR_RR)) && (i <= 10)) {  /* If SJA is not in reset mode, write reset,max 10x times */
+    can_write_reg(flags|sjaCR_RR,SJACR);
     _delay_us(100);
     i++;
-    flags = can_read_reg(chip,SJACR);
+    flags = can_read_reg(SJACR);
   }
-  if (i>=10) {  // pokud neproslo vypis hlasku
-    CANMSG("Reset error\n");
-    can_enable_irq(chip->chip_irq); // povol preruseni procesoru od sja
-    return -ENODEV;
+  if (i >= 10) {  /* If reset did not succeed, print message */
+    CANMSG("Reset error");
+    can_enable_irq(); /* enable AVR interrupt */
+    return -1;
   }
+  return 0;
+}
+
+char sja1000_disable_configuration()
+{
+  unsigned char i = 0;
+  unsigned char flags;
+
+  flags = can_read_reg(SJACR);
+
+  while ((flags & sjaCR_RR) && (i <= 10)) {
+    can_write_reg(flags & (sjaCR_RIE|sjaCR_TIE|sjaCR_EIE|sjaCR_OIE),SJACR);
+    _delay_us(100);
+    i++;
+    flags = can_read_reg(SJACR);
+  }
+  if (i >= 10) {
+    CANMSG("Err. exit reset.");
+    return -1;
+  }
+  can_enable_irq();
+  return 0;
+}
+
+char sja1000_chip_config(struct canchip_t *chip)
+{
+  if (sja1000_enable_configuration())
+    return -1;
+
+  /* Set mode, clock out, comparator */
+  can_write_reg(chip->sja_cdr_reg,SJACDR); 
+  /* Set driver output configuration */
+  can_write_reg(chip->sja_ocr_reg,SJAOCR); 
+
+  if (sja1000_standard_mask(0x0000, 0xffff))
+    return -1;
+  
+  if (!chip->baudrate)
+    chip->baudrate=1000000;
+  if (sja1000_baud_rate(chip->baudrate,chip->clock,0,75,0))
+    return -1;
+
+  /* Enable hardware interrupts */
+  can_write_reg((sjaCR_RIE|sjaCR_TIE|sjaCR_EIE|sjaCR_OIE),SJACR); 
+
+  sja1000_disable_configuration();
+  
+  return 0;
+}
+
+char sja1000_standard_mask(unsigned short code, unsigned short mask)
+{
+  unsigned char write_code, write_mask;
+
+  if (sja1000_enable_configuration())
+    return -1;
+
+  /* The acceptance code bits (SJAACR bits 0-7) and the eight most 
+   * significant bits of the message identifier (id.10 to id.3) must be
+   * equal to those bit positions which are marked relevant by the 
+   * acceptance mask bits (SJAAMR bits 0-7).
+   * (id.10 to id.3) = (SJAACR.7 to SJAACR.0) v (SJAAMR.7 to SJAAMR.0)
+   * (Taken from Philips sja1000 Data Sheet)
+   */
+  write_code = (unsigned char) code >> 3;
+  write_mask = (unsigned char) mask >> 3;
+  
+  can_write_reg(write_code,SJAACR);
+  can_write_reg(write_mask,SJAAMR);
+
+  sja1000_disable_configuration();
 
   return 0;
 }
 
-// int sja1000_disable_configuration(struct canchip_t *chip)
-// {
-//   int i=0;
-//   unsigned flags;
-// 
-//   flags=can_read_reg(chip,SJACR);
-// 
-//   while ( (flags & sjaCR_RR) && (i<=10) ) {
-//     can_write_reg(chip,flags & (sjaCR_RIE|sjaCR_TIE|sjaCR_EIE|sjaCR_OIE),SJACR);
-//     udelay(100);
-//     i++;
-//     flags=can_read_reg(chip,SJACR);
-//   }
-//   if (i>=10) {
-//     CANMSG("Error leaving reset status\n");
-//     return -ENODEV;
-//   }
-// 
-//   can_enable_irq(chip->chip_irq);
-// 
-//   return 0;
-// }
-// 
-// int sja1000_chip_config(struct canchip_t *chip)
-// {
-//   if (sja1000_enable_configuration(chip))
-//     return -ENODEV;
-// 
-//   /* Set mode, clock out, comparator */
-//   can_write_reg(chip,chip->sja_cdr_reg,SJACDR); 
-//   /* Set driver output configuration */
-//   can_write_reg(chip,chip->sja_ocr_reg,SJAOCR); 
-// 
-//   if (sja1000_standard_mask(chip,0x0000, 0xffff))
-//     return -ENODEV;
-//   
-//   if (!chip->baudrate)
-//     chip->baudrate=1000000;
-//   if (sja1000_baud_rate(chip,chip->baudrate,chip->clock,0,75,0))
-//     return -ENODEV;
-// 
-//   /* Enable hardware interrupts */
-//   can_write_reg(chip,(sjaCR_RIE|sjaCR_TIE|sjaCR_EIE|sjaCR_OIE),SJACR); 
-// 
-//   sja1000_disable_configuration(chip);
-//   
-//   return 0;
-// }
-// 
-// int sja1000_standard_mask(struct canchip_t *chip, unsigned short code, unsigned short mask)
-// {
-//   unsigned char write_code, write_mask;
-// 
-//   if (sja1000_enable_configuration(chip))
-//     return -ENODEV;
-// 
-//   /* The acceptance code bits (SJAACR bits 0-7) and the eight most 
-//    * significant bits of the message identifier (id.10 to id.3) must be
-//    * equal to those bit positions which are marked relevant by the 
-//    * acceptance mask bits (SJAAMR bits 0-7).
-//    * (id.10 to id.3) = (SJAACR.7 to SJAACR.0) v (SJAAMR.7 to SJAAMR.0)
-//    * (Taken from Philips sja1000 Data Sheet)
-//    */
-//   write_code = (unsigned char) code >> 3;
-//   write_mask = (unsigned char) mask >> 3;
-//   
-//   can_write_reg(chip,write_code,SJAACR);
-//   can_write_reg(chip,write_mask,SJAAMR);
-// 
-//   DEBUGMSG("Setting acceptance code to 0x%lx\n",(unsigned long)code);
-//   DEBUGMSG("Setting acceptance mask to 0x%lx\n",(unsigned long)mask);
-// 
-//   sja1000_disable_configuration(chip);
-// 
-//   return 0;
-// }
-// 
-// /* Set communication parameters.
-//  * param rate baud rate in Hz
-//  * param clock frequency of sja1000 clock in Hz (ISA osc is 14318000)
-//  * param sjw synchronization jump width (0-3) prescaled clock cycles
-//  * param sampl_pt sample point in % (0-100) sets (TSEG1+2)/(TSEG1+TSEG2+3) ratio
-//  * param flags fields BTR1_SAM, OCMODE, OCPOL, OCTP, OCTN, CLK_OFF, CBP
-//  */
-// int sja1000_baud_rate(struct canchip_t *chip, int rate, int clock, int sjw,
-//               int sampl_pt, int flags)
-// {
-//   int best_error = 1000000000, error;
-//   int best_tseg=0, best_brp=0, best_rate=0, brp=0;
-//   int tseg=0, tseg1=0, tseg2=0;
-//   
-//   if (sja1000_enable_configuration(chip))
-//     return -ENODEV;
-// 
-//   clock /=2;
-// 
-//   /* tseg even = round down, odd = round up */
-//   for (tseg=(0+0+2)*2; tseg<=(MAX_TSEG2+MAX_TSEG1+2)*2+1; tseg++) {
-//     brp = clock/((1+tseg/2)*rate)+tseg%2;
-//     if (brp == 0 || brp > 64)
-//       continue;
-//     error = rate - clock/(brp*(1+tseg/2));
-//     if (error < 0)
-//       error = -error;
-//     if (error <= best_error) {
-//       best_error = error;
-//       best_tseg = tseg/2;
-//       best_brp = brp-1;
-//       best_rate = clock/(brp*(1+tseg/2));
-//     }
-//   }
-//   if (best_error && (rate/best_error < 10)) {
-//     CANMSG("baud rate %d is not possible with %d Hz clock\n",
-//                 rate, 2*clock);
-//     CANMSG("%d bps. brp=%d, best_tseg=%d, tseg1=%d, tseg2=%d\n",
-//         best_rate, best_brp, best_tseg, tseg1, tseg2);
-//     return -EINVAL;
-//   }
-//   tseg2 = best_tseg-(sampl_pt*(best_tseg+1))/100;
-//   if (tseg2 < 0)
-//     tseg2 = 0;
-//   if (tseg2 > MAX_TSEG2)
-//     tseg2 = MAX_TSEG2;
-//   tseg1 = best_tseg-tseg2-2;
-//   if (tseg1 > MAX_TSEG1) {
-//     tseg1 = MAX_TSEG1;
-//     tseg2 = best_tseg-tseg1-2;
-//   }
-// 
-//   DEBUGMSG("Setting %d bps.\n", best_rate);
-//   DEBUGMSG("brp=%d, best_tseg=%d, tseg1=%d, tseg2=%d, sampl_pt=%d\n",
-//           best_brp, best_tseg, tseg1, tseg2,
-//           (100*(best_tseg-tseg2)/(best_tseg+1)));
-// 
-// 
-//   can_write_reg(chip, sjw<<6 | best_brp, SJABTR0);
-//   can_write_reg(chip, ((flags & BTR1_SAM) != 0)<<7 | tseg2<<4 | tseg1,
-//                 SJABTR1);
-// //  can_write_reg(chip, sjaOCR_MODE_NORMAL | sjaOCR_TX0_LH | sjaOCR_TX1_ZZ, SJAOCR);
-//   /* BASIC mode, bypass input comparator */
-// //  can_write_reg(chip, sjaCDR_CBP| /* sjaCDR_CLK_OFF | */ 7, SJACDR);
-// 
-//   sja1000_disable_configuration(chip);
-// 
-//   return 0;
-// }
+/* Set communication parameters.
+ * param rate baud rate in Hz
+ * param clock frequency of sja1000 clock in Hz (ISA osc is 14318000)
+ * param sjw synchronization jump width (0-3) prescaled clock cycles
+ * param sampl_pt sample point in % (0-100) sets (TSEG1+2)/(TSEG1+TSEG2+3) ratio
+ * param flags fields BTR1_SAM, OCMODE, OCPOL, OCTP, OCTN, CLK_OFF, CBP
+ */
+char sja1000_baud_rate(unsigned long rate, unsigned long clock, unsigned char sjw,
+              unsigned char sampl_pt, unsigned char flags)
+{
+  unsigned long best_error = 1000000000, error;
+  unsigned long best_tseg=0, best_brp=0, best_rate=0, brp=0;
+  unsigned long tseg=0, tseg1=0, tseg2=0;
+  
+  if (sja1000_enable_configuration())
+    return -1;
+
+  clock /=2;
+
+  /* tseg even = round down, odd = round up */
+  for (tseg=(0+0+2)*2; tseg<=(MAX_TSEG2+MAX_TSEG1+2)*2+1; tseg++) {
+    brp = clock/((1+tseg/2)*rate)+tseg%2;
+    if (brp == 0 || brp > 64)
+      continue;
+    error = rate - clock/(brp*(1+tseg/2));
+    if (error < 0)
+      error = -error;
+    if (error <= best_error) {
+      best_error = error;
+      best_tseg = tseg/2;
+      best_brp = brp-1;
+      best_rate = clock/(brp*(1+tseg/2));
+    }
+  }
+  if (best_error && (rate/best_error < 10)) {
+    return -1;
+  }
+  tseg2 = best_tseg-(sampl_pt*(best_tseg+1))/100;
+  if (tseg2 < 0)
+    tseg2 = 0;
+  if (tseg2 > MAX_TSEG2)
+    tseg2 = MAX_TSEG2;
+  tseg1 = best_tseg-tseg2-2;
+  if (tseg1 > MAX_TSEG1) {
+    tseg1 = MAX_TSEG1;
+    tseg2 = best_tseg-tseg1-2;
+  }
+
+  can_write_reg(sjw<<6 | best_brp, SJABTR0);
+  can_write_reg(((flags & BTR1_SAM) != 0)<<7 | tseg2<<4 | tseg1, SJABTR1);
+
+  sja1000_disable_configuration();
+
+  return 0;
+}
 // 
 // int sja1000_pre_read_config(struct canchip_t *chip, struct msgobj_t *obj)
 // {

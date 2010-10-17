@@ -169,13 +169,6 @@
 
 #define LCD_MODE_DEFAULT     ((1<<LCD_ENTRY_MODE) | (1<<LCD_ENTRY_INC) )
 
-
-/** 
- *  Moje funkce
- */
-
-void lcd_puts_line(unsigned char,const char *);
-void lcd_clear_line(unsigned char);
 /** 
  *  @name Functions
  */

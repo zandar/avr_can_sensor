@@ -83,31 +83,9 @@
 static void toggle_e(void);
 #endif
 
-
-/**
-  Moje funkce
-*/
-
-static char *CLEAR = "                ";
-
-void lcd_puts_line(unsigned char line,const char *s)
-{
-    lcd_clear_line(line);
-    lcd_gotoxy(0,line);
-    lcd_puts(s);
-}
-
-void lcd_clear_line(unsigned char line)
-{
-  lcd_gotoxy(0,line);
-  lcd_puts(CLEAR);
-}
-
 /*
 ** local functions
 */
-
-
 
 /*************************************************************************
  delay loop for small accurate delays: 16-bit counter, 4 cycles/loop
