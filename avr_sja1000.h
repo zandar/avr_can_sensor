@@ -9,6 +9,8 @@
  * Version lincan-0.3  17 Jun 2004 -> avrCAN-0.1 16/10/2010
  */
 
+#ifndef AVR_SJA1000_H
+#define AVR_SJA1000_H
 
 /* BasicCAN mode address map */
 #define SJACR     0x00  /* Control register */
@@ -47,6 +49,7 @@
 /* Flags for baud_rate function */
 #define BTR1_SAM (1<<1)
 
+#include "avr_main.h"
 
 char sja1000_enable_configuration();
 char sja1000_disable_configuration();
@@ -152,3 +155,5 @@ enum timing_BTR1 {
   MAX_TSEG1 = 15,
   MAX_TSEG2 = 7
 };
+
+#endif

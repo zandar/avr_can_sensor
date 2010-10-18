@@ -9,6 +9,9 @@
  * Version avrCAN-0.1  16/10/2010
  */
 
+#ifndef AVR_MAIN_H
+#define AVR_MAIN_H
+
 // #include "./can.h"
 // #include "./constants.h"
 // #include "./can_sysdep.h"
@@ -168,3 +171,5 @@ struct canchip_t {
 // 
 // int can_check_dev_taken(void *anydev);
 // 
+
+#endif

@@ -11,22 +11,11 @@
  */
 
 #include "display.h"
+#include "F_CPU.h"
 #include <util/delay.h>
-
-#ifndef _AVR_SJA1000_H
-#define _AVR_SJA1000_H
 #include "avr_sja1000.h"
-#endif
-
-#ifndef _AVR_MAIN_H
-#define _AVR_MAIN_H
 #include "avr_main.h"
-#endif
-
-#ifndef _SJA_CONTROL_H
-#define _SJA_CONTROL_H
 #include "sja_control.h"
-#endif
 
 // #include "../include/can.h"
 // #include "../include/can_sysdep.h"
@@ -41,7 +30,7 @@ char sja1000_enable_configuration()
   unsigned char flags;
 
   can_disable_irq();  /* disable AVR interrupt from SJA */
-
+  
   flags = can_read_reg(SJACR); /* read control register */
 
   while ((!(flags & sjaCR_RR)) && (i <= 10)) {  /* If SJA is not in reset mode, write reset,max 10x times */
@@ -49,12 +38,17 @@ char sja1000_enable_configuration()
     _delay_us(100);
     i++;
     flags = can_read_reg(SJACR);
+#ifdef DEBUG    
+    debug(flags);
+#endif
   }
   if (i >= 10) {  /* If reset did not succeed, print message */
     CANMSG("Reset error");
     can_enable_irq(); /* enable AVR interrupt */
     return -1;
   }
+  
+  CANMSG("Reset OK");
   return 0;
 }
 
@@ -76,6 +70,7 @@ char sja1000_disable_configuration()
     return -1;
   }
   can_enable_irq();
+  CANMSG("Exit rst. OK");
   return 0;
 }
 
@@ -101,7 +96,7 @@ char sja1000_chip_config(struct canchip_t *chip)
   can_write_reg((sjaCR_RIE|sjaCR_TIE|sjaCR_EIE|sjaCR_OIE),SJACR); 
 
   sja1000_disable_configuration();
-  
+  CANMSG("Config OK");
   return 0;
 }
 
@@ -126,7 +121,7 @@ char sja1000_standard_mask(unsigned short code, unsigned short mask)
   can_write_reg(write_mask,SJAAMR);
 
   sja1000_disable_configuration();
-
+  CANMSG("Std. mask OK");
   return 0;
 }
 
@@ -165,6 +160,7 @@ char sja1000_baud_rate(unsigned long rate, unsigned long clock, unsigned char sj
     }
   }
   if (best_error && (rate/best_error < 10)) {
+    CANMSG("Baud rate err.");
     return -1;
   }
   tseg2 = best_tseg-(sampl_pt*(best_tseg+1))/100;
@@ -182,7 +178,7 @@ char sja1000_baud_rate(unsigned long rate, unsigned long clock, unsigned char sj
   can_write_reg(((flags & BTR1_SAM) != 0)<<7 | tseg2<<4 | tseg1, SJABTR1);
 
   sja1000_disable_configuration();
-
+  CANMSG("Baud rate OK");
   return 0;
 }
 // 
