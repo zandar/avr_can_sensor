@@ -68,7 +68,7 @@ static unsigned char sja_read_register(unsigned char address)
   sja_write_address(address);
   sja_cs_low;
   sja_rd_low;
-  sja_bus_read;
+  sja_bus_in;
   _delay_us(1);
   data = SJA_BUS_DATA;
   sja_rd_high;

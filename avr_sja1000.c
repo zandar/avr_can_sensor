@@ -38,16 +38,12 @@ char sja1000_enable_configuration()
     _delay_us(100);
     i++;
     flags = can_read_reg(SJACR);
-#ifdef DEBUG    
-    debug(flags);
-#endif
   }
   if (i >= 10) {  /* If reset did not succeed, print message */
     CANMSG("Reset error");
     can_enable_irq(); /* enable AVR interrupt */
     return -1;
   }
-  
   CANMSG("Reset OK");
   return 0;
 }

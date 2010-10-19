@@ -14,8 +14,6 @@
 #include "avr_main.h"
 #include "sja_control.h"
 
-#define DEBUG
-
 struct canchip_t chip;
 
 
@@ -38,6 +36,7 @@ int main(void)
   chip.sja_ocr_reg = SJA_OCR_REG;
   
   sja1000_chip_config(&chip);
+  //debug(can_read_reg(0x01));
   
   while(1) {
     
