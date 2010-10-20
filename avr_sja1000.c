@@ -16,6 +16,7 @@
 #include "avr_sja1000.h"
 #include "avr_main.h"
 #include "sja_control.h"
+#include "avr_canmsg.h"
 
 // #include "../include/can.h"
 // #include "../include/can_sysdep.h"
@@ -39,12 +40,12 @@ char sja1000_enable_configuration()
     i++;
     flags = can_read_reg(SJACR);
   }
+  
   if (i >= 10) {  /* If reset did not succeed, print message */
     CANMSG("Reset error");
     can_enable_irq(); /* enable AVR interrupt */
     return -1;
   }
-  CANMSG("Reset OK");
   return 0;
 }
 
@@ -61,12 +62,13 @@ char sja1000_disable_configuration()
     i++;
     flags = can_read_reg(SJACR);
   }
+  
   if (i >= 10) {
     CANMSG("Err. exit reset.");
     return -1;
   }
+  
   can_enable_irq();
-  CANMSG("Exit rst. OK");
   return 0;
 }
 
@@ -85,6 +87,7 @@ char sja1000_chip_config(struct canchip_t *chip)
   
   if (!chip->baudrate)
     chip->baudrate=1000000;
+  
   if (sja1000_baud_rate(chip->baudrate,chip->clock,0,75,0))
     return -1;
 
@@ -117,7 +120,6 @@ char sja1000_standard_mask(unsigned short code, unsigned short mask)
   can_write_reg(write_mask,SJAAMR);
 
   sja1000_disable_configuration();
-  CANMSG("Std. mask OK");
   return 0;
 }
 
@@ -143,11 +145,14 @@ char sja1000_baud_rate(unsigned long rate, unsigned long clock, unsigned char sj
   /* tseg even = round down, odd = round up */
   for (tseg=(0+0+2)*2; tseg<=(MAX_TSEG2+MAX_TSEG1+2)*2+1; tseg++) {
     brp = clock/((1+tseg/2)*rate)+tseg%2;
+   
     if (brp == 0 || brp > 64)
       continue;
     error = rate - clock/(brp*(1+tseg/2));
+    
     if (error < 0)
       error = -error;
+    
     if (error <= best_error) {
       best_error = error;
       best_tseg = tseg/2;
@@ -160,11 +165,15 @@ char sja1000_baud_rate(unsigned long rate, unsigned long clock, unsigned char sj
     return -1;
   }
   tseg2 = best_tseg-(sampl_pt*(best_tseg+1))/100;
+  
   if (tseg2 < 0)
     tseg2 = 0;
+  
   if (tseg2 > MAX_TSEG2)
     tseg2 = MAX_TSEG2;
+  
   tseg1 = best_tseg-tseg2-2;
+  
   if (tseg1 > MAX_TSEG1) {
     tseg1 = MAX_TSEG1;
     tseg2 = best_tseg-tseg1-2;
@@ -174,26 +183,23 @@ char sja1000_baud_rate(unsigned long rate, unsigned long clock, unsigned char sj
   can_write_reg(((flags & BTR1_SAM) != 0)<<7 | tseg2<<4 | tseg1, SJABTR1);
 
   sja1000_disable_configuration();
-  CANMSG("Baud rate OK");
   return 0;
 }
-// 
+
 // int sja1000_pre_read_config(struct canchip_t *chip, struct msgobj_t *obj)
 // {
-//   int i;
+//   unsigned char i;
 //   
-//   i=can_read_reg(chip,SJASR);
+//   i = can_read_reg(SJASR);
 //   
-//   if (!(i&sjaSR_RBS)) {
-// //Temp
-//     for (i=0; i<0x20; i++)
-//       CANMSG("0x%x is 0x%x\n",i,can_read_reg(chip,i));
-//       return 0;
+//   if (!(i & sjaSR_RBS)) {
+//     CANMSG("RBS empty");
+//     return 0;
 //   }
 //   sja1000_start_chip(chip);
 // 
-//     // disable interrupts for a moment
-//   can_write_reg(chip, 0, SJACR); 
+//   /* disable interrupts for a moment */
+//   can_write_reg(0,SJACR); 
 // 
 //   sja1000_irq_read_handler(chip, obj);
 // 
@@ -204,64 +210,66 @@ char sja1000_baud_rate(unsigned long rate, unsigned long clock, unsigned char sj
 //   return 1;
 // }
 // 
-// #define MAX_TRANSMIT_WAIT_LOOPS 10
-// 
-// int sja1000_pre_write_config(struct canchip_t *chip, struct msgobj_t *obj, 
-//               struct canmsg_t *msg)
-// {
-//   int i=0, id=0;
-//   int len;
-// 
-//   sja1000_start_chip(chip); //sja1000 goes automatically into reset mode on errors
-// 
-//   /* Wait until Transmit Buffer Status is released */
-//   while ( !(can_read_reg(chip, SJASR) & sjaSR_TBS) && 
-//             i++<MAX_TRANSMIT_WAIT_LOOPS) {
-//     udelay(i);
-//   }
-//   
-//   if (!(can_read_reg(chip, SJASR) & sjaSR_TBS)) {
-//     CANMSG("Transmit timed out, cancelling\n");
-//     can_write_reg(chip, sjaCMR_AT, SJACMR);
-//     i=0;
-//     while ( !(can_read_reg(chip, SJASR) & sjaSR_TBS) &&
-//         i++<MAX_TRANSMIT_WAIT_LOOPS) {
-//       udelay(i);
-//     }
-//     if (!(can_read_reg(chip, SJASR) & sjaSR_TBS)) {
-//       CANMSG("Could not cancel, please reset\n");
-//       return -EIO;
-//     }
-//   }
-// 
-//   len = msg->length;
-//   if(len > CAN_MSG_LENGTH) len = CAN_MSG_LENGTH;
-//   id = (msg->id<<5) | ((msg->flags&MSG_RTR)?sjaID0_RTR:0) | len;
-// 
-//   can_write_reg(chip, id>>8, SJATXID1);
-//   can_write_reg(chip, id & 0xff , SJATXID0);
-// 
-//   for (i=0; i<len; i++)
-//     can_write_reg(chip, msg->data[i], SJATXDAT0+i);
-// 
-//   return 0;
-// }
-// 
-// int sja1000_send_msg(struct canchip_t *chip, struct msgobj_t *obj, 
-//               struct canmsg_t *msg)
-// {
-//   can_write_reg(chip, sjaCMR_TR, SJACMR);
-// 
-//   return 0;
-// }
-// 
-// int sja1000_check_tx_stat(struct canchip_t *chip)
-// {
-//   if (can_read_reg(chip,SJASR) & sjaSR_TCS)
-//     return 0;
-//   else
-//     return 1;
-// }
+#define MAX_TRANSMIT_WAIT_LOOPS 10
+
+char sja1000_pre_write_config(struct canmsg_t *msg)
+{
+  unsigned char i = 0, id = 0;
+  unsigned char len;
+
+  sja1000_start_chip(); //sja1000 goes automatically into reset mode on errors
+
+  /* Wait until Transmit Buffer Status is released */
+  while ( !(can_read_reg(SJASR) & sjaSR_TBS) && i++<MAX_TRANSMIT_WAIT_LOOPS) {
+    _delay_us(10);
+  }
+  
+  if (!(can_read_reg(SJASR) & sjaSR_TBS)) {
+    CANMSG("Tx time-out");
+    can_write_reg(sjaCMR_AT, SJACMR);
+    i = 0;
+    
+    while ( !(can_read_reg(SJASR) & sjaSR_TBS) &&
+        i++<MAX_TRANSMIT_WAIT_LOOPS) {
+      _delay_us(10);
+    }
+    
+    if (!(can_read_reg(SJASR) & sjaSR_TBS)) {
+      CANMSG("Please reset!");
+      return -1;
+    }
+  }
+
+  len = msg->length;
+  
+  if(len > CAN_MSG_LENGTH)
+    len = CAN_MSG_LENGTH;
+  
+  id = (msg->id<<5) | ((msg->flags&MSG_RTR) ? sjaID0_RTR:0) | len;
+
+  can_write_reg(id>>8, SJATXID1);
+  can_write_reg(id & 0xff , SJATXID0);
+
+  for (i = 0; i < len; i++)
+    can_write_reg(msg->data[i], SJATXDAT0+i);
+
+  return 0;
+}
+
+char sja1000_send_msg()
+{
+  can_write_reg(sjaCMR_TR, SJACMR);
+
+  return 0;
+}
+
+char sja1000_check_tx_stat()
+{
+  if (can_read_reg(SJASR) & sjaSR_TCS)
+    return 0;
+  else
+    return 1;
+}
 // 
 // int sja1000_set_btregs(struct canchip_t *chip, unsigned short btr0, 
 //               unsigned short btr1)
@@ -277,30 +285,26 @@ char sja1000_baud_rate(unsigned long rate, unsigned long clock, unsigned char sj
 //   return 0;
 // }
 // 
-// int sja1000_start_chip(struct canchip_t *chip)
-// {
-//   unsigned short flags = 0;
-// 
-//   flags = can_read_reg(chip, SJACR) & (sjaCR_RIE|sjaCR_TIE|sjaCR_EIE|sjaCR_OIE);
-//   can_write_reg(chip, flags, SJACR);
-// 
-//   return 0;
-// }
-// 
-// int sja1000_stop_chip(struct canchip_t *chip)
-// {
-//   unsigned short flags = 0;
-// 
-//   flags = can_read_reg(chip, SJACR) & (sjaCR_RIE|sjaCR_TIE|sjaCR_EIE|sjaCR_OIE);
-//   can_write_reg(chip, flags|sjaCR_RR, SJACR);
-// 
-//   return 0;
-// }
-// 
-// int sja1000_attach_to_chip(struct canchip_t *chip)
-// {
-//   return 0;
-// }
+char sja1000_start_chip()
+{
+  unsigned char flags = 0;
+
+  flags = can_read_reg(SJACR) & (sjaCR_RIE|sjaCR_TIE|sjaCR_EIE|sjaCR_OIE);
+  can_write_reg(flags, SJACR);
+
+  return 0;
+}
+
+char sja1000_stop_chip()
+{
+  unsigned char flags = 0;
+
+  flags = can_read_reg(SJACR) & (sjaCR_RIE|sjaCR_TIE|sjaCR_EIE|sjaCR_OIE);
+  can_write_reg(flags|sjaCR_RR, SJACR);
+
+  return 0;
+}
+
 // 
 // int sja1000_release_chip(struct canchip_t *chip)
 // {
@@ -310,30 +314,9 @@ char sja1000_baud_rate(unsigned long rate, unsigned long clock, unsigned char sj
 //   return 0;
 // }
 // 
-// int sja1000_remote_request(struct canchip_t *chip, struct msgobj_t *obj)
-// {
-//   CANMSG("sja1000_remote_request not implemented\n");
-//   return -ENOSYS;
-// }
-// 
-// int sja1000_extended_mask(struct canchip_t *chip, unsigned long code,
-//     unsigned long mask)
-// {
-//   CANMSG("sja1000_extended_mask not implemented\n");
-//   return -ENOSYS;
-// }
-// 
-// int sja1000_clear_objects(struct canchip_t *chip)
-// {
-//   CANMSG("sja1000_clear_objects not implemented\n");
-//   return -ENOSYS;
-// }
-// 
-// int sja1000_config_irqs(struct canchip_t *chip, short irqs)
-// {
-//   CANMSG("sja1000_config_irqs not implemented\n");
-//   return -ENOSYS;
-// }
+
+
+
 // 
 // 
 // int sja1000_irq_handler(int irq, struct canchip_t *chip)
@@ -480,39 +463,3 @@ char sja1000_baud_rate(unsigned long rate, unsigned long clock, unsigned char sj
 //   can_preempt_enable();
 //   return 0;
 // }
-// 
-// int sja1000_register(struct chipspecops_t *chipspecops)
-// {
-//   chipspecops->chip_config = sja1000_chip_config;
-//   chipspecops->baud_rate = sja1000_baud_rate;
-//   chipspecops->standard_mask = sja1000_standard_mask;
-//   chipspecops->extended_mask = sja1000_extended_mask;
-//   chipspecops->message15_mask = sja1000_extended_mask;
-//   chipspecops->clear_objects = sja1000_clear_objects;
-//   chipspecops->config_irqs = sja1000_config_irqs;
-//   chipspecops->pre_read_config = sja1000_pre_read_config;
-//   chipspecops->pre_write_config = sja1000_pre_write_config;
-//   chipspecops->send_msg = sja1000_send_msg;
-//   chipspecops->check_tx_stat = sja1000_check_tx_stat;
-//   chipspecops->wakeup_tx=sja1000_wakeup_tx;
-//   chipspecops->remote_request = sja1000_remote_request;
-//   chipspecops->enable_configuration = sja1000_enable_configuration;
-//   chipspecops->disable_configuration = sja1000_disable_configuration;
-//   chipspecops->set_btregs = sja1000_set_btregs;
-//   chipspecops->attach_to_chip=sja1000_attach_to_chip;
-//   chipspecops->release_chip=sja1000_release_chip;
-//   chipspecops->start_chip = sja1000_start_chip;
-//   chipspecops->stop_chip = sja1000_stop_chip;
-//   chipspecops->irq_handler = sja1000_irq_handler;
-//   chipspecops->irq_handler = NULL;
-//   return 0;
-// }
-// 
-// int sja1000_fill_chipspecops(struct canchip_t *chip)
-// {
-//   chip->chip_type="sja1000";
-//   chip->max_objects=1;
-//   sja1000_register(chip->chipspecops);
-//   return 0;
-// }
-// 

@@ -26,9 +26,12 @@
 #define SJA_INT_BIT 5   /* Bit in AVR GICR register for interrupt control */
 
 #define SJA_CLOCK   16000000  /* SJA clock frequency in Hz */
-#define SJA_BAUD    1000000  /* SJA required baudrate */
+#define SJA_BAUD    1000000  /* SJA required baudrate in Hz*/
 #define SJA_CDR_REG 0
 #define SJA_OCR_REG 0
+
+#define canobj_write_reg can_write_reg
+#define canobj_read_reg can_read_reg
 
 unsigned char can_read_reg(unsigned char address);
 void can_write_reg(unsigned char data, unsigned char address);

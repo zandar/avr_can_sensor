@@ -50,6 +50,7 @@
 #define BTR1_SAM (1<<1)
 
 #include "avr_main.h"
+#include "avr_canmsg.h"
 
 char sja1000_enable_configuration();
 char sja1000_disable_configuration();
@@ -59,16 +60,14 @@ char sja1000_baud_rate(unsigned long rate, unsigned long clock, unsigned char sj
             unsigned char sampl_pt, unsigned char flags);
 
 // int sja1000_pre_read_config(struct canchip_t *chip, struct msgobj_t *obj);
-// int sja1000_pre_write_config(struct canchip_t *chip, struct msgobj_t *obj, 
-//               struct canmsg_t *msg);
-// int sja1000_send_msg(struct canchip_t *chip, struct msgobj_t *obj, 
-//               struct canmsg_t *msg);
-// int sja1000_check_tx_stat(struct canchip_t *chip);
+char sja1000_pre_write_config(struct canmsg_t *msg);
+char sja1000_send_msg();
+char sja1000_check_tx_stat();
 // int sja1000_set_btregs(struct canchip_t *chip, unsigned short btr0, 
 //               unsigned short btr1);
-// int sja1000_start_chip(struct canchip_t *chip);
-// int sja1000_stop_chip(struct canchip_t *chip);
-// int sja1000_irq_handler(int irq, struct canchip_t *chip);
+char sja1000_start_chip();
+char sja1000_stop_chip();
+//char sja1000_irq_handler(int irq, struct canchip_t *chip);
 // int sja1000_fill_chipspecops(struct canchip_t *chip);
 
 
