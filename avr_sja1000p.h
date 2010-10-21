@@ -22,10 +22,8 @@ char sja1000p_baud_rate(unsigned long rate, unsigned long clock,unsigned char sj
 		unsigned char sampl_pt, unsigned char flags);
     
 //int sja1000p_pre_read_config(struct canchip_t *chip, struct msgobj_t *obj);
-//int sja1000p_pre_write_config(struct canchip_t *chip, struct msgobj_t *obj,
-//		struct canmsg_t *msg);
-//int sja1000p_send_msg(struct canchip_t *chip, struct msgobj_t *obj,
-//		struct canmsg_t *msg);
+char sja1000p_pre_write_config(struct canmsg_t *msg);
+char sja1000p_send_msg();
 //int sja1000p_fill_chipspecops(struct canchip_t *chip);
 //int sja1000p_irq_handler(int irq, struct canchip_t *chip);
 

@@ -9,9 +9,6 @@
  * Version lincan-0.3  17 Jun 2004
  */
 
-// #include "../include/can.h"
-// #include "../include/can_sysdep.h"
-// #include "../include/main.h"
 #include "avr_sja1000p.h"
 #include "sja_control.h"
 #include "display.h"
@@ -115,35 +112,25 @@ char sja1000p_chip_config(struct canchip_t *chip)
 
 	/* Set driver output configuration */
 	can_write_reg(chip->sja_ocr_reg,SJAOCR); 
-	
-//   CANMSG("Chip check");
-//     _delay_ms(1000);
-// 	/* Simple check for chip presence */
-// 	for (i=0, n=0x5a; i<8; i++, n+=0xf) {
-// 		can_write_reg(n,SJAACR0+i);
-//     debug(i);
-//     _delay_ms(500);
-// 	}
-// 	CANMSG("Read check");
-//    _delay_ms(1000);
-// 	for (i=0, n=0x5a; i<8; i++, n+=0xf) {
-// 		r = n^can_read_reg(SJAACR0+i);
-//     debug(r);
-//     _delay_ms(500);
-// 		if (r) {
-// 			CANMSG("Config error");
-//       _delay_ms(1000);
-// 			return -1;
-// 		}
-// 	}
+  
+	/* Simple check for chip presence */
+	for (i=0, n=0x5a; i<8; i++, n+=0xf) {
+		can_write_reg(n,SJAACR0+i);
+	}
 
-	if (sja1000p_extended_mask(0x0000000, 0xfffffff)) {
+	for (i=0, n=0x5a; i<8; i++, n+=0xf) {
+		r = n^can_read_reg(SJAACR0+i);
+		if (r) {
 #ifdef DEBUG
-    CANMSG("Mask error");
-    _delay_ms(1000);
+			CANMSG("Config error");
+      _delay_ms(1000);
 #endif
+			return -1;
+		}
+	}
+
+	if (sja1000p_extended_mask(0x0000000, 0xfffffff))
 		return -1;
-  }
 	
 	if (!chip->baudrate)
 		chip->baudrate=1000000;
@@ -155,8 +142,10 @@ char sja1000p_chip_config(struct canchip_t *chip)
 	can_write_reg(sjaENABLE_INTERRUPTS, SJAIER); 
 
 	sja1000p_disable_configuration();
+#ifdef DEBUG  
 	CANMSG("Config OK");
   _delay_ms(1000);
+#endif
 	return 0;
 }
 
@@ -182,23 +171,9 @@ char sja1000p_extended_mask(unsigned long code, unsigned  long mask)
 		can_write_reg(mask&0xff,SJAAMR0+i);
 		code >>= 8;
 		mask >>= 8;
-#ifdef DEBUG
-    CANMSG("Code");
-    _delay_ms(500);
-    debug(code);
-    _delay_ms(500);
-    CANMSG("mask");
-    _delay_ms(500);
-    debug(mask);
-    _delay_ms(500);
-#endif
 	}
 
-	sja1000p_disable_configuration();
-#ifdef DEBUG
-  CANMSG("Mask OK");
-  _delay_ms(1000);
-#endif  
+	sja1000p_disable_configuration();  
 
 	return 0;
 }
@@ -359,8 +334,6 @@ char sja1000p_baud_rate(unsigned long rate, unsigned long clock, unsigned char s
 #define MAX_TRANSMIT_WAIT_LOOPS 10
 /**
  * sja1000p_pre_write_config: - prepares message object for message transmission
- * @chip: pointer to chip state structure
- * @obj: pointer to message object state structure
  * @msg: pointer to CAN message
  *
  * This function prepares selected message object for future initiation
@@ -370,94 +343,104 @@ char sja1000p_baud_rate(unsigned long rate, unsigned long clock, unsigned char s
  * Return Value: negative value reports error.
  * File: src/sja1000p.c
  */
-// int sja1000p_pre_write_config(struct canchip_t *chip, struct msgobj_t *obj, 
-// 							struct canmsg_t *msg)
-// {
-// 	int i=0; 
-// 	unsigned int id;
-// 	int status;
-// 	int len;
-// 
-// 	/* Wait until Transmit Buffer Status is released */
-// 	while ( !((status=can_read_reg(SJASR)) & sjaSR_TBS) && 
-// 						i++<MAX_TRANSMIT_WAIT_LOOPS) {
-// 		_delay_ms(10);
-// 	}
-// 	
-// 	if(status & sjaSR_BS) {
-// 		/* Try to recover from error condition */
-// #ifdef DEBUG
-// 		CANMSG("Bus recover);
-// #endif
-// 		sja1000p_enable_configuration(chip);
-// 		can_write_reg(chip, 0, SJARXERR);
-// 		can_write_reg(chip, 0, SJATXERR1);
-// 		can_read_reg(chip, SJAECC);
-// 		sja1000p_disable_configuration(chip);
-// 	}
-// 	if (!(can_read_reg(chip, SJASR) & sjaSR_TBS)) {
-// 		CANMSG("Transmit timed out, cancelling\n");
-// // here we should check if there is no write/select waiting for this
-// // transmit. If so, set error ret and wake up.
-// // CHECKME: if we do not disable sjaIER_TIE (TX IRQ) here we get interrupt
-// // immediately
-// 		can_write_reg(chip, sjaCMR_AT, SJACMR);
-// 		i=0;
-// 		while ( !(can_read_reg(chip, SJASR) & sjaSR_TBS) &&
-// 						i++<MAX_TRANSMIT_WAIT_LOOPS) {
-// 			udelay(i);
-// 		}
-// 		if (!(can_read_reg(chip, SJASR) & sjaSR_TBS)) {
-// 			CANMSG("Could not cancel, please reset\n");
-// 			return -EIO;
-// 		}
-// 	}
-// 	len = msg->length;
-// 	if(len > CAN_MSG_LENGTH) len = CAN_MSG_LENGTH;
-// 	/* len &= sjaFRM_DLC_M; ensured by above condition already */
-// 	can_write_reg(chip, ((msg->flags&MSG_EXT)?sjaFRM_FF:0) |
-// 		((msg->flags & MSG_RTR) ? sjaFRM_RTR : 0) | len, SJAFRM);
-// 	if(msg->flags&MSG_EXT) {
-// 		id=msg->id<<3;
-// 		can_write_reg(chip, id & 0xff, SJAID3);
-// 		id >>= 8;
-// 		can_write_reg(chip, id & 0xff, SJAID2);
-// 		id >>= 8;
-// 		can_write_reg(chip, id & 0xff, SJAID1);
-// 		id >>= 8;
-// 		can_write_reg(chip, id, SJAID0);
-// 		for(i=0; i < len; i++) {
-// 			can_write_reg(chip, msg->data[i], SJADATE+i);
-// 		}
-// 	} else {
-// 		id=msg->id<<5;
-// 		can_write_reg(chip, (id >> 8) & 0xff, SJAID0);
-// 		can_write_reg(chip, id & 0xff, SJAID1);
-// 		for(i=0; i < len; i++) {
-// 			can_write_reg(chip, msg->data[i], SJADATS+i);
-// 		}
-// 	}
-// 	return 0;
-// }
+char sja1000p_pre_write_config(struct canmsg_t *msg)
+{
+	unsigned char i = 0; 
+	unsigned long id;
+	unsigned char status;
+	unsigned char len;
+
+	/* Wait until Transmit Buffer Status is released */
+	while ( !((status = can_read_reg(SJASR)) & sjaSR_TBS) && 
+						i++<MAX_TRANSMIT_WAIT_LOOPS) {
+		_delay_us(10);
+	}
+	
+	if(status & sjaSR_BS) {
+		/* Try to recover from error condition */
+#ifdef DEBUG
+		CANMSG("Bus recovering");
+    _delay_ms(1000);
+#endif
+		sja1000p_enable_configuration();
+		can_write_reg(0, SJARXERR);
+		can_write_reg(0, SJATXERR1);
+		can_read_reg(SJAECC);
+		sja1000p_disable_configuration();
+	}
+	if (!(can_read_reg(SJASR) & sjaSR_TBS)) {
+#ifdef DEBUG
+		CANMSG("TX timed out");
+    _delay_ms(1000);
+#endif
+// here we should check if there is no write/select waiting for this
+// transmit. If so, set error ret and wake up.
+// CHECKME: if we do not disable sjaIER_TIE (TX IRQ) here we get interrupt
+// immediately
+		can_write_reg(sjaCMR_AT, SJACMR);
+		i = 0;
+		while ( !(can_read_reg(SJASR) & sjaSR_TBS) &&
+						i++<MAX_TRANSMIT_WAIT_LOOPS) {
+			_delay_us(10);
+		}
+		if (!(can_read_reg(SJASR) & sjaSR_TBS)) {
+#ifdef DEBUG
+			CANMSG("Tx err. Reset!");
+      _delay_ms(1000);
+#endif
+			return -1;
+		}
+	}
+	len = msg->length;
+	if(len > CAN_MSG_LENGTH)
+    len = CAN_MSG_LENGTH;
+	
+  /* len &= sjaFRM_DLC_M; ensured by above condition already */
+	can_write_reg(((msg->flags&MSG_EXT)?sjaFRM_FF:0) |
+		((msg->flags & MSG_RTR) ? sjaFRM_RTR : 0) | len, SJAFRM);
+	
+  if(msg->flags&MSG_EXT) {
+		id=msg->id<<3;
+		can_write_reg(id & 0xff, SJAID3);
+		id >>= 8;
+		can_write_reg(id & 0xff, SJAID2);
+		id >>= 8;
+		can_write_reg(id & 0xff, SJAID1);
+		id >>= 8;
+		can_write_reg(id, SJAID0);
+    
+		for(i=0; i < len; i++) {
+			can_write_reg(msg->data[i], SJADATE+i);
+		}
+	} else {
+		id=msg->id<<5;
+		can_write_reg((id >> 8) & 0xff, SJAID0);
+		can_write_reg(id & 0xff, SJAID1);
+		for(i=0; i < len; i++) {
+			can_write_reg(msg->data[i], SJADATS+i);
+		}
+	}
+#ifdef DEBUG
+    CANMSG("Tx OK");
+    _delay_ms(1000);
+#endif
+	return 0;
+}
 
 /**
  * sja1000p_send_msg: - initiate message transmission
- * @chip: pointer to chip state structure
- * @obj: pointer to message object state structure
- * @msg: pointer to CAN message
  *
  * This function is called after sja1000p_pre_write_config() function,
  * which prepares data in chip buffer.
  * Return Value: negative value reports error.
  * File: src/sja1000p.c
  */
-// int sja1000p_send_msg(struct canchip_t *chip, struct msgobj_t *obj, 
-// 							struct canmsg_t *msg)
-// {
-// 	can_write_reg(chip, sjaCMR_TR, SJACMR);
-// 
-// 	return 0;
-// }
+char sja1000p_send_msg()
+{
+	can_write_reg(sjaCMR_TR, SJACMR);
+
+	return 0;
+}
 
 /**
  * sja1000p_check_tx_stat: - checks state of transmission engine
@@ -476,28 +459,6 @@ char sja1000p_baud_rate(unsigned long rate, unsigned long clock, unsigned char s
 // 		return 1;
 // }
 
-/**
- * sja1000p_set_btregs: -  configures bitrate registers
- * @chip: pointer to chip state structure
- * @btr0: bitrate register 0
- * @btr1: bitrate register 1
- *
- * Return Value: negative value reports error.
- * File: src/sja1000p.c
- */
-// int sja1000p_set_btregs(struct canchip_t *chip, unsigned short btr0, 
-// 							unsigned short btr1)
-// {
-// 	if (sja1000p_enable_configuration(chip))
-// 		return -ENODEV;
-// 
-// 	can_write_reg(chip, btr0, SJABTR0);
-// 	can_write_reg(chip, btr1, SJABTR1);
-// 
-// 	sja1000p_disable_configuration(chip);
-// 
-// 	return 0;
-// }
 
 /**
  * sja1000p_start_chip: -  starts chip message processing
@@ -506,17 +467,15 @@ char sja1000p_baud_rate(unsigned long rate, unsigned long clock, unsigned char s
  * Return Value: negative value reports error.
  * File: src/sja1000p.c
  */
-// int sja1000p_start_chip(struct canchip_t *chip)
-// {
-// 	enum sja1000_PeliCAN_MOD flags;
-// 
-// 	flags = can_read_reg(chip, SJAMOD) & (sjaMOD_LOM|sjaMOD_STM|sjaMOD_AFM|sjaMOD_SM);
-// 	can_write_reg(chip, flags, SJAMOD);
-// 
-// 	sja1000_report_error_limit_counter=0;
-// 
-// 	return 0;
-// }
+char sja1000p_start_chip()
+{
+	enum sja1000_PeliCAN_MOD flags;
+
+	flags = can_read_reg(SJAMOD) & (sjaMOD_LOM|sjaMOD_STM|sjaMOD_AFM|sjaMOD_SM);
+	can_write_reg(flags, SJAMOD);
+
+	return 0;
+}
 
 /**
  * sja1000p_stop_chip: -  stops chip message processing
@@ -525,15 +484,15 @@ char sja1000p_baud_rate(unsigned long rate, unsigned long clock, unsigned char s
  * Return Value: negative value reports error.
  * File: src/sja1000p.c
  */
-// int sja1000p_stop_chip(struct canchip_t *chip)
-// {
-// 	enum sja1000_PeliCAN_MOD flags;
-// 
-// 	flags = can_read_reg(chip, SJAMOD) & (sjaMOD_LOM|sjaMOD_STM|sjaMOD_AFM|sjaMOD_SM);
-// 	can_write_reg(chip, flags|sjaMOD_RM, SJAMOD);
-// 
-// 	return 0;
-// }
+int sja1000p_stop_chip()
+{
+	enum sja1000_PeliCAN_MOD flags;
+
+	flags = can_read_reg(SJAMOD) & (sjaMOD_LOM|sjaMOD_STM|sjaMOD_AFM|sjaMOD_SM);
+	can_write_reg(flags|sjaMOD_RM, SJAMOD);
+
+	return 0;
+}
 
 /**
  * sja1000p_attach_to_chip: - attaches to the chip, setups registers and state
@@ -560,63 +519,6 @@ char sja1000p_baud_rate(unsigned long rate, unsigned long clock, unsigned char s
 // 	can_write_reg(chip, sjaDISABLE_INTERRUPTS, SJAIER);
 // 
 // 	return 0;
-// }
-
-/**
- * sja1000p_remote_request: - configures message object and asks for RTR message
- * @chip: pointer to chip state structure
- * @obj: pointer to message object structure
- *
- * Return Value: negative value reports error.
- * File: src/sja1000p.c
- */
-// int sja1000p_remote_request(struct canchip_t *chip, struct msgobj_t *obj)
-// {
-// 	CANMSG("sja1000p_remote_request not implemented\n");
-// 	return -ENOSYS;
-// }
-
-/**
- * sja1000p_standard_mask: - setup of mask for message filtering
- * @chip: pointer to chip state structure
- * @code: can message acceptance code
- * @mask: can message acceptance mask
- *
- * Return Value: negative value reports error.
- * File: src/sja1000p.c
- */
-// int sja1000p_standard_mask(struct canchip_t *chip, unsigned short code,
-// 		unsigned short mask)
-// {
-// 	CANMSG("sja1000p_standard_mask not implemented\n");
-// 	return -ENOSYS;
-// }
-
-/**
- * sja1000p_clear_objects: - clears state of all message object residing in chip
- * @chip: pointer to chip state structure
- *
- * Return Value: negative value reports error.
- * File: src/sja1000p.c
- */
-// int sja1000p_clear_objects(struct canchip_t *chip)
-// {
-// 	CANMSG("sja1000p_clear_objects not implemented\n");
-// 	return -ENOSYS;
-// }
-
-/**
- * sja1000p_config_irqs: - tunes chip hardware interrupt delivery
- * @chip: pointer to chip state structure
- * @irqs: requested chip IRQ configuration
- *
- * Return Value: negative value reports error.
- * File: src/sja1000p.c
- */
-// int sja1000p_config_irqs(struct canchip_t *chip, short irqs)
-// {
-// 	CANMSG("sja1000p_config_irqs not implemented\n");
-// 	return -ENOSYS;
 // }
 
 /**
@@ -822,46 +724,4 @@ char sja1000p_baud_rate(unsigned long rate, unsigned long clock, unsigned char s
 // 	return 0;
 // }
 
-// int sja1000p_register(struct chipspecops_t *chipspecops)
-// {
-// 	CANMSG("initializing sja1000p chip operations\n");
-// 	chipspecops->chip_config=sja1000p_chip_config;
-// 	chipspecops->baud_rate=sja1000p_baud_rate;
-// 	chipspecops->standard_mask=sja1000p_standard_mask;
-// 	chipspecops->extended_mask=sja1000p_extended_mask;
-// 	chipspecops->message15_mask=sja1000p_extended_mask;
-// 	chipspecops->clear_objects=sja1000p_clear_objects;
-// 	chipspecops->config_irqs=sja1000p_config_irqs;
-// 	chipspecops->pre_read_config=sja1000p_pre_read_config;
-// 	chipspecops->pre_write_config=sja1000p_pre_write_config;
-// 	chipspecops->send_msg=sja1000p_send_msg;
-// 	chipspecops->check_tx_stat=sja1000p_check_tx_stat;
-// 	chipspecops->wakeup_tx=sja1000p_wakeup_tx;
-// 	chipspecops->remote_request=sja1000p_remote_request;
-// 	chipspecops->enable_configuration=sja1000p_enable_configuration;
-// 	chipspecops->disable_configuration=sja1000p_disable_configuration;
-// 	chipspecops->attach_to_chip=sja1000p_attach_to_chip;
-// 	chipspecops->release_chip=sja1000p_release_chip;
-// 	chipspecops->set_btregs=sja1000p_set_btregs;
-// 	chipspecops->start_chip=sja1000p_start_chip;
-// 	chipspecops->stop_chip=sja1000p_stop_chip;
-// 	chipspecops->irq_handler=sja1000p_irq_handler;
-// 	chipspecops->irq_accept=NULL;
-// 	return 0;
-// }
 
-/**
- * sja1000p_fill_chipspecops - fills chip specific operations
- * @chip: pointer to chip representation structure
- *
- * The function fills chip specific operations for sja1000 (PeliCAN) chip.
- *
- * Return Value: returns negative number in the case of fail
- */
-// int sja1000p_fill_chipspecops(struct canchip_t *chip)
-// {
-// 	chip->chip_type="sja1000p";
-// 	chip->max_objects=1;
-// 	sja1000p_register(chip->chipspecops);
-// 	return 0;
-// }

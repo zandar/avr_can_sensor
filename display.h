@@ -5,6 +5,6 @@
 
 void lcd_puts_line(unsigned char line_nr,const char *string);
 void lcd_clear_line(unsigned char line_nr);
-void debug(long num);
+void debug(unsigned char line_nr,long num);
 
 #endif

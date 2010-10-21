@@ -10,7 +10,6 @@
 #include "F_CPU.h"
 #include <util/delay.h>
 #include "sja_control.h"
-#include "display.h"
 
 // #include "../include/can.h"
 // #include "../include/can_sysdep.h"
@@ -19,7 +18,7 @@
 
 /* Macros for low level hw. control */
 #define sja_bus_out   SJA_BUS_DIR = 0xff   /* set bus lines in DDR register as output */
-#define sja_bus_in    SJA_BUS_DIR = 0x00   /* set bus lines in DDR register as input */
+#define sja_bus_in    SJA_BUS_PORT = 0xff,SJA_BUS_DIR = 0x00   /* set bus lines in DDR register as input */
 #define sja_ctrl_out  SJA_CTRL_DIR |= (1 << SJA_ALE_PIN)|(1 << SJA_CS_PIN)\
                       |(1 << SJA_RD_PIN)|(1 << SJA_WR_PIN)  /* set control lines in DDR register as output */
 #define sja_int_init  SJA_INT_DIR &= ~(1 << SJA_INT_PIN)\
@@ -87,6 +86,7 @@ static void sja_write_register(unsigned char data,unsigned char address)
   sja_wr_high;
   sja_cs_high;
   _delay_us(1);
+  
 }
 
 unsigned char can_read_reg(unsigned char address)

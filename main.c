@@ -6,6 +6,7 @@
  * Version avrCAN-0.1 13/10/2010
  */
 
+#include "F_CPU.h"
 #include <avr/interrupt.h>
 #include <avr/io.h>
 #include "display.h"
@@ -14,10 +15,12 @@
 #include "avr_main.h"
 #include "sja_control.h"
 #include "avr_canmsg.h"
+#include <util/delay.h>
 
 struct canchip_t chip;
-//struct canmsg_t msg;
+struct canmsg_t msg;
 
+char sja_status = 0;
 
 /*
  *  MAIN
@@ -28,7 +31,7 @@ int main(void)
   
   init_ports();
   
-  sei();      // globalni povoleni preruseni
+  //sei();      // globalni povoleni preruseni
   
   lcd_init(LCD_DISP_ON);
   
@@ -40,15 +43,18 @@ int main(void)
   chip.sja_ocr_reg = sjaOCR_MODE_NORMAL|sjaOCR_TX0_LH;
   
   
-//   msg.id = 0x00;
-//   msg.length = 8;
-//   
-//   for (;i< CAN_MSG_LENGTH;i++)
-//     msg.data[i] = i;
+  msg.id = 1;
+  msg.length = 4;
+  msg.flags = 0;
   
-  sja1000p_chip_config(&chip);
-//   sja1000_pre_write_config(&msg);
-//   sja1000_send_msg();
+  for (;i< msg.length;i++)
+    msg.data[i] = i*10;
+  
+  sja_status = sja1000p_chip_config(&chip); 
+  
+  sja1000p_pre_write_config(&msg);
+  sja1000p_send_msg();
+ 
   
   while(1) {
     

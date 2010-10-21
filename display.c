@@ -22,11 +22,11 @@ void lcd_clear_line(unsigned char line_nr)
   }
 }
 
-void debug(long num)
+void debug(unsigned char line_nr,long num)
 {
   char string[11];
   
   itoa(num,string,10);
   
-  lcd_puts_line(1,string);
+  lcd_puts_line(line_nr,string);
 }
