@@ -12,15 +12,25 @@
 #include "display.h"
 #include "lcd.h"
 #include "avr_sja1000p.h"
-#include "avr_main.h"
 #include "sja_control.h"
-#include "avr_canmsg.h"
+#include "avr_can.h"
 #include <util/delay.h>
 
+#define DEBUG
+
 struct canchip_t chip;
-struct canmsg_t msg;
+
+struct canmsg_t tx_msg,rx_msg;
 
 char sja_status = 0;
+
+/*
+ * SJA interrupt service routine
+ */
+ISR(INT0_vect)
+{
+  sja1000p_irq_handler(&rx_msg);
+}
 
 /*
  *  MAIN
@@ -31,7 +41,7 @@ int main(void)
   
   init_ports();
   
-  //sei();      // globalni povoleni preruseni
+  sei();      // globalni povoleni preruseni
   
   lcd_init(LCD_DISP_ON);
   
@@ -43,16 +53,23 @@ int main(void)
   chip.sja_ocr_reg = sjaOCR_MODE_NORMAL|sjaOCR_TX0_LH;
   
   
-  msg.id = 1;
-  msg.length = 4;
-  msg.flags = 0;
+  tx_msg.id = 1;
+  tx_msg.length = 8;
+  tx_msg.flags = MSG_EXT;
   
-  for (;i< msg.length;i++)
-    msg.data[i] = i*10;
+  for (;i< tx_msg.length;i++)
+    tx_msg.data[i] = i*10;
   
-  sja_status = sja1000p_chip_config(&chip); 
+  if(sja1000p_chip_config(&chip))
+  {
+    CANMSG("Config error!");
+    _delay_ms(1000);
+    CANMSG("Restarting...");
+    _delay_ms(1000);
+    while (1); // proved sw reset nejak
+  } 
   
-  sja1000p_pre_write_config(&msg);
+  sja1000p_pre_write_config(&tx_msg);
   sja1000p_send_msg();
  
   
