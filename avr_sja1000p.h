@@ -11,8 +11,7 @@
 #ifndef AVR_SJA1000P_H
 #define AVR_SJA1000P_H
 
-#include "avr_main.h"
-#include "avr_canmsg.h"
+#include "avr_can.h"
 
 char sja1000p_enable_configuration();
 char sja1000p_disable_configuration();
@@ -21,11 +20,9 @@ char sja1000p_extended_mask(unsigned long code, unsigned long mask);
 char sja1000p_baud_rate(unsigned long rate, unsigned long clock,unsigned char sjw,
 		unsigned char sampl_pt, unsigned char flags);
     
-//int sja1000p_pre_read_config(struct canchip_t *chip, struct msgobj_t *obj);
 char sja1000p_pre_write_config(struct canmsg_t *msg);
 char sja1000p_send_msg();
-//int sja1000p_fill_chipspecops(struct canchip_t *chip);
-//int sja1000p_irq_handler(int irq, struct canchip_t *chip);
+char sja1000p_irq_handler(struct canmsg_t *rx_msg);
 
 
 /* PeliCAN mode */
@@ -202,7 +199,7 @@ enum sja1000_CDR {
 	sjaCDR_CLKOUT_MASK = 7
 };
 
-/** flags for sja1000_baud_rate */
+/* Flags for baud_rate function */
 #define BTR1_SAM (1<<1)
 
 #endif
