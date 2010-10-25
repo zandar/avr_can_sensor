@@ -22,7 +22,8 @@
 #define sja_ctrl_out  SJA_CTRL_DIR |= (1 << SJA_ALE_PIN)|(1 << SJA_CS_PIN)\
                       |(1 << SJA_RD_PIN)|(1 << SJA_WR_PIN)  /* set control lines in DDR register as output */
 #define sja_int_init  SJA_INT_DIR &= ~(1 << SJA_INT_PIN)\
-                      ,SJA_INT_PORT |= (1 << SJA_INT_PIN)
+                      ,SJA_INT_PORT |= (1 << SJA_INT_PIN)\
+                      ,MCUCR |= (SJA_INT_ISC_BIT << SJA_INTERRUPT)
 
 #define sja_bus_write(data) sja_bus_out,SJA_BUS_PORT = data
 #define sja_bus_read        SJA_BUS_DATA 
