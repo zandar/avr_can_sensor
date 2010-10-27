@@ -1,5 +1,5 @@
-#include "lcd.h"
-#include "display.h"
+#include "../include/lcd.h"
+#include "../include/display.h"
 #include <stdlib.h>
 
 /* Print string parameter to line specified by line_nr */

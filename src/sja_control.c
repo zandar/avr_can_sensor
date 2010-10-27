@@ -7,9 +7,9 @@
  */
 
 #include <avr/io.h>
-#include "F_CPU.h"
+#include "../include/F_CPU.h"
 #include <util/delay.h>
-#include "sja_control.h"
+#include "../include/sja_control.h"
 
 // #include "../include/can.h"
 // #include "../include/can_sysdep.h"

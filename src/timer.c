@@ -8,8 +8,8 @@
 
 #include <avr/io.h>
 #include <avr/interrupt.h>
-#include "timer.h"
-#include "sja_control.h"
+#include "../include/timer.h"
+#include "../include/sja_control.h"
 
 #define timer0_stop() TCCR0 &= ~0x07, timer0 = 0
 

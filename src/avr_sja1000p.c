@@ -9,11 +9,11 @@
  * Version lincan-0.3  17 Jun 2004
  */
 
-#include "avr_sja1000p.h"
-#include "sja_control.h"
-#include "display.h"
-#include "avr_can.h"
-#include "F_CPU.h"
+#include "../include/avr_sja1000p.h"
+#include "../include/sja_control.h"
+#include "../include/display.h"
+#include "../include/avr_can.h"
+#include "../include/F_CPU.h"
 #include <util/delay.h>
 
 #define DEBUG

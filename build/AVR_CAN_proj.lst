@@ -1,0 +1,3236 @@
+
+../build/AVR_CAN_proj.elf:     file format elf32-avr
+
+Sections:
+Idx Name          Size      VMA       LMA       File off  Algn
+  0 .text         00000f22  00000000  00000000  00000094  2**1
+                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  1 .data         000000fa  00800060  00000f22  00000fb6  2**0
+                  CONTENTS, ALLOC, LOAD, DATA
+  2 .bss          00000028  0080015a  0080015a  000010b0  2**0
+                  ALLOC
+  3 .stab         00003c30  00000000  00000000  000010b0  2**2
+                  CONTENTS, READONLY, DEBUGGING
+  4 .stabstr      0000193e  00000000  00000000  00004ce0  2**0
+                  CONTENTS, READONLY, DEBUGGING
+
+Disassembly of section .text:
+
+00000000 <__vectors>:
+   0:	0c 94 2a 00 	jmp	0x54	; 0x54 <__ctors_end>
+   4:	0c 94 b6 00 	jmp	0x16c	; 0x16c <__vector_1>
+   8:	0c 94 47 00 	jmp	0x8e	; 0x8e <__bad_interrupt>
+   c:	0c 94 47 00 	jmp	0x8e	; 0x8e <__bad_interrupt>
+  10:	0c 94 47 00 	jmp	0x8e	; 0x8e <__bad_interrupt>
+  14:	0c 94 47 00 	jmp	0x8e	; 0x8e <__bad_interrupt>
+  18:	0c 94 47 00 	jmp	0x8e	; 0x8e <__bad_interrupt>
+  1c:	0c 94 47 00 	jmp	0x8e	; 0x8e <__bad_interrupt>
+  20:	0c 94 47 00 	jmp	0x8e	; 0x8e <__bad_interrupt>
+  24:	0c 94 47 00 	jmp	0x8e	; 0x8e <__bad_interrupt>
+  28:	0c 94 47 00 	jmp	0x8e	; 0x8e <__bad_interrupt>
+  2c:	0c 94 47 00 	jmp	0x8e	; 0x8e <__bad_interrupt>
+  30:	0c 94 47 00 	jmp	0x8e	; 0x8e <__bad_interrupt>
+  34:	0c 94 47 00 	jmp	0x8e	; 0x8e <__bad_interrupt>
+  38:	0c 94 47 00 	jmp	0x8e	; 0x8e <__bad_interrupt>
+  3c:	0c 94 47 00 	jmp	0x8e	; 0x8e <__bad_interrupt>
+  40:	0c 94 47 00 	jmp	0x8e	; 0x8e <__bad_interrupt>
+  44:	0c 94 47 00 	jmp	0x8e	; 0x8e <__bad_interrupt>
+  48:	0c 94 47 00 	jmp	0x8e	; 0x8e <__bad_interrupt>
+  4c:	0c 94 47 00 	jmp	0x8e	; 0x8e <__bad_interrupt>
+  50:	0c 94 47 00 	jmp	0x8e	; 0x8e <__bad_interrupt>
+
+00000054 <__ctors_end>:
+  54:	11 24       	eor	r1, r1
+  56:	1f be       	out	0x3f, r1	; 63
+  58:	cf e5       	ldi	r28, 0x5F	; 95
+  5a:	d4 e0       	ldi	r29, 0x04	; 4
+  5c:	de bf       	out	0x3e, r29	; 62
+  5e:	cd bf       	out	0x3d, r28	; 61
+
+00000060 <__do_copy_data>:
+  60:	11 e0       	ldi	r17, 0x01	; 1
+  62:	a0 e6       	ldi	r26, 0x60	; 96
+  64:	b0 e0       	ldi	r27, 0x00	; 0
+  66:	e2 e2       	ldi	r30, 0x22	; 34
+  68:	ff e0       	ldi	r31, 0x0F	; 15
+  6a:	02 c0       	rjmp	.+4      	; 0x70 <.do_copy_data_start>
+
+0000006c <.do_copy_data_loop>:
+  6c:	05 90       	lpm	r0, Z+
+  6e:	0d 92       	st	X+, r0
+
+00000070 <.do_copy_data_start>:
+  70:	aa 35       	cpi	r26, 0x5A	; 90
+  72:	b1 07       	cpc	r27, r17
+  74:	d9 f7       	brne	.-10     	; 0x6c <.do_copy_data_loop>
+
+00000076 <__do_clear_bss>:
+  76:	11 e0       	ldi	r17, 0x01	; 1
+  78:	aa e5       	ldi	r26, 0x5A	; 90
+  7a:	b1 e0       	ldi	r27, 0x01	; 1
+  7c:	01 c0       	rjmp	.+2      	; 0x80 <.do_clear_bss_start>
+
+0000007e <.do_clear_bss_loop>:
+  7e:	1d 92       	st	X+, r1
+
+00000080 <.do_clear_bss_start>:
+  80:	a2 38       	cpi	r26, 0x82	; 130
+  82:	b1 07       	cpc	r27, r17
+  84:	e1 f7       	brne	.-8      	; 0x7e <.do_clear_bss_loop>
+  86:	0e 94 49 00 	call	0x92	; 0x92 <main>
+  8a:	0c 94 8f 07 	jmp	0xf1e	; 0xf1e <_exit>
+
+0000008e <__bad_interrupt>:
+  8e:	0c 94 00 00 	jmp	0	; 0x0 <__vectors>
+
+00000092 <main>:
+ */
+int main(void)
+{
+  unsigned char i = 0;
+  
+  init_ports();
+  92:	0e 94 22 02 	call	0x444	; 0x444 <init_ports>
+  
+  sei();      // globalni povoleni preruseni
+  96:	78 94       	sei
+  
+  lcd_init(LCD_DISP_ON);
+  98:	8c e0       	ldi	r24, 0x0C	; 12
+  9a:	0e 94 9e 01 	call	0x33c	; 0x33c <lcd_init>
+  
+  lcd_puts_line(0,"CAN senzor");
+  9e:	80 e0       	ldi	r24, 0x00	; 0
+  a0:	60 e6       	ldi	r22, 0x60	; 96
+  a2:	70 e0       	ldi	r23, 0x00	; 0
+  a4:	0e 94 e7 01 	call	0x3ce	; 0x3ce <lcd_puts_line>
+  
+  chip.baudrate = SJA_BAUD;
+  a8:	80 e4       	ldi	r24, 0x40	; 64
+  aa:	92 e4       	ldi	r25, 0x42	; 66
+  ac:	af e0       	ldi	r26, 0x0F	; 15
+  ae:	b0 e0       	ldi	r27, 0x00	; 0
+  b0:	80 93 7c 01 	sts	0x017C, r24
+  b4:	90 93 7d 01 	sts	0x017D, r25
+  b8:	a0 93 7e 01 	sts	0x017E, r26
+  bc:	b0 93 7f 01 	sts	0x017F, r27
+  chip.clock = SJA_CLOCK;
+  c0:	80 e0       	ldi	r24, 0x00	; 0
+  c2:	94 e2       	ldi	r25, 0x24	; 36
+  c4:	a4 ef       	ldi	r26, 0xF4	; 244
+  c6:	b0 e0       	ldi	r27, 0x00	; 0
+  c8:	80 93 78 01 	sts	0x0178, r24
+  cc:	90 93 79 01 	sts	0x0179, r25
+  d0:	a0 93 7a 01 	sts	0x017A, r26
+  d4:	b0 93 7b 01 	sts	0x017B, r27
+  chip.sja_cdr_reg = sjaCDR_CLK_OFF;
+  d8:	28 e0       	ldi	r18, 0x08	; 8
+  da:	20 93 80 01 	sts	0x0180, r18
+  chip.sja_ocr_reg = sjaOCR_MODE_NORMAL|sjaOCR_TX0_LH;
+  de:	8a e1       	ldi	r24, 0x1A	; 26
+  e0:	80 93 81 01 	sts	0x0181, r24
+  
+  
+  tx_msg.id = 1;
+  e4:	81 e0       	ldi	r24, 0x01	; 1
+  e6:	90 e0       	ldi	r25, 0x00	; 0
+  e8:	a0 e0       	ldi	r26, 0x00	; 0
+  ea:	b0 e0       	ldi	r27, 0x00	; 0
+  ec:	80 93 5c 01 	sts	0x015C, r24
+  f0:	90 93 5d 01 	sts	0x015D, r25
+  f4:	a0 93 5e 01 	sts	0x015E, r26
+  f8:	b0 93 5f 01 	sts	0x015F, r27
+  tx_msg.length = 8;
+  fc:	20 93 60 01 	sts	0x0160, r18
+  tx_msg.flags = MSG_EXT;
+ 100:	84 e0       	ldi	r24, 0x04	; 4
+ 102:	80 93 5b 01 	sts	0x015B, r24
+ 106:	e1 e6       	ldi	r30, 0x61	; 97
+ 108:	f1 e0       	ldi	r31, 0x01	; 1
+ 10a:	80 e0       	ldi	r24, 0x00	; 0
+  
+  for (;i< tx_msg.length;i++)
+    tx_msg.data[i] = i*10;
+ 10c:	81 93       	st	Z+, r24
+ 10e:	86 5f       	subi	r24, 0xF6	; 246
+  
+  tx_msg.id = 1;
+  tx_msg.length = 8;
+  tx_msg.flags = MSG_EXT;
+  
+  for (;i< tx_msg.length;i++)
+ 110:	80 35       	cpi	r24, 0x50	; 80
+ 112:	e1 f7       	brne	.-8      	; 0x10c <main+0x7a>
+    tx_msg.data[i] = i*10;
+  
+  if(sja1000p_chip_config(&chip))
+ 114:	87 e7       	ldi	r24, 0x77	; 119
+ 116:	91 e0       	ldi	r25, 0x01	; 1
+ 118:	0e 94 7d 06 	call	0xcfa	; 0xcfa <sja1000p_chip_config>
+ 11c:	88 23       	and	r24, r24
+ 11e:	f9 f0       	breq	.+62     	; 0x15e <main+0xcc>
+  {
+    CANMSG("Config error!");
+ 120:	81 e0       	ldi	r24, 0x01	; 1
+ 122:	6b e6       	ldi	r22, 0x6B	; 107
+ 124:	70 e0       	ldi	r23, 0x00	; 0
+ 126:	0e 94 e7 01 	call	0x3ce	; 0x3ce <lcd_puts_line>
+ 12a:	20 e1       	ldi	r18, 0x10	; 16
+ 12c:	37 e2       	ldi	r19, 0x27	; 39
+    milliseconds can be achieved.
+ */
+void
+_delay_loop_2(uint16_t __count)
+{
+	__asm__ volatile (
+ 12e:	48 ec       	ldi	r20, 0xC8	; 200
+ 130:	50 e0       	ldi	r21, 0x00	; 0
+ 132:	ca 01       	movw	r24, r20
+ 134:	01 97       	sbiw	r24, 0x01	; 1
+ 136:	f1 f7       	brne	.-4      	; 0x134 <main+0xa2>
+		__ticks = (uint16_t) (__ms * 10.0);
+		while(__ticks)
+		{
+			// wait 1/10 ms
+			_delay_loop_2(((F_CPU) / 4e3) / 10);
+			__ticks --;
+ 138:	21 50       	subi	r18, 0x01	; 1
+ 13a:	30 40       	sbci	r19, 0x00	; 0
+		__ticks = 1;
+	else if (__tmp > 65535)
+	{
+		//	__ticks = requested delay in 1/10 ms
+		__ticks = (uint16_t) (__ms * 10.0);
+		while(__ticks)
+ 13c:	d1 f7       	brne	.-12     	; 0x132 <main+0xa0>
+    _delay_ms(1000);
+    CANMSG("Restarting...");
+ 13e:	81 e0       	ldi	r24, 0x01	; 1
+ 140:	69 e7       	ldi	r22, 0x79	; 121
+ 142:	70 e0       	ldi	r23, 0x00	; 0
+ 144:	0e 94 e7 01 	call	0x3ce	; 0x3ce <lcd_puts_line>
+ 148:	20 e1       	ldi	r18, 0x10	; 16
+ 14a:	37 e2       	ldi	r19, 0x27	; 39
+ 14c:	48 ec       	ldi	r20, 0xC8	; 200
+ 14e:	50 e0       	ldi	r21, 0x00	; 0
+ 150:	ca 01       	movw	r24, r20
+ 152:	01 97       	sbiw	r24, 0x01	; 1
+ 154:	f1 f7       	brne	.-4      	; 0x152 <main+0xc0>
+		{
+			// wait 1/10 ms
+			_delay_loop_2(((F_CPU) / 4e3) / 10);
+			__ticks --;
+ 156:	21 50       	subi	r18, 0x01	; 1
+ 158:	30 40       	sbci	r19, 0x00	; 0
+		__ticks = 1;
+	else if (__tmp > 65535)
+	{
+		//	__ticks = requested delay in 1/10 ms
+		__ticks = (uint16_t) (__ms * 10.0);
+		while(__ticks)
+ 15a:	d1 f7       	brne	.-12     	; 0x150 <main+0xbe>
+ 15c:	ff cf       	rjmp	.-2      	; 0x15c <main+0xca>
+    _delay_ms(1000);
+    while (1); // proved sw reset nejak
+  } 
+  
+  sja1000p_pre_write_config(&tx_msg);
+ 15e:	8b e5       	ldi	r24, 0x5B	; 91
+ 160:	91 e0       	ldi	r25, 0x01	; 1
+ 162:	0e 94 fe 03 	call	0x7fc	; 0x7fc <sja1000p_pre_write_config>
+  sja1000p_send_msg();
+ 166:	0e 94 6d 02 	call	0x4da	; 0x4da <sja1000p_send_msg>
+ 16a:	ff cf       	rjmp	.-2      	; 0x16a <main+0xd8>
+
+0000016c <__vector_1>:
+
+/*
+ * SJA interrupt service routine
+ */
+ISR(INT0_vect)
+{
+ 16c:	1f 92       	push	r1
+ 16e:	0f 92       	push	r0
+ 170:	0f b6       	in	r0, 0x3f	; 63
+ 172:	0f 92       	push	r0
+ 174:	11 24       	eor	r1, r1
+ 176:	2f 93       	push	r18
+ 178:	3f 93       	push	r19
+ 17a:	4f 93       	push	r20
+ 17c:	5f 93       	push	r21
+ 17e:	6f 93       	push	r22
+ 180:	7f 93       	push	r23
+ 182:	8f 93       	push	r24
+ 184:	9f 93       	push	r25
+ 186:	af 93       	push	r26
+ 188:	bf 93       	push	r27
+ 18a:	ef 93       	push	r30
+ 18c:	ff 93       	push	r31
+  sja1000p_irq_handler(&rx_msg);
+ 18e:	89 e6       	ldi	r24, 0x69	; 105
+ 190:	91 e0       	ldi	r25, 0x01	; 1
+ 192:	0e 94 04 03 	call	0x608	; 0x608 <sja1000p_irq_handler>
+}
+ 196:	ff 91       	pop	r31
+ 198:	ef 91       	pop	r30
+ 19a:	bf 91       	pop	r27
+ 19c:	af 91       	pop	r26
+ 19e:	9f 91       	pop	r25
+ 1a0:	8f 91       	pop	r24
+ 1a2:	7f 91       	pop	r23
+ 1a4:	6f 91       	pop	r22
+ 1a6:	5f 91       	pop	r21
+ 1a8:	4f 91       	pop	r20
+ 1aa:	3f 91       	pop	r19
+ 1ac:	2f 91       	pop	r18
+ 1ae:	0f 90       	pop	r0
+ 1b0:	0f be       	out	0x3f, r0	; 63
+ 1b2:	0f 90       	pop	r0
+ 1b4:	1f 90       	pop	r1
+ 1b6:	18 95       	reti
+
+000001b8 <lcd_write>:
+static void lcd_write(uint8_t data,uint8_t rs) 
+{
+    unsigned char dataBits ;
+
+
+    if (rs) {   /* write data        (RS=1, RW=0) */
+ 1b8:	66 23       	and	r22, r22
+ 1ba:	49 f1       	breq	.+82     	; 0x20e <lcd_write+0x56>
+       lcd_rs_high();
+ 1bc:	c0 9a       	sbi	0x18, 0	; 24
+    } else {    /* write instruction (RS=0, RW=0) */
+       lcd_rs_low();
+    }
+    lcd_rw_low();
+ 1be:	c1 98       	cbi	0x18, 1	; 24
+        LCD_DATA0_PORT = dataBits | 0x0F;
+    }
+    else
+    {
+        /* configure data pins as output */
+        DDR(LCD_DATA0_PORT) |= _BV(LCD_DATA0_PIN);
+ 1c0:	8b 9a       	sbi	0x11, 3	; 17
+        DDR(LCD_DATA1_PORT) |= _BV(LCD_DATA1_PIN);
+ 1c2:	8c 9a       	sbi	0x11, 4	; 17
+        DDR(LCD_DATA2_PORT) |= _BV(LCD_DATA2_PIN);
+ 1c4:	8d 9a       	sbi	0x11, 5	; 17
+        DDR(LCD_DATA3_PORT) |= _BV(LCD_DATA3_PIN);
+ 1c6:	8e 9a       	sbi	0x11, 6	; 17
+        
+        /* output high nibble first */
+        LCD_DATA3_PORT &= ~_BV(LCD_DATA3_PIN);
+ 1c8:	96 98       	cbi	0x12, 6	; 18
+        LCD_DATA2_PORT &= ~_BV(LCD_DATA2_PIN);
+ 1ca:	95 98       	cbi	0x12, 5	; 18
+        LCD_DATA1_PORT &= ~_BV(LCD_DATA1_PIN);
+ 1cc:	94 98       	cbi	0x12, 4	; 18
+        LCD_DATA0_PORT &= ~_BV(LCD_DATA0_PIN);
+ 1ce:	93 98       	cbi	0x12, 3	; 18
+    	if(data & 0x80) LCD_DATA3_PORT |= _BV(LCD_DATA3_PIN);
+ 1d0:	87 fd       	sbrc	r24, 7
+ 1d2:	1f c0       	rjmp	.+62     	; 0x212 <lcd_write+0x5a>
+    	if(data & 0x40) LCD_DATA2_PORT |= _BV(LCD_DATA2_PIN);
+ 1d4:	86 fd       	sbrc	r24, 6
+ 1d6:	95 9a       	sbi	0x12, 5	; 18
+    	if(data & 0x20) LCD_DATA1_PORT |= _BV(LCD_DATA1_PIN);
+ 1d8:	85 fd       	sbrc	r24, 5
+ 1da:	94 9a       	sbi	0x12, 4	; 18
+    	if(data & 0x10) LCD_DATA0_PORT |= _BV(LCD_DATA0_PIN);   
+ 1dc:	84 fd       	sbrc	r24, 4
+ 1de:	93 9a       	sbi	0x12, 3	; 18
+
+#if LCD_IO_MODE
+/* toggle Enable Pin to initiate write */
+static void toggle_e(void)
+{
+    lcd_e_high();
+ 1e0:	c2 9a       	sbi	0x18, 2	; 24
+    lcd_e_delay();
+ 1e2:	00 c0       	rjmp	.+0      	; 0x1e4 <lcd_write+0x2c>
+    lcd_e_low();
+ 1e4:	c2 98       	cbi	0x18, 2	; 24
+    	if(data & 0x20) LCD_DATA1_PORT |= _BV(LCD_DATA1_PIN);
+    	if(data & 0x10) LCD_DATA0_PORT |= _BV(LCD_DATA0_PIN);   
+        lcd_e_toggle();
+        
+        /* output low nibble */
+        LCD_DATA3_PORT &= ~_BV(LCD_DATA3_PIN);
+ 1e6:	96 98       	cbi	0x12, 6	; 18
+        LCD_DATA2_PORT &= ~_BV(LCD_DATA2_PIN);
+ 1e8:	95 98       	cbi	0x12, 5	; 18
+        LCD_DATA1_PORT &= ~_BV(LCD_DATA1_PIN);
+ 1ea:	94 98       	cbi	0x12, 4	; 18
+        LCD_DATA0_PORT &= ~_BV(LCD_DATA0_PIN);
+ 1ec:	93 98       	cbi	0x12, 3	; 18
+    	if(data & 0x08) LCD_DATA3_PORT |= _BV(LCD_DATA3_PIN);
+ 1ee:	83 fd       	sbrc	r24, 3
+ 1f0:	96 9a       	sbi	0x12, 6	; 18
+    	if(data & 0x04) LCD_DATA2_PORT |= _BV(LCD_DATA2_PIN);
+ 1f2:	82 fd       	sbrc	r24, 2
+ 1f4:	95 9a       	sbi	0x12, 5	; 18
+    	if(data & 0x02) LCD_DATA1_PORT |= _BV(LCD_DATA1_PIN);
+ 1f6:	81 fd       	sbrc	r24, 1
+ 1f8:	94 9a       	sbi	0x12, 4	; 18
+    	if(data & 0x01) LCD_DATA0_PORT |= _BV(LCD_DATA0_PIN);
+ 1fa:	80 fd       	sbrc	r24, 0
+ 1fc:	93 9a       	sbi	0x12, 3	; 18
+
+#if LCD_IO_MODE
+/* toggle Enable Pin to initiate write */
+static void toggle_e(void)
+{
+    lcd_e_high();
+ 1fe:	c2 9a       	sbi	0x18, 2	; 24
+    lcd_e_delay();
+ 200:	00 c0       	rjmp	.+0      	; 0x202 <lcd_write+0x4a>
+    lcd_e_low();
+ 202:	c2 98       	cbi	0x18, 2	; 24
+    	if(data & 0x02) LCD_DATA1_PORT |= _BV(LCD_DATA1_PIN);
+    	if(data & 0x01) LCD_DATA0_PORT |= _BV(LCD_DATA0_PIN);
+        lcd_e_toggle();        
+        
+        /* all data pins high (inactive) */
+        LCD_DATA0_PORT |= _BV(LCD_DATA0_PIN);
+ 204:	93 9a       	sbi	0x12, 3	; 18
+        LCD_DATA1_PORT |= _BV(LCD_DATA1_PIN);
+ 206:	94 9a       	sbi	0x12, 4	; 18
+        LCD_DATA2_PORT |= _BV(LCD_DATA2_PIN);
+ 208:	95 9a       	sbi	0x12, 5	; 18
+        LCD_DATA3_PORT |= _BV(LCD_DATA3_PIN);
+ 20a:	96 9a       	sbi	0x12, 6	; 18
+    }
+}
+ 20c:	08 95       	ret
+
+
+    if (rs) {   /* write data        (RS=1, RW=0) */
+       lcd_rs_high();
+    } else {    /* write instruction (RS=0, RW=0) */
+       lcd_rs_low();
+ 20e:	c0 98       	cbi	0x18, 0	; 24
+ 210:	d6 cf       	rjmp	.-84     	; 0x1be <lcd_write+0x6>
+        /* output high nibble first */
+        LCD_DATA3_PORT &= ~_BV(LCD_DATA3_PIN);
+        LCD_DATA2_PORT &= ~_BV(LCD_DATA2_PIN);
+        LCD_DATA1_PORT &= ~_BV(LCD_DATA1_PIN);
+        LCD_DATA0_PORT &= ~_BV(LCD_DATA0_PIN);
+    	if(data & 0x80) LCD_DATA3_PORT |= _BV(LCD_DATA3_PIN);
+ 212:	96 9a       	sbi	0x12, 6	; 18
+ 214:	df cf       	rjmp	.-66     	; 0x1d4 <lcd_write+0x1c>
+
+00000216 <lcd_read>:
+static uint8_t lcd_read(uint8_t rs) 
+{
+    uint8_t data;
+    
+    
+    if (rs)
+ 216:	88 23       	and	r24, r24
+ 218:	09 f1       	breq	.+66     	; 0x25c <lcd_read+0x46>
+        lcd_rs_high();                       /* RS=1: read data      */
+ 21a:	c0 9a       	sbi	0x18, 0	; 24
+    else
+        lcd_rs_low();                        /* RS=0: read busy flag */
+    lcd_rw_high();                           /* RW=1  read mode      */
+ 21c:	c1 9a       	sbi	0x18, 1	; 24
+        lcd_e_low();
+    }
+    else
+    {
+        /* configure data pins as input */
+        DDR(LCD_DATA0_PORT) &= ~_BV(LCD_DATA0_PIN);
+ 21e:	8b 98       	cbi	0x11, 3	; 17
+        DDR(LCD_DATA1_PORT) &= ~_BV(LCD_DATA1_PIN);
+ 220:	8c 98       	cbi	0x11, 4	; 17
+        DDR(LCD_DATA2_PORT) &= ~_BV(LCD_DATA2_PIN);
+ 222:	8d 98       	cbi	0x11, 5	; 17
+        DDR(LCD_DATA3_PORT) &= ~_BV(LCD_DATA3_PIN);
+ 224:	8e 98       	cbi	0x11, 6	; 17
+                
+        /* read high nibble first */
+        lcd_e_high();
+ 226:	c2 9a       	sbi	0x18, 2	; 24
+        lcd_e_delay();        
+ 228:	00 c0       	rjmp	.+0      	; 0x22a <lcd_read+0x14>
+        data = 0;
+        if ( PIN(LCD_DATA0_PORT) & _BV(LCD_DATA0_PIN) ) data |= 0x10;
+ 22a:	83 9b       	sbis	0x10, 3	; 16
+ 22c:	15 c0       	rjmp	.+42     	; 0x258 <lcd_read+0x42>
+ 22e:	80 e1       	ldi	r24, 0x10	; 16
+        if ( PIN(LCD_DATA1_PORT) & _BV(LCD_DATA1_PIN) ) data |= 0x20;
+ 230:	84 99       	sbic	0x10, 4	; 16
+ 232:	80 62       	ori	r24, 0x20	; 32
+        if ( PIN(LCD_DATA2_PORT) & _BV(LCD_DATA2_PIN) ) data |= 0x40;
+ 234:	85 99       	sbic	0x10, 5	; 16
+ 236:	80 64       	ori	r24, 0x40	; 64
+        if ( PIN(LCD_DATA3_PORT) & _BV(LCD_DATA3_PIN) ) data |= 0x80;
+ 238:	86 99       	sbic	0x10, 6	; 16
+ 23a:	80 68       	ori	r24, 0x80	; 128
+        lcd_e_low();
+ 23c:	c2 98       	cbi	0x18, 2	; 24
+
+        lcd_e_delay();                       /* Enable 500ns low       */
+ 23e:	00 c0       	rjmp	.+0      	; 0x240 <lcd_read+0x2a>
+    
+        /* read low nibble */    
+        lcd_e_high();
+ 240:	c2 9a       	sbi	0x18, 2	; 24
+        lcd_e_delay();
+ 242:	00 c0       	rjmp	.+0      	; 0x244 <lcd_read+0x2e>
+        if ( PIN(LCD_DATA0_PORT) & _BV(LCD_DATA0_PIN) ) data |= 0x01;
+ 244:	83 99       	sbic	0x10, 3	; 16
+ 246:	81 60       	ori	r24, 0x01	; 1
+        if ( PIN(LCD_DATA1_PORT) & _BV(LCD_DATA1_PIN) ) data |= 0x02;
+ 248:	84 99       	sbic	0x10, 4	; 16
+ 24a:	82 60       	ori	r24, 0x02	; 2
+        if ( PIN(LCD_DATA2_PORT) & _BV(LCD_DATA2_PIN) ) data |= 0x04;
+ 24c:	85 99       	sbic	0x10, 5	; 16
+ 24e:	84 60       	ori	r24, 0x04	; 4
+        if ( PIN(LCD_DATA3_PORT) & _BV(LCD_DATA3_PIN) ) data |= 0x08;        
+ 250:	86 99       	sbic	0x10, 6	; 16
+ 252:	88 60       	ori	r24, 0x08	; 8
+        lcd_e_low();
+ 254:	c2 98       	cbi	0x18, 2	; 24
+    }
+    return data;
+}
+ 256:	08 95       	ret
+                
+        /* read high nibble first */
+        lcd_e_high();
+        lcd_e_delay();        
+        data = 0;
+        if ( PIN(LCD_DATA0_PORT) & _BV(LCD_DATA0_PIN) ) data |= 0x10;
+ 258:	80 e0       	ldi	r24, 0x00	; 0
+ 25a:	ea cf       	rjmp	.-44     	; 0x230 <lcd_read+0x1a>
+    
+    
+    if (rs)
+        lcd_rs_high();                       /* RS=1: read data      */
+    else
+        lcd_rs_low();                        /* RS=0: read busy flag */
+ 25c:	c0 98       	cbi	0x18, 0	; 24
+ 25e:	de cf       	rjmp	.-68     	; 0x21c <lcd_read+0x6>
+
+00000260 <lcd_waitbusy>:
+
+{
+    register uint8_t c;
+    
+    /* wait until busy flag is cleared */
+    while ( (c=lcd_read(0)) & (1<<LCD_BUSY)) {}
+ 260:	80 e0       	ldi	r24, 0x00	; 0
+ 262:	0e 94 0b 01 	call	0x216	; 0x216 <lcd_read>
+ 266:	87 fd       	sbrc	r24, 7
+ 268:	fb cf       	rjmp	.-10     	; 0x260 <lcd_waitbusy>
+static inline void _delayFourCycles(unsigned int __count)
+{
+    if ( __count == 0 )    
+        __asm__ __volatile__( "rjmp 1f\n 1:" );    // 2 cycles
+    else
+        __asm__ __volatile__ (
+ 26a:	84 e0       	ldi	r24, 0x04	; 4
+ 26c:	90 e0       	ldi	r25, 0x00	; 0
+ 26e:	01 97       	sbiw	r24, 0x01	; 1
+ 270:	f1 f7       	brne	.-4      	; 0x26e <lcd_waitbusy+0xe>
+    
+    /* the address counter is updated 4us after the busy flag is cleared */
+    delay(2);
+
+    /* now read the address counter */
+    return (lcd_read(0));  // return address counter
+ 272:	80 e0       	ldi	r24, 0x00	; 0
+ 274:	0e 94 0b 01 	call	0x216	; 0x216 <lcd_read>
+    
+}/* lcd_waitbusy */
+ 278:	08 95       	ret
+
+0000027a <lcd_command>:
+Send LCD controller instruction command
+Input:   instruction to send to LCD controller, see HD44780 data sheet
+Returns: none
+*************************************************************************/
+void lcd_command(uint8_t cmd)
+{
+ 27a:	1f 93       	push	r17
+ 27c:	18 2f       	mov	r17, r24
+    lcd_waitbusy();
+ 27e:	0e 94 30 01 	call	0x260	; 0x260 <lcd_waitbusy>
+    lcd_write(cmd,0);
+ 282:	81 2f       	mov	r24, r17
+ 284:	60 e0       	ldi	r22, 0x00	; 0
+ 286:	0e 94 dc 00 	call	0x1b8	; 0x1b8 <lcd_write>
+}
+ 28a:	1f 91       	pop	r17
+ 28c:	08 95       	ret
+
+0000028e <lcd_data>:
+Send data byte to LCD controller 
+Input:   data to send to LCD controller, see HD44780 data sheet
+Returns: none
+*************************************************************************/
+void lcd_data(uint8_t data)
+{
+ 28e:	1f 93       	push	r17
+ 290:	18 2f       	mov	r17, r24
+    lcd_waitbusy();
+ 292:	0e 94 30 01 	call	0x260	; 0x260 <lcd_waitbusy>
+    lcd_write(data,1);
+ 296:	81 2f       	mov	r24, r17
+ 298:	61 e0       	ldi	r22, 0x01	; 1
+ 29a:	0e 94 dc 00 	call	0x1b8	; 0x1b8 <lcd_write>
+}
+ 29e:	1f 91       	pop	r17
+ 2a0:	08 95       	ret
+
+000002a2 <lcd_gotoxy>:
+{
+#if LCD_LINES==1
+    lcd_command((1<<LCD_DDRAM)+LCD_START_LINE1+x);
+#endif
+#if LCD_LINES==2
+    if ( y==0 ) 
+ 2a2:	66 23       	and	r22, r22
+ 2a4:	21 f0       	breq	.+8      	; 0x2ae <lcd_gotoxy+0xc>
+        lcd_command((1<<LCD_DDRAM)+LCD_START_LINE1+x);
+    else
+        lcd_command((1<<LCD_DDRAM)+LCD_START_LINE2+x);
+ 2a6:	80 54       	subi	r24, 0x40	; 64
+ 2a8:	0e 94 3d 01 	call	0x27a	; 0x27a <lcd_command>
+ 2ac:	08 95       	ret
+#if LCD_LINES==1
+    lcd_command((1<<LCD_DDRAM)+LCD_START_LINE1+x);
+#endif
+#if LCD_LINES==2
+    if ( y==0 ) 
+        lcd_command((1<<LCD_DDRAM)+LCD_START_LINE1+x);
+ 2ae:	80 58       	subi	r24, 0x80	; 128
+ 2b0:	0e 94 3d 01 	call	0x27a	; 0x27a <lcd_command>
+ 2b4:	08 95       	ret
+
+000002b6 <lcd_getxy>:
+
+/*************************************************************************
+*************************************************************************/
+int lcd_getxy(void)
+{
+    return lcd_waitbusy();
+ 2b6:	0e 94 30 01 	call	0x260	; 0x260 <lcd_waitbusy>
+}
+ 2ba:	90 e0       	ldi	r25, 0x00	; 0
+ 2bc:	08 95       	ret
+
+000002be <lcd_clrscr>:
+/*************************************************************************
+Clear display and set cursor to home position
+*************************************************************************/
+void lcd_clrscr(void)
+{
+    lcd_command(1<<LCD_CLR);
+ 2be:	81 e0       	ldi	r24, 0x01	; 1
+ 2c0:	0e 94 3d 01 	call	0x27a	; 0x27a <lcd_command>
+}
+ 2c4:	08 95       	ret
+
+000002c6 <lcd_home>:
+/*************************************************************************
+Set cursor to home position
+*************************************************************************/
+void lcd_home(void)
+{
+    lcd_command(1<<LCD_HOME);
+ 2c6:	82 e0       	ldi	r24, 0x02	; 2
+ 2c8:	0e 94 3d 01 	call	0x27a	; 0x27a <lcd_command>
+}
+ 2cc:	08 95       	ret
+
+000002ce <lcd_putc>:
+Display character at current cursor position 
+Input:    character to be displayed                                       
+Returns:  none
+*************************************************************************/
+void lcd_putc(char c)
+{
+ 2ce:	1f 93       	push	r17
+ 2d0:	18 2f       	mov	r17, r24
+    uint8_t pos;
+
+
+    pos = lcd_waitbusy();   // read busy-flag and address counter
+ 2d2:	0e 94 30 01 	call	0x260	; 0x260 <lcd_waitbusy>
+    if (c=='\n')
+ 2d6:	1a 30       	cpi	r17, 0x0A	; 10
+ 2d8:	39 f4       	brne	.+14     	; 0x2e8 <lcd_putc+0x1a>
+
+#if LCD_LINES==1
+    addressCounter = 0;
+#endif
+#if LCD_LINES==2
+    if ( pos < (LCD_START_LINE2) )
+ 2da:	80 34       	cpi	r24, 0x40	; 64
+ 2dc:	58 f0       	brcs	.+22     	; 0x2f4 <lcd_putc+0x26>
+ 2de:	80 e8       	ldi	r24, 0x80	; 128
+        addressCounter = LCD_START_LINE4;
+    else 
+        addressCounter = LCD_START_LINE1;
+#endif
+#endif
+    lcd_command((1<<LCD_DDRAM)+addressCounter);
+ 2e0:	0e 94 3d 01 	call	0x27a	; 0x27a <lcd_command>
+        lcd_waitbusy();
+#endif
+        lcd_write(c, 1);
+    }
+
+}/* lcd_putc */
+ 2e4:	1f 91       	pop	r17
+ 2e6:	08 95       	ret
+            lcd_write((1<<LCD_DDRAM)+LCD_START_LINE1,0);
+        }
+#endif
+        lcd_waitbusy();
+#endif
+        lcd_write(c, 1);
+ 2e8:	81 2f       	mov	r24, r17
+ 2ea:	61 e0       	ldi	r22, 0x01	; 1
+ 2ec:	0e 94 dc 00 	call	0x1b8	; 0x1b8 <lcd_write>
+    }
+
+}/* lcd_putc */
+ 2f0:	1f 91       	pop	r17
+ 2f2:	08 95       	ret
+
+#if LCD_LINES==1
+    addressCounter = 0;
+#endif
+#if LCD_LINES==2
+    if ( pos < (LCD_START_LINE2) )
+ 2f4:	80 ec       	ldi	r24, 0xC0	; 192
+ 2f6:	f4 cf       	rjmp	.-24     	; 0x2e0 <lcd_putc+0x12>
+
+000002f8 <lcd_puts>:
+Input:    string to be displayed
+Returns:  none
+*************************************************************************/
+void lcd_puts(const char *s)
+/* print string on lcd (no auto linefeed) */
+{
+ 2f8:	cf 93       	push	r28
+ 2fa:	df 93       	push	r29
+ 2fc:	fc 01       	movw	r30, r24
+    register char c;
+
+    while ( (c = *s++) ) {
+ 2fe:	80 81       	ld	r24, Z
+ 300:	88 23       	and	r24, r24
+ 302:	39 f0       	breq	.+14     	; 0x312 <lcd_puts+0x1a>
+ 304:	ef 01       	movw	r28, r30
+        lcd_putc(c);
+ 306:	0e 94 67 01 	call	0x2ce	; 0x2ce <lcd_putc>
+void lcd_puts(const char *s)
+/* print string on lcd (no auto linefeed) */
+{
+    register char c;
+
+    while ( (c = *s++) ) {
+ 30a:	89 81       	ldd	r24, Y+1	; 0x01
+ 30c:	21 96       	adiw	r28, 0x01	; 1
+ 30e:	88 23       	and	r24, r24
+ 310:	d1 f7       	brne	.-12     	; 0x306 <lcd_puts+0xe>
+        lcd_putc(c);
+    }
+
+}/* lcd_puts */
+ 312:	df 91       	pop	r29
+ 314:	cf 91       	pop	r28
+ 316:	08 95       	ret
+
+00000318 <lcd_puts_p>:
+Input:     string from program memory be be displayed                                        
+Returns:   none
+*************************************************************************/
+void lcd_puts_p(const char *progmem_s)
+/* print string from program memory on lcd (no auto linefeed) */
+{
+ 318:	cf 93       	push	r28
+ 31a:	df 93       	push	r29
+ 31c:	fc 01       	movw	r30, r24
+    register char c;
+
+    while ( (c = pgm_read_byte(progmem_s++)) ) {
+ 31e:	84 91       	lpm	r24, Z+
+ 320:	88 23       	and	r24, r24
+ 322:	49 f0       	breq	.+18     	; 0x336 <lcd_puts_p+0x1e>
+ 324:	ef 01       	movw	r28, r30
+ 326:	21 96       	adiw	r28, 0x01	; 1
+        lcd_putc(c);
+ 328:	0e 94 67 01 	call	0x2ce	; 0x2ce <lcd_putc>
+ 32c:	fe 01       	movw	r30, r28
+void lcd_puts_p(const char *progmem_s)
+/* print string from program memory on lcd (no auto linefeed) */
+{
+    register char c;
+
+    while ( (c = pgm_read_byte(progmem_s++)) ) {
+ 32e:	21 96       	adiw	r28, 0x01	; 1
+ 330:	84 91       	lpm	r24, Z+
+ 332:	88 23       	and	r24, r24
+ 334:	c9 f7       	brne	.-14     	; 0x328 <lcd_puts_p+0x10>
+        lcd_putc(c);
+    }
+
+}/* lcd_puts_p */
+ 336:	df 91       	pop	r29
+ 338:	cf 91       	pop	r28
+ 33a:	08 95       	ret
+
+0000033c <lcd_init>:
+                   LCD_DISP_ON_CURSOR      display on, cursor on
+                   LCD_DISP_CURSOR_BLINK   display on, cursor on flashing
+Returns:  none
+*************************************************************************/
+void lcd_init(uint8_t dispAttr)
+{
+ 33c:	1f 93       	push	r17
+ 33e:	18 2f       	mov	r17, r24
+        DDR(LCD_E_PORT)     |= _BV(LCD_E_PIN);
+    }
+    else
+    {
+        /* configure all port bits as output (LCD data and control lines on different ports */
+        DDR(LCD_RS_PORT)    |= _BV(LCD_RS_PIN);
+ 340:	b8 9a       	sbi	0x17, 0	; 23
+        DDR(LCD_RW_PORT)    |= _BV(LCD_RW_PIN);
+ 342:	b9 9a       	sbi	0x17, 1	; 23
+        DDR(LCD_E_PORT)     |= _BV(LCD_E_PIN);
+ 344:	ba 9a       	sbi	0x17, 2	; 23
+        DDR(LCD_DATA0_PORT) |= _BV(LCD_DATA0_PIN);
+ 346:	8b 9a       	sbi	0x11, 3	; 17
+        DDR(LCD_DATA1_PORT) |= _BV(LCD_DATA1_PIN);
+ 348:	8c 9a       	sbi	0x11, 4	; 17
+        DDR(LCD_DATA2_PORT) |= _BV(LCD_DATA2_PIN);
+ 34a:	8d 9a       	sbi	0x11, 5	; 17
+        DDR(LCD_DATA3_PORT) |= _BV(LCD_DATA3_PIN);
+ 34c:	8e 9a       	sbi	0x11, 6	; 17
+static inline void _delayFourCycles(unsigned int __count)
+{
+    if ( __count == 0 )    
+        __asm__ __volatile__( "rjmp 1f\n 1:" );    // 2 cycles
+    else
+        __asm__ __volatile__ (
+ 34e:	80 e0       	ldi	r24, 0x00	; 0
+ 350:	9d e7       	ldi	r25, 0x7D	; 125
+ 352:	01 97       	sbiw	r24, 0x01	; 1
+ 354:	f1 f7       	brne	.-4      	; 0x352 <lcd_init+0x16>
+        DDR(LCD_DATA3_PORT) |= _BV(LCD_DATA3_PIN);
+    }
+    delay(16000);        /* wait 16ms or more after power-on       */
+    
+    /* initial write to lcd is 8bit */
+    LCD_DATA1_PORT |= _BV(LCD_DATA1_PIN);  // _BV(LCD_FUNCTION)>>4;
+ 356:	94 9a       	sbi	0x12, 4	; 18
+    LCD_DATA0_PORT |= _BV(LCD_DATA0_PIN);  // _BV(LCD_FUNCTION_8BIT)>>4;
+ 358:	93 9a       	sbi	0x12, 3	; 18
+
+#if LCD_IO_MODE
+/* toggle Enable Pin to initiate write */
+static void toggle_e(void)
+{
+    lcd_e_high();
+ 35a:	c2 9a       	sbi	0x18, 2	; 24
+    lcd_e_delay();
+ 35c:	00 c0       	rjmp	.+0      	; 0x35e <lcd_init+0x22>
+    lcd_e_low();
+ 35e:	c2 98       	cbi	0x18, 2	; 24
+static inline void _delayFourCycles(unsigned int __count)
+{
+    if ( __count == 0 )    
+        __asm__ __volatile__( "rjmp 1f\n 1:" );    // 2 cycles
+    else
+        __asm__ __volatile__ (
+ 360:	80 e0       	ldi	r24, 0x00	; 0
+ 362:	97 e2       	ldi	r25, 0x27	; 39
+ 364:	01 97       	sbiw	r24, 0x01	; 1
+ 366:	f1 f7       	brne	.-4      	; 0x364 <lcd_init+0x28>
+
+#if LCD_IO_MODE
+/* toggle Enable Pin to initiate write */
+static void toggle_e(void)
+{
+    lcd_e_high();
+ 368:	c2 9a       	sbi	0x18, 2	; 24
+    lcd_e_delay();
+ 36a:	00 c0       	rjmp	.+0      	; 0x36c <lcd_init+0x30>
+    lcd_e_low();
+ 36c:	c2 98       	cbi	0x18, 2	; 24
+static inline void _delayFourCycles(unsigned int __count)
+{
+    if ( __count == 0 )    
+        __asm__ __volatile__( "rjmp 1f\n 1:" );    // 2 cycles
+    else
+        __asm__ __volatile__ (
+ 36e:	80 e8       	ldi	r24, 0x80	; 128
+ 370:	90 e0       	ldi	r25, 0x00	; 0
+ 372:	fc 01       	movw	r30, r24
+ 374:	31 97       	sbiw	r30, 0x01	; 1
+ 376:	f1 f7       	brne	.-4      	; 0x374 <lcd_init+0x38>
+
+#if LCD_IO_MODE
+/* toggle Enable Pin to initiate write */
+static void toggle_e(void)
+{
+    lcd_e_high();
+ 378:	c2 9a       	sbi	0x18, 2	; 24
+    lcd_e_delay();
+ 37a:	00 c0       	rjmp	.+0      	; 0x37c <lcd_init+0x40>
+    lcd_e_low();
+ 37c:	c2 98       	cbi	0x18, 2	; 24
+static inline void _delayFourCycles(unsigned int __count)
+{
+    if ( __count == 0 )    
+        __asm__ __volatile__( "rjmp 1f\n 1:" );    // 2 cycles
+    else
+        __asm__ __volatile__ (
+ 37e:	fc 01       	movw	r30, r24
+ 380:	31 97       	sbiw	r30, 0x01	; 1
+ 382:	f1 f7       	brne	.-4      	; 0x380 <lcd_init+0x44>
+    /* repeat last command a third time */
+    lcd_e_toggle();      
+    delay(64);           /* delay, busy flag can't be checked here */
+
+    /* now configure for 4bit mode */
+    LCD_DATA0_PORT &= ~_BV(LCD_DATA0_PIN);   // LCD_FUNCTION_4BIT_1LINE>>4
+ 384:	93 98       	cbi	0x12, 3	; 18
+
+#if LCD_IO_MODE
+/* toggle Enable Pin to initiate write */
+static void toggle_e(void)
+{
+    lcd_e_high();
+ 386:	c2 9a       	sbi	0x18, 2	; 24
+    lcd_e_delay();
+ 388:	00 c0       	rjmp	.+0      	; 0x38a <lcd_init+0x4e>
+    lcd_e_low();
+ 38a:	c2 98       	cbi	0x18, 2	; 24
+static inline void _delayFourCycles(unsigned int __count)
+{
+    if ( __count == 0 )    
+        __asm__ __volatile__( "rjmp 1f\n 1:" );    // 2 cycles
+    else
+        __asm__ __volatile__ (
+ 38c:	01 97       	sbiw	r24, 0x01	; 1
+ 38e:	f1 f7       	brne	.-4      	; 0x38c <lcd_init+0x50>
+    /* Display with KS0073 controller requires special commands for enabling 4 line mode */
+	lcd_command(KS0073_EXTENDED_FUNCTION_REGISTER_ON);
+	lcd_command(KS0073_4LINES_MODE);
+	lcd_command(KS0073_EXTENDED_FUNCTION_REGISTER_OFF);
+#else
+    lcd_command(LCD_FUNCTION_DEFAULT);      /* function set: display lines  */
+ 390:	88 e2       	ldi	r24, 0x28	; 40
+ 392:	0e 94 3d 01 	call	0x27a	; 0x27a <lcd_command>
+#endif
+    lcd_command(LCD_DISP_OFF);              /* display off                  */
+ 396:	88 e0       	ldi	r24, 0x08	; 8
+ 398:	0e 94 3d 01 	call	0x27a	; 0x27a <lcd_command>
+    lcd_clrscr();                           /* display clear                */ 
+ 39c:	0e 94 5f 01 	call	0x2be	; 0x2be <lcd_clrscr>
+    lcd_command(LCD_MODE_DEFAULT);          /* set entry mode               */
+ 3a0:	86 e0       	ldi	r24, 0x06	; 6
+ 3a2:	0e 94 3d 01 	call	0x27a	; 0x27a <lcd_command>
+    lcd_command(dispAttr);                  /* display/cursor control       */
+ 3a6:	81 2f       	mov	r24, r17
+ 3a8:	0e 94 3d 01 	call	0x27a	; 0x27a <lcd_command>
+
+}/* lcd_init */
+ 3ac:	1f 91       	pop	r17
+ 3ae:	08 95       	ret
+
+000003b0 <lcd_clear_line>:
+    lcd_puts(string);
+}
+
+/* Clear line specified by line_nr */
+void lcd_clear_line(unsigned char line_nr)
+{
+ 3b0:	1f 93       	push	r17
+ 3b2:	68 2f       	mov	r22, r24
+  unsigned char i = 0;
+  
+  lcd_gotoxy(0,line_nr);
+ 3b4:	80 e0       	ldi	r24, 0x00	; 0
+ 3b6:	0e 94 51 01 	call	0x2a2	; 0x2a2 <lcd_gotoxy>
+ 3ba:	10 e0       	ldi	r17, 0x00	; 0
+  
+  for (;i < LCD_DISP_LENGTH; i++) {
+    lcd_puts(" ");
+ 3bc:	87 e8       	ldi	r24, 0x87	; 135
+ 3be:	90 e0       	ldi	r25, 0x00	; 0
+ 3c0:	0e 94 7c 01 	call	0x2f8	; 0x2f8 <lcd_puts>
+{
+  unsigned char i = 0;
+  
+  lcd_gotoxy(0,line_nr);
+  
+  for (;i < LCD_DISP_LENGTH; i++) {
+ 3c4:	1f 5f       	subi	r17, 0xFF	; 255
+ 3c6:	10 31       	cpi	r17, 0x10	; 16
+ 3c8:	c9 f7       	brne	.-14     	; 0x3bc <lcd_clear_line+0xc>
+    lcd_puts(" ");
+  }
+}
+ 3ca:	1f 91       	pop	r17
+ 3cc:	08 95       	ret
+
+000003ce <lcd_puts_line>:
+#include "../include/display.h"
+#include <stdlib.h>
+
+/* Print string parameter to line specified by line_nr */
+void lcd_puts_line(unsigned char line_nr,const char *string)
+{
+ 3ce:	ff 92       	push	r15
+ 3d0:	0f 93       	push	r16
+ 3d2:	1f 93       	push	r17
+ 3d4:	f8 2e       	mov	r15, r24
+ 3d6:	8b 01       	movw	r16, r22
+    lcd_clear_line(line_nr);
+ 3d8:	0e 94 d8 01 	call	0x3b0	; 0x3b0 <lcd_clear_line>
+    lcd_gotoxy(0,line_nr);
+ 3dc:	80 e0       	ldi	r24, 0x00	; 0
+ 3de:	6f 2d       	mov	r22, r15
+ 3e0:	0e 94 51 01 	call	0x2a2	; 0x2a2 <lcd_gotoxy>
+    lcd_puts(string);
+ 3e4:	c8 01       	movw	r24, r16
+ 3e6:	0e 94 7c 01 	call	0x2f8	; 0x2f8 <lcd_puts>
+}
+ 3ea:	1f 91       	pop	r17
+ 3ec:	0f 91       	pop	r16
+ 3ee:	ff 90       	pop	r15
+ 3f0:	08 95       	ret
+
+000003f2 <debug>:
+    lcd_puts(" ");
+  }
+}
+
+void debug(unsigned char line_nr,long num)
+{
+ 3f2:	ef 92       	push	r14
+ 3f4:	ff 92       	push	r15
+ 3f6:	1f 93       	push	r17
+ 3f8:	df 93       	push	r29
+ 3fa:	cf 93       	push	r28
+ 3fc:	cd b7       	in	r28, 0x3d	; 61
+ 3fe:	de b7       	in	r29, 0x3e	; 62
+ 400:	2b 97       	sbiw	r28, 0x0b	; 11
+ 402:	0f b6       	in	r0, 0x3f	; 63
+ 404:	f8 94       	cli
+ 406:	de bf       	out	0x3e, r29	; 62
+ 408:	0f be       	out	0x3f, r0	; 63
+ 40a:	cd bf       	out	0x3d, r28	; 61
+ 40c:	18 2f       	mov	r17, r24
+ 40e:	db 01       	movw	r26, r22
+ 410:	ca 01       	movw	r24, r20
+  char string[11];
+  
+  itoa(num,string,10);
+ 412:	7e 01       	movw	r14, r28
+ 414:	08 94       	sec
+ 416:	e1 1c       	adc	r14, r1
+ 418:	f1 1c       	adc	r15, r1
+ 41a:	b7 01       	movw	r22, r14
+ 41c:	4a e0       	ldi	r20, 0x0A	; 10
+ 41e:	50 e0       	ldi	r21, 0x00	; 0
+ 420:	0e 94 4a 07 	call	0xe94	; 0xe94 <itoa>
+  
+  lcd_puts_line(line_nr,string);
+ 424:	81 2f       	mov	r24, r17
+ 426:	b7 01       	movw	r22, r14
+ 428:	0e 94 e7 01 	call	0x3ce	; 0x3ce <lcd_puts_line>
+}
+ 42c:	2b 96       	adiw	r28, 0x0b	; 11
+ 42e:	0f b6       	in	r0, 0x3f	; 63
+ 430:	f8 94       	cli
+ 432:	de bf       	out	0x3e, r29	; 62
+ 434:	0f be       	out	0x3f, r0	; 63
+ 436:	cd bf       	out	0x3d, r28	; 61
+ 438:	cf 91       	pop	r28
+ 43a:	df 91       	pop	r29
+ 43c:	1f 91       	pop	r17
+ 43e:	ff 90       	pop	r15
+ 440:	ef 90       	pop	r14
+ 442:	08 95       	ret
+
+00000444 <init_ports>:
+#define sja_disable_irq GICR &= ~(1 << SJA_INT_BIT) /* AVR interrupt from SJA disabled */
+#define sja_enable_irq  GICR |= (1 << SJA_INT_BIT)  /* AVR interrupt from SJA enabled */
+
+void init_ports()
+{
+  sja_bus_out;
+ 444:	8f ef       	ldi	r24, 0xFF	; 255
+ 446:	84 bb       	out	0x14, r24	; 20
+  sja_ctrl_out;
+ 448:	8a b3       	in	r24, 0x1a	; 26
+ 44a:	80 6f       	ori	r24, 0xF0	; 240
+ 44c:	8a bb       	out	0x1a, r24	; 26
+  sja_int_init;
+ 44e:	8a 98       	cbi	0x11, 2	; 17
+ 450:	92 9a       	sbi	0x12, 2	; 18
+ 452:	85 b7       	in	r24, 0x35	; 53
+ 454:	85 bf       	out	0x35, r24	; 53
+  sja_enable_irq;
+ 456:	8b b7       	in	r24, 0x3b	; 59
+ 458:	80 64       	ori	r24, 0x40	; 64
+ 45a:	8b bf       	out	0x3b, r24	; 59
+}
+ 45c:	08 95       	ret
+
+0000045e <can_read_reg>:
+
+static void sja_write_address(unsigned char address)
+{
+  sja_ale_low;
+ 45e:	df 98       	cbi	0x1b, 7	; 27
+  sja_rd_high;
+ 460:	dd 9a       	sbi	0x1b, 5	; 27
+  sja_wr_high;
+ 462:	dc 9a       	sbi	0x1b, 4	; 27
+  sja_cs_high;
+ 464:	de 9a       	sbi	0x1b, 6	; 27
+  sja_ale_high;
+ 466:	df 9a       	sbi	0x1b, 7	; 27
+  sja_bus_write(address);
+ 468:	9f ef       	ldi	r25, 0xFF	; 255
+ 46a:	94 bb       	out	0x14, r25	; 20
+ 46c:	85 bb       	out	0x15, r24	; 21
+    can be achieved.
+*/
+void
+_delay_loop_1(uint8_t __count)
+{
+	__asm__ volatile (
+ 46e:	82 e0       	ldi	r24, 0x02	; 2
+ 470:	28 2f       	mov	r18, r24
+ 472:	2a 95       	dec	r18
+ 474:	f1 f7       	brne	.-4      	; 0x472 <__stack+0x13>
+  _delay_us(1);
+  sja_ale_low;
+ 476:	df 98       	cbi	0x1b, 7	; 27
+ 478:	28 2f       	mov	r18, r24
+ 47a:	2a 95       	dec	r18
+ 47c:	f1 f7       	brne	.-4      	; 0x47a <__stack+0x1b>
+static unsigned char sja_read_register(unsigned char address)
+{
+  unsigned char data;
+  
+  sja_write_address(address);
+  sja_cs_low;
+ 47e:	de 98       	cbi	0x1b, 6	; 27
+  sja_rd_low;
+ 480:	dd 98       	cbi	0x1b, 5	; 27
+  sja_bus_in;
+ 482:	95 bb       	out	0x15, r25	; 21
+ 484:	14 ba       	out	0x14, r1	; 20
+ 486:	8a 95       	dec	r24
+ 488:	f1 f7       	brne	.-4      	; 0x486 <__stack+0x27>
+  _delay_us(1);
+  data = SJA_BUS_DATA;
+ 48a:	83 b3       	in	r24, 0x13	; 19
+  sja_rd_high;
+ 48c:	dd 9a       	sbi	0x1b, 5	; 27
+  sja_cs_high;
+ 48e:	de 9a       	sbi	0x1b, 6	; 27
+}
+
+unsigned char can_read_reg(unsigned char address)
+{ 
+  return sja_read_register(address);
+}
+ 490:	08 95       	ret
+
+00000492 <can_write_reg>:
+  sja_enable_irq;
+}
+
+static void sja_write_address(unsigned char address)
+{
+  sja_ale_low;
+ 492:	df 98       	cbi	0x1b, 7	; 27
+  sja_rd_high;
+ 494:	dd 9a       	sbi	0x1b, 5	; 27
+  sja_wr_high;
+ 496:	dc 9a       	sbi	0x1b, 4	; 27
+  sja_cs_high;
+ 498:	de 9a       	sbi	0x1b, 6	; 27
+  sja_ale_high;
+ 49a:	df 9a       	sbi	0x1b, 7	; 27
+  sja_bus_write(address);
+ 49c:	2f ef       	ldi	r18, 0xFF	; 255
+ 49e:	24 bb       	out	0x14, r18	; 20
+ 4a0:	65 bb       	out	0x15, r22	; 21
+ 4a2:	92 e0       	ldi	r25, 0x02	; 2
+ 4a4:	39 2f       	mov	r19, r25
+ 4a6:	3a 95       	dec	r19
+ 4a8:	f1 f7       	brne	.-4      	; 0x4a6 <can_write_reg+0x14>
+  _delay_us(1);
+  sja_ale_low;
+ 4aa:	df 98       	cbi	0x1b, 7	; 27
+ 4ac:	39 2f       	mov	r19, r25
+ 4ae:	3a 95       	dec	r19
+ 4b0:	f1 f7       	brne	.-4      	; 0x4ae <can_write_reg+0x1c>
+}
+
+static void sja_write_register(unsigned char data,unsigned char address)
+{
+  sja_write_address(address);
+  sja_cs_low;
+ 4b2:	de 98       	cbi	0x1b, 6	; 27
+  sja_wr_low;
+ 4b4:	dc 98       	cbi	0x1b, 4	; 27
+  sja_bus_write(data);
+ 4b6:	24 bb       	out	0x14, r18	; 20
+ 4b8:	85 bb       	out	0x15, r24	; 21
+ 4ba:	89 2f       	mov	r24, r25
+ 4bc:	8a 95       	dec	r24
+ 4be:	f1 f7       	brne	.-4      	; 0x4bc <can_write_reg+0x2a>
+  _delay_us(1);
+  sja_wr_high;
+ 4c0:	dc 9a       	sbi	0x1b, 4	; 27
+  sja_cs_high;
+ 4c2:	de 9a       	sbi	0x1b, 6	; 27
+ 4c4:	9a 95       	dec	r25
+ 4c6:	f1 f7       	brne	.-4      	; 0x4c4 <can_write_reg+0x32>
+}
+
+void can_write_reg(unsigned char data,unsigned char address)
+{
+  sja_write_register(data,address);
+}
+ 4c8:	08 95       	ret
+
+000004ca <can_enable_irq>:
+
+void can_enable_irq()
+{
+  sja_enable_irq;
+ 4ca:	8b b7       	in	r24, 0x3b	; 59
+ 4cc:	80 64       	ori	r24, 0x40	; 64
+ 4ce:	8b bf       	out	0x3b, r24	; 59
+}
+ 4d0:	08 95       	ret
+
+000004d2 <can_disable_irq>:
+
+void can_disable_irq()
+{
+  sja_disable_irq;
+ 4d2:	8b b7       	in	r24, 0x3b	; 59
+ 4d4:	8f 7b       	andi	r24, 0xBF	; 191
+ 4d6:	8b bf       	out	0x3b, r24	; 59
+}
+ 4d8:	08 95       	ret
+
+000004da <sja1000p_send_msg>:
+ * Return Value: negative value reports error.
+ * File: src/sja1000p.c
+ */
+char sja1000p_send_msg()
+{
+  can_write_reg(sjaCMR_TR, SJACMR);
+ 4da:	81 e0       	ldi	r24, 0x01	; 1
+ 4dc:	61 e0       	ldi	r22, 0x01	; 1
+ 4de:	0e 94 49 02 	call	0x492	; 0x492 <can_write_reg>
+
+  return 0;
+}
+ 4e2:	80 e0       	ldi	r24, 0x00	; 0
+ 4e4:	08 95       	ret
+
+000004e6 <sja1000p_read>:
+ * @chip: pointer to chip state structure
+ * @obj: pinter to CAN message queue information
+ *
+ * File: src/sja1000p.c
+ */
+void sja1000p_read(struct canmsg_t *rx_msg) {
+ 4e6:	8f 92       	push	r8
+ 4e8:	9f 92       	push	r9
+ 4ea:	af 92       	push	r10
+ 4ec:	bf 92       	push	r11
+ 4ee:	cf 92       	push	r12
+ 4f0:	df 92       	push	r13
+ 4f2:	ef 92       	push	r14
+ 4f4:	ff 92       	push	r15
+ 4f6:	0f 93       	push	r16
+ 4f8:	1f 93       	push	r17
+ 4fa:	cf 93       	push	r28
+ 4fc:	df 93       	push	r29
+ 4fe:	ec 01       	movw	r28, r24
+
+  unsigned char i, flags, len;
+  unsigned long pom;
+
+  flags = can_read_reg(SJAFRM);
+ 500:	80 e1       	ldi	r24, 0x10	; 16
+ 502:	0e 94 2f 02 	call	0x45e	; 0x45e <can_read_reg>
+ 506:	98 2e       	mov	r9, r24
+
+  pom = (can_read_reg(SJAID0)<<10);
+ 508:	81 e1       	ldi	r24, 0x11	; 17
+ 50a:	0e 94 2f 02 	call	0x45e	; 0x45e <can_read_reg>
+ 50e:	b8 2e       	mov	r11, r24
+ 510:	bb 0c       	add	r11, r11
+ 512:	bb 0c       	add	r11, r11
+ 514:	aa 24       	eor	r10, r10
+ 516:	cc 24       	eor	r12, r12
+ 518:	b7 fc       	sbrc	r11, 7
+ 51a:	c0 94       	com	r12
+ 51c:	dc 2c       	mov	r13, r12
+  pom = pom<<11;
+  
+  rx_msg->id =
+ 51e:	82 e1       	ldi	r24, 0x12	; 18
+ 520:	0e 94 2f 02 	call	0x45e	; 0x45e <can_read_reg>
+ 524:	88 2e       	mov	r8, r24
+ 526:	83 e1       	ldi	r24, 0x13	; 19
+ 528:	0e 94 2f 02 	call	0x45e	; 0x45e <can_read_reg>
+ 52c:	e8 2e       	mov	r14, r24
+ 52e:	84 e1       	ldi	r24, 0x14	; 20
+ 530:	0e 94 2f 02 	call	0x45e	; 0x45e <can_read_reg>
+ 534:	38 2d       	mov	r19, r8
+ 536:	32 95       	swap	r19
+ 538:	33 0f       	add	r19, r19
+ 53a:	30 7e       	andi	r19, 0xE0	; 224
+ 53c:	20 e0       	ldi	r18, 0x00	; 0
+ 53e:	44 27       	eor	r20, r20
+ 540:	37 fd       	sbrc	r19, 7
+ 542:	40 95       	com	r20
+ 544:	54 2f       	mov	r21, r20
+ 546:	ff 24       	eor	r15, r15
+ 548:	ee 0c       	add	r14, r14
+ 54a:	ff 1c       	adc	r15, r15
+ 54c:	e2 94       	swap	r14
+ 54e:	f2 94       	swap	r15
+ 550:	70 ef       	ldi	r23, 0xF0	; 240
+ 552:	f7 22       	and	r15, r23
+ 554:	fe 24       	eor	r15, r14
+ 556:	e7 22       	and	r14, r23
+ 558:	fe 24       	eor	r15, r14
+ 55a:	00 27       	eor	r16, r16
+ 55c:	f7 fc       	sbrc	r15, 7
+ 55e:	00 95       	com	r16
+ 560:	10 2f       	mov	r17, r16
+ 562:	2e 0d       	add	r18, r14
+ 564:	3f 1d       	adc	r19, r15
+ 566:	40 1f       	adc	r20, r16
+ 568:	51 1f       	adc	r21, r17
+ 56a:	86 95       	lsr	r24
+ 56c:	86 95       	lsr	r24
+ 56e:	86 95       	lsr	r24
+ 570:	28 0f       	add	r18, r24
+ 572:	31 1d       	adc	r19, r1
+ 574:	41 1d       	adc	r20, r1
+ 576:	51 1d       	adc	r21, r1
+ 578:	6b e0       	ldi	r22, 0x0B	; 11
+ 57a:	aa 0c       	add	r10, r10
+ 57c:	bb 1c       	adc	r11, r11
+ 57e:	cc 1c       	adc	r12, r12
+ 580:	dd 1c       	adc	r13, r13
+ 582:	6a 95       	dec	r22
+ 584:	d1 f7       	brne	.-12     	; 0x57a <sja1000p_read+0x94>
+ 586:	2a 0d       	add	r18, r10
+ 588:	3b 1d       	adc	r19, r11
+ 58a:	4c 1d       	adc	r20, r12
+ 58c:	5d 1d       	adc	r21, r13
+ 58e:	29 83       	std	Y+1, r18	; 0x01
+ 590:	3a 83       	std	Y+2, r19	; 0x02
+ 592:	4b 83       	std	Y+3, r20	; 0x03
+ 594:	5c 83       	std	Y+4, r21	; 0x04
+    pom +
+    (can_read_reg(SJAID1)<<13) +
+    (can_read_reg(SJAID2)<<5) +
+    (can_read_reg(SJAID3)>>3);
+  
+  rx_msg->flags =
+ 596:	29 2d       	mov	r18, r9
+ 598:	22 1f       	adc	r18, r18
+ 59a:	22 27       	eor	r18, r18
+ 59c:	22 1f       	adc	r18, r18
+ 59e:	22 0f       	add	r18, r18
+ 5a0:	22 0f       	add	r18, r18
+ 5a2:	89 2d       	mov	r24, r9
+ 5a4:	90 e0       	ldi	r25, 0x00	; 0
+ 5a6:	00 24       	eor	r0, r0
+ 5a8:	88 0f       	add	r24, r24
+ 5aa:	99 1f       	adc	r25, r25
+ 5ac:	00 1c       	adc	r0, r0
+ 5ae:	88 0f       	add	r24, r24
+ 5b0:	99 1f       	adc	r25, r25
+ 5b2:	00 1c       	adc	r0, r0
+ 5b4:	89 2f       	mov	r24, r25
+ 5b6:	90 2d       	mov	r25, r0
+ 5b8:	81 70       	andi	r24, 0x01	; 1
+ 5ba:	28 2b       	or	r18, r24
+ 5bc:	28 83       	st	Y, r18
+    ((flags & sjaFRM_RTR) ? MSG_RTR : 0) |
+    ((flags & sjaFRM_FF) ? MSG_EXT : 0);
+  
+  len = flags & sjaFRM_DLC_M;
+ 5be:	8f e0       	ldi	r24, 0x0F	; 15
+ 5c0:	98 22       	and	r9, r24
+  
+  rx_msg->length = len;
+ 5c2:	9d 82       	std	Y+5, r9	; 0x05
+ 5c4:	09 2d       	mov	r16, r9
+ 5c6:	09 30       	cpi	r16, 0x09	; 9
+ 5c8:	e0 f0       	brcs	.+56     	; 0x602 <sja1000p_read+0x11c>
+ 5ca:	08 e0       	ldi	r16, 0x08	; 8
+  
+  if(len > CAN_MSG_LENGTH)
+    len = CAN_MSG_LENGTH;
+  
+  for(i = 0; i < len; i++) {
+ 5cc:	10 e0       	ldi	r17, 0x00	; 0
+    rx_msg->data[i] = can_read_reg(SJADATE+i);
+ 5ce:	81 2f       	mov	r24, r17
+ 5d0:	8b 5e       	subi	r24, 0xEB	; 235
+ 5d2:	0e 94 2f 02 	call	0x45e	; 0x45e <can_read_reg>
+ 5d6:	8e 83       	std	Y+6, r24	; 0x06
+  rx_msg->length = len;
+  
+  if(len > CAN_MSG_LENGTH)
+    len = CAN_MSG_LENGTH;
+  
+  for(i = 0; i < len; i++) {
+ 5d8:	1f 5f       	subi	r17, 0xFF	; 255
+ 5da:	21 96       	adiw	r28, 0x01	; 1
+ 5dc:	10 17       	cp	r17, r16
+ 5de:	b8 f3       	brcs	.-18     	; 0x5ce <sja1000p_read+0xe8>
+    rx_msg->data[i] = can_read_reg(SJADATE+i);
+  }
+
+  can_write_reg(sjaCMR_RRB, SJACMR);
+ 5e0:	84 e0       	ldi	r24, 0x04	; 4
+ 5e2:	61 e0       	ldi	r22, 0x01	; 1
+ 5e4:	0e 94 49 02 	call	0x492	; 0x492 <can_write_reg>
+
+}
+ 5e8:	df 91       	pop	r29
+ 5ea:	cf 91       	pop	r28
+ 5ec:	1f 91       	pop	r17
+ 5ee:	0f 91       	pop	r16
+ 5f0:	ff 90       	pop	r15
+ 5f2:	ef 90       	pop	r14
+ 5f4:	df 90       	pop	r13
+ 5f6:	cf 90       	pop	r12
+ 5f8:	bf 90       	pop	r11
+ 5fa:	af 90       	pop	r10
+ 5fc:	9f 90       	pop	r9
+ 5fe:	8f 90       	pop	r8
+ 600:	08 95       	ret
+  rx_msg->length = len;
+  
+  if(len > CAN_MSG_LENGTH)
+    len = CAN_MSG_LENGTH;
+  
+  for(i = 0; i < len; i++) {
+ 602:	99 20       	and	r9, r9
+ 604:	19 f7       	brne	.-58     	; 0x5cc <sja1000p_read+0xe6>
+ 606:	ec cf       	rjmp	.-40     	; 0x5e0 <sja1000p_read+0xfa>
+
+00000608 <sja1000p_irq_handler>:
+ * CAN controller chip and distribution of message through attached
+ * message queues.
+ * File: src/sja1000p.c
+ */
+char sja1000p_irq_handler(struct canmsg_t *rx_msg)
+{
+ 608:	0f 93       	push	r16
+ 60a:	1f 93       	push	r17
+ 60c:	cf 93       	push	r28
+ 60e:	df 93       	push	r29
+ 610:	ec 01       	movw	r28, r24
+  unsigned char irq_register, status;
+
+  irq_register = can_read_reg(SJAIR);
+ 612:	83 e0       	ldi	r24, 0x03	; 3
+ 614:	0e 94 2f 02 	call	0x45e	; 0x45e <can_read_reg>
+ 618:	18 2f       	mov	r17, r24
+
+#ifdef DEBUG
+    lcd_puts_line(0,"Interrupt");
+ 61a:	80 e0       	ldi	r24, 0x00	; 0
+ 61c:	69 e8       	ldi	r22, 0x89	; 137
+ 61e:	70 e0       	ldi	r23, 0x00	; 0
+ 620:	0e 94 e7 01 	call	0x3ce	; 0x3ce <lcd_puts_line>
+    debug(1,irq_register);
+ 624:	41 2f       	mov	r20, r17
+ 626:	50 e0       	ldi	r21, 0x00	; 0
+ 628:	60 e0       	ldi	r22, 0x00	; 0
+ 62a:	70 e0       	ldi	r23, 0x00	; 0
+ 62c:	81 e0       	ldi	r24, 0x01	; 1
+ 62e:	0e 94 f9 01 	call	0x3f2	; 0x3f2 <debug>
+ 632:	20 e1       	ldi	r18, 0x10	; 16
+ 634:	37 e2       	ldi	r19, 0x27	; 39
+    milliseconds can be achieved.
+ */
+void
+_delay_loop_2(uint16_t __count)
+{
+	__asm__ volatile (
+ 636:	48 ec       	ldi	r20, 0xC8	; 200
+ 638:	50 e0       	ldi	r21, 0x00	; 0
+ 63a:	ca 01       	movw	r24, r20
+ 63c:	01 97       	sbiw	r24, 0x01	; 1
+ 63e:	f1 f7       	brne	.-4      	; 0x63c <sja1000p_irq_handler+0x34>
+		{
+			// wait 1/10 ms
+			_delay_loop_2(((F_CPU) / 4e3) / 10);
+			__ticks --;
+ 640:	21 50       	subi	r18, 0x01	; 1
+ 642:	30 40       	sbci	r19, 0x00	; 0
+		__ticks = 1;
+	else if (__tmp > 65535)
+	{
+		//	__ticks = requested delay in 1/10 ms
+		__ticks = (uint16_t) (__ms * 10.0);
+		while(__ticks)
+ 644:	d1 f7       	brne	.-12     	; 0x63a <sja1000p_irq_handler+0x32>
+    _delay_ms(1000);
+#endif  
+
+  if ((irq_register & (sjaIR_BEI|sjaIR_EPI|sjaIR_DOI|sjaIR_EI|sjaIR_TI|sjaIR_RI)) == 0) {
+ 646:	81 2f       	mov	r24, r17
+ 648:	8f 7a       	andi	r24, 0xAF	; 175
+ 64a:	a9 f4       	brne	.+42     	; 0x676 <sja1000p_irq_handler+0x6e>
+#ifdef DEBUG
+    CANMSG("None int. flag");
+ 64c:	81 e0       	ldi	r24, 0x01	; 1
+ 64e:	63 e9       	ldi	r22, 0x93	; 147
+ 650:	70 e0       	ldi	r23, 0x00	; 0
+ 652:	0e 94 e7 01 	call	0x3ce	; 0x3ce <lcd_puts_line>
+ 656:	20 e1       	ldi	r18, 0x10	; 16
+ 658:	37 e2       	ldi	r19, 0x27	; 39
+ 65a:	48 ec       	ldi	r20, 0xC8	; 200
+ 65c:	50 e0       	ldi	r21, 0x00	; 0
+ 65e:	ca 01       	movw	r24, r20
+ 660:	01 97       	sbiw	r24, 0x01	; 1
+ 662:	f1 f7       	brne	.-4      	; 0x660 <sja1000p_irq_handler+0x58>
+		{
+			// wait 1/10 ms
+			_delay_loop_2(((F_CPU) / 4e3) / 10);
+			__ticks --;
+ 664:	21 50       	subi	r18, 0x01	; 1
+ 666:	30 40       	sbci	r19, 0x00	; 0
+		__ticks = 1;
+	else if (__tmp > 65535)
+	{
+		//	__ticks = requested delay in 1/10 ms
+		__ticks = (uint16_t) (__ms * 10.0);
+		while(__ticks)
+ 668:	d1 f7       	brne	.-12     	; 0x65e <sja1000p_irq_handler+0x56>
+ 66a:	80 e0       	ldi	r24, 0x00	; 0
+      can_write_reg(0, SJAMOD);
+    }
+  }
+
+  return 1;
+}
+ 66c:	df 91       	pop	r29
+ 66e:	cf 91       	pop	r28
+ 670:	1f 91       	pop	r17
+ 672:	0f 91       	pop	r16
+ 674:	08 95       	ret
+    _delay_ms(1000);
+#endif
+    return 0;
+  }
+
+  status = can_read_reg(SJASR);
+ 676:	82 e0       	ldi	r24, 0x02	; 2
+ 678:	0e 94 2f 02 	call	0x45e	; 0x45e <can_read_reg>
+ 67c:	08 2f       	mov	r16, r24
+
+  /* (irq_register & sjaIR_RI) */
+  /*  old variant using SJAIR, collides with intended use with irq_accept */
+  if (status & sjaSR_RBS) {
+ 67e:	80 fd       	sbrc	r24, 0
+ 680:	0a c0       	rjmp	.+20     	; 0x696 <sja1000p_irq_handler+0x8e>
+    _delay_ms(1000);
+#endif
+    sja1000p_read(rx_msg);
+  }
+  
+  if ((irq_register & (sjaIR_EI|sjaIR_BEI|sjaIR_EPI|sjaIR_DOI)) != 0) { 
+ 682:	1c 7a       	andi	r17, 0xAC	; 172
+ 684:	11 f0       	breq	.+4      	; 0x68a <sja1000p_irq_handler+0x82>
+    // Some error happened
+    
+    if(status & sjaSR_BS) {
+ 686:	07 fd       	sbrc	r16, 7
+ 688:	1b c0       	rjmp	.+54     	; 0x6c0 <sja1000p_irq_handler+0xb8>
+      CANMSG("bus-off");
+      _delay_ms(1000);
+      CANMSG("resetting chip");
+      _delay_ms(1000);
+#endif
+      can_write_reg(0, SJAMOD);
+ 68a:	81 e0       	ldi	r24, 0x01	; 1
+    }
+  }
+
+  return 1;
+}
+ 68c:	df 91       	pop	r29
+ 68e:	cf 91       	pop	r28
+ 690:	1f 91       	pop	r17
+ 692:	0f 91       	pop	r16
+ 694:	08 95       	ret
+
+  /* (irq_register & sjaIR_RI) */
+  /*  old variant using SJAIR, collides with intended use with irq_accept */
+  if (status & sjaSR_RBS) {
+#ifdef DEBUG
+    CANMSG("IRQ: RI or RBS");
+ 696:	81 e0       	ldi	r24, 0x01	; 1
+ 698:	62 ea       	ldi	r22, 0xA2	; 162
+ 69a:	70 e0       	ldi	r23, 0x00	; 0
+ 69c:	0e 94 e7 01 	call	0x3ce	; 0x3ce <lcd_puts_line>
+ 6a0:	20 e1       	ldi	r18, 0x10	; 16
+ 6a2:	37 e2       	ldi	r19, 0x27	; 39
+ 6a4:	48 ec       	ldi	r20, 0xC8	; 200
+ 6a6:	50 e0       	ldi	r21, 0x00	; 0
+ 6a8:	ca 01       	movw	r24, r20
+ 6aa:	01 97       	sbiw	r24, 0x01	; 1
+ 6ac:	f1 f7       	brne	.-4      	; 0x6aa <sja1000p_irq_handler+0xa2>
+		{
+			// wait 1/10 ms
+			_delay_loop_2(((F_CPU) / 4e3) / 10);
+			__ticks --;
+ 6ae:	21 50       	subi	r18, 0x01	; 1
+ 6b0:	30 40       	sbci	r19, 0x00	; 0
+		__ticks = 1;
+	else if (__tmp > 65535)
+	{
+		//	__ticks = requested delay in 1/10 ms
+		__ticks = (uint16_t) (__ms * 10.0);
+		while(__ticks)
+ 6b2:	d1 f7       	brne	.-12     	; 0x6a8 <sja1000p_irq_handler+0xa0>
+    _delay_ms(1000);
+#endif
+    sja1000p_read(rx_msg);
+ 6b4:	ce 01       	movw	r24, r28
+ 6b6:	0e 94 73 02 	call	0x4e6	; 0x4e6 <sja1000p_read>
+  }
+  
+  if ((irq_register & (sjaIR_EI|sjaIR_BEI|sjaIR_EPI|sjaIR_DOI)) != 0) { 
+ 6ba:	1c 7a       	andi	r17, 0xAC	; 172
+ 6bc:	21 f7       	brne	.-56     	; 0x686 <sja1000p_irq_handler+0x7e>
+ 6be:	e5 cf       	rjmp	.-54     	; 0x68a <sja1000p_irq_handler+0x82>
+    // Some error happened
+    
+    if(status & sjaSR_BS) {
+#ifdef DEBUG
+      CANMSG("bus-off");
+ 6c0:	81 e0       	ldi	r24, 0x01	; 1
+ 6c2:	61 eb       	ldi	r22, 0xB1	; 177
+ 6c4:	70 e0       	ldi	r23, 0x00	; 0
+ 6c6:	0e 94 e7 01 	call	0x3ce	; 0x3ce <lcd_puts_line>
+ 6ca:	20 e1       	ldi	r18, 0x10	; 16
+ 6cc:	37 e2       	ldi	r19, 0x27	; 39
+ 6ce:	48 ec       	ldi	r20, 0xC8	; 200
+ 6d0:	50 e0       	ldi	r21, 0x00	; 0
+ 6d2:	ca 01       	movw	r24, r20
+ 6d4:	01 97       	sbiw	r24, 0x01	; 1
+ 6d6:	f1 f7       	brne	.-4      	; 0x6d4 <sja1000p_irq_handler+0xcc>
+		{
+			// wait 1/10 ms
+			_delay_loop_2(((F_CPU) / 4e3) / 10);
+			__ticks --;
+ 6d8:	21 50       	subi	r18, 0x01	; 1
+ 6da:	30 40       	sbci	r19, 0x00	; 0
+		__ticks = 1;
+	else if (__tmp > 65535)
+	{
+		//	__ticks = requested delay in 1/10 ms
+		__ticks = (uint16_t) (__ms * 10.0);
+		while(__ticks)
+ 6dc:	d1 f7       	brne	.-12     	; 0x6d2 <sja1000p_irq_handler+0xca>
+      _delay_ms(1000);
+      CANMSG("resetting chip");
+ 6de:	81 e0       	ldi	r24, 0x01	; 1
+ 6e0:	69 eb       	ldi	r22, 0xB9	; 185
+ 6e2:	70 e0       	ldi	r23, 0x00	; 0
+ 6e4:	0e 94 e7 01 	call	0x3ce	; 0x3ce <lcd_puts_line>
+ 6e8:	20 e1       	ldi	r18, 0x10	; 16
+ 6ea:	37 e2       	ldi	r19, 0x27	; 39
+ 6ec:	48 ec       	ldi	r20, 0xC8	; 200
+ 6ee:	50 e0       	ldi	r21, 0x00	; 0
+ 6f0:	ca 01       	movw	r24, r20
+ 6f2:	01 97       	sbiw	r24, 0x01	; 1
+ 6f4:	f1 f7       	brne	.-4      	; 0x6f2 <sja1000p_irq_handler+0xea>
+		{
+			// wait 1/10 ms
+			_delay_loop_2(((F_CPU) / 4e3) / 10);
+			__ticks --;
+ 6f6:	21 50       	subi	r18, 0x01	; 1
+ 6f8:	30 40       	sbci	r19, 0x00	; 0
+		__ticks = 1;
+	else if (__tmp > 65535)
+	{
+		//	__ticks = requested delay in 1/10 ms
+		__ticks = (uint16_t) (__ms * 10.0);
+		while(__ticks)
+ 6fa:	d1 f7       	brne	.-12     	; 0x6f0 <sja1000p_irq_handler+0xe8>
+      _delay_ms(1000);
+#endif
+      can_write_reg(0, SJAMOD);
+ 6fc:	80 e0       	ldi	r24, 0x00	; 0
+ 6fe:	60 e0       	ldi	r22, 0x00	; 0
+ 700:	0e 94 49 02 	call	0x492	; 0x492 <can_write_reg>
+ 704:	81 e0       	ldi	r24, 0x01	; 1
+ 706:	b2 cf       	rjmp	.-156    	; 0x66c <sja1000p_irq_handler+0x64>
+
+00000708 <sja1000p_disable_configuration>:
+/**
+ * sja1000p_disable_configuration - disable chip configuration mode
+ * @chip: pointer to chip state structure
+ */
+char sja1000p_disable_configuration()
+{
+ 708:	1f 93       	push	r17
+ 70a:	cf 93       	push	r28
+ 70c:	df 93       	push	r29
+  unsigned char i = 0;
+  enum sja1000_PeliCAN_MOD flags;
+
+  flags = can_read_reg(SJAMOD);
+ 70e:	80 e0       	ldi	r24, 0x00	; 0
+ 710:	0e 94 2f 02 	call	0x45e	; 0x45e <can_read_reg>
+
+  while ( (flags & sjaMOD_RM) && (i<=50) ) {
+ 714:	80 ff       	sbrs	r24, 0
+ 716:	15 c0       	rjmp	.+42     	; 0x742 <sja1000p_disable_configuration+0x3a>
+ 718:	10 e0       	ldi	r17, 0x00	; 0
+ 71a:	c8 ec       	ldi	r28, 0xC8	; 200
+ 71c:	d0 e0       	ldi	r29, 0x00	; 0
+ 71e:	02 c0       	rjmp	.+4      	; 0x724 <sja1000p_disable_configuration+0x1c>
+ 720:	13 33       	cpi	r17, 0x33	; 51
+ 722:	b1 f0       	breq	.+44     	; 0x750 <sja1000p_disable_configuration+0x48>
+// could be as long as 11*128 bit times after buss-off
+    can_write_reg(0, SJAMOD);
+ 724:	80 e0       	ldi	r24, 0x00	; 0
+ 726:	60 e0       	ldi	r22, 0x00	; 0
+ 728:	0e 94 49 02 	call	0x492	; 0x492 <can_write_reg>
+ 72c:	ce 01       	movw	r24, r28
+ 72e:	01 97       	sbiw	r24, 0x01	; 1
+ 730:	f1 f7       	brne	.-4      	; 0x72e <sja1000p_disable_configuration+0x26>
+    _delay_us(100);
+    i++;
+ 732:	1f 5f       	subi	r17, 0xFF	; 255
+    flags = can_read_reg(SJAMOD);
+ 734:	80 e0       	ldi	r24, 0x00	; 0
+ 736:	0e 94 2f 02 	call	0x45e	; 0x45e <can_read_reg>
+  unsigned char i = 0;
+  enum sja1000_PeliCAN_MOD flags;
+
+  flags = can_read_reg(SJAMOD);
+
+  while ( (flags & sjaMOD_RM) && (i<=50) ) {
+ 73a:	80 fd       	sbrc	r24, 0
+ 73c:	f1 cf       	rjmp	.-30     	; 0x720 <sja1000p_disable_configuration+0x18>
+    can_write_reg(0, SJAMOD);
+    _delay_us(100);
+    i++;
+    flags = can_read_reg(SJAMOD);
+  }
+  if (i >= 10) {
+ 73e:	1a 30       	cpi	r17, 0x0A	; 10
+ 740:	38 f4       	brcc	.+14     	; 0x750 <sja1000p_disable_configuration+0x48>
+    _delay_ms(1000);
+#endif
+    return -1;
+  }
+
+  can_enable_irq();
+ 742:	0e 94 65 02 	call	0x4ca	; 0x4ca <can_enable_irq>
+ 746:	80 e0       	ldi	r24, 0x00	; 0
+
+  return 0;
+}
+ 748:	df 91       	pop	r29
+ 74a:	cf 91       	pop	r28
+ 74c:	1f 91       	pop	r17
+ 74e:	08 95       	ret
+    i++;
+    flags = can_read_reg(SJAMOD);
+  }
+  if (i >= 10) {
+#ifdef DEBUG
+    CANMSG("Err. exit reset");
+ 750:	81 e0       	ldi	r24, 0x01	; 1
+ 752:	68 ec       	ldi	r22, 0xC8	; 200
+ 754:	70 e0       	ldi	r23, 0x00	; 0
+ 756:	0e 94 e7 01 	call	0x3ce	; 0x3ce <lcd_puts_line>
+ 75a:	20 e1       	ldi	r18, 0x10	; 16
+ 75c:	37 e2       	ldi	r19, 0x27	; 39
+ 75e:	48 ec       	ldi	r20, 0xC8	; 200
+ 760:	50 e0       	ldi	r21, 0x00	; 0
+ 762:	ca 01       	movw	r24, r20
+ 764:	01 97       	sbiw	r24, 0x01	; 1
+ 766:	f1 f7       	brne	.-4      	; 0x764 <sja1000p_disable_configuration+0x5c>
+		{
+			// wait 1/10 ms
+			_delay_loop_2(((F_CPU) / 4e3) / 10);
+			__ticks --;
+ 768:	21 50       	subi	r18, 0x01	; 1
+ 76a:	30 40       	sbci	r19, 0x00	; 0
+		__ticks = 1;
+	else if (__tmp > 65535)
+	{
+		//	__ticks = requested delay in 1/10 ms
+		__ticks = (uint16_t) (__ms * 10.0);
+		while(__ticks)
+ 76c:	d1 f7       	brne	.-12     	; 0x762 <sja1000p_disable_configuration+0x5a>
+ 76e:	8f ef       	ldi	r24, 0xFF	; 255
+ 770:	eb cf       	rjmp	.-42     	; 0x748 <sja1000p_disable_configuration+0x40>
+
+00000772 <sja1000p_enable_configuration>:
+/**
+ * sja1000p_enable_configuration - enable chip configuration mode
+ * @chip: pointer to chip state structure
+ */
+char sja1000p_enable_configuration()
+{
+ 772:	1f 93       	push	r17
+ 774:	cf 93       	push	r28
+ 776:	df 93       	push	r29
+  unsigned char i = 0;
+  enum sja1000_PeliCAN_MOD flags;
+
+  can_disable_irq();
+ 778:	0e 94 69 02 	call	0x4d2	; 0x4d2 <can_disable_irq>
+
+  flags = can_read_reg(SJAMOD);
+ 77c:	80 e0       	ldi	r24, 0x00	; 0
+ 77e:	0e 94 2f 02 	call	0x45e	; 0x45e <can_read_reg>
+
+  while ((!(flags & sjaMOD_RM)) && (i <= 10)) {
+ 782:	80 fd       	sbrc	r24, 0
+ 784:	27 c0       	rjmp	.+78     	; 0x7d4 <sja1000p_enable_configuration+0x62>
+ 786:	10 e0       	ldi	r17, 0x00	; 0
+ 788:	c8 ec       	ldi	r28, 0xC8	; 200
+ 78a:	d0 e0       	ldi	r29, 0x00	; 0
+    can_write_reg(sjaMOD_RM, SJAMOD);
+ 78c:	81 e0       	ldi	r24, 0x01	; 1
+ 78e:	60 e0       	ldi	r22, 0x00	; 0
+ 790:	0e 94 49 02 	call	0x492	; 0x492 <can_write_reg>
+ 794:	ce 01       	movw	r24, r28
+ 796:	01 97       	sbiw	r24, 0x01	; 1
+ 798:	f1 f7       	brne	.-4      	; 0x796 <sja1000p_enable_configuration+0x24>
+    _delay_us(100);
+    i++;
+ 79a:	1f 5f       	subi	r17, 0xFF	; 255
+    flags = can_read_reg(SJAMOD);
+ 79c:	80 e0       	ldi	r24, 0x00	; 0
+ 79e:	0e 94 2f 02 	call	0x45e	; 0x45e <can_read_reg>
+
+  can_disable_irq();
+
+  flags = can_read_reg(SJAMOD);
+
+  while ((!(flags & sjaMOD_RM)) && (i <= 10)) {
+ 7a2:	80 fd       	sbrc	r24, 0
+ 7a4:	15 c0       	rjmp	.+42     	; 0x7d0 <sja1000p_enable_configuration+0x5e>
+ 7a6:	1b 30       	cpi	r17, 0x0B	; 11
+ 7a8:	89 f7       	brne	.-30     	; 0x78c <sja1000p_enable_configuration+0x1a>
+    i++;
+    flags = can_read_reg(SJAMOD);
+  }
+  if (i >= 10) {
+#ifdef DEBUG
+    CANMSG("Reset mode error");
+ 7aa:	81 e0       	ldi	r24, 0x01	; 1
+ 7ac:	68 ed       	ldi	r22, 0xD8	; 216
+ 7ae:	70 e0       	ldi	r23, 0x00	; 0
+ 7b0:	0e 94 e7 01 	call	0x3ce	; 0x3ce <lcd_puts_line>
+ 7b4:	20 e1       	ldi	r18, 0x10	; 16
+ 7b6:	37 e2       	ldi	r19, 0x27	; 39
+ 7b8:	48 ec       	ldi	r20, 0xC8	; 200
+ 7ba:	50 e0       	ldi	r21, 0x00	; 0
+ 7bc:	ca 01       	movw	r24, r20
+ 7be:	01 97       	sbiw	r24, 0x01	; 1
+ 7c0:	f1 f7       	brne	.-4      	; 0x7be <sja1000p_enable_configuration+0x4c>
+		{
+			// wait 1/10 ms
+			_delay_loop_2(((F_CPU) / 4e3) / 10);
+			__ticks --;
+ 7c2:	21 50       	subi	r18, 0x01	; 1
+ 7c4:	30 40       	sbci	r19, 0x00	; 0
+		__ticks = 1;
+	else if (__tmp > 65535)
+	{
+		//	__ticks = requested delay in 1/10 ms
+		__ticks = (uint16_t) (__ms * 10.0);
+		while(__ticks)
+ 7c6:	d1 f7       	brne	.-12     	; 0x7bc <sja1000p_enable_configuration+0x4a>
+    _delay_ms(1000);
+#endif
+    can_enable_irq();
+ 7c8:	0e 94 65 02 	call	0x4ca	; 0x4ca <can_enable_irq>
+ 7cc:	8f ef       	ldi	r24, 0xFF	; 255
+ 7ce:	12 c0       	rjmp	.+36     	; 0x7f4 <sja1000p_enable_configuration+0x82>
+    can_write_reg(sjaMOD_RM, SJAMOD);
+    _delay_us(100);
+    i++;
+    flags = can_read_reg(SJAMOD);
+  }
+  if (i >= 10) {
+ 7d0:	1a 30       	cpi	r17, 0x0A	; 10
+ 7d2:	58 f7       	brcc	.-42     	; 0x7aa <sja1000p_enable_configuration+0x38>
+#endif
+    can_enable_irq();
+    return -1;
+  }
+#ifdef DEBUG
+  CANMSG("Reset mode OK");
+ 7d4:	81 e0       	ldi	r24, 0x01	; 1
+ 7d6:	69 ee       	ldi	r22, 0xE9	; 233
+ 7d8:	70 e0       	ldi	r23, 0x00	; 0
+ 7da:	0e 94 e7 01 	call	0x3ce	; 0x3ce <lcd_puts_line>
+ 7de:	20 e1       	ldi	r18, 0x10	; 16
+ 7e0:	37 e2       	ldi	r19, 0x27	; 39
+ 7e2:	48 ec       	ldi	r20, 0xC8	; 200
+ 7e4:	50 e0       	ldi	r21, 0x00	; 0
+ 7e6:	ca 01       	movw	r24, r20
+ 7e8:	01 97       	sbiw	r24, 0x01	; 1
+ 7ea:	f1 f7       	brne	.-4      	; 0x7e8 <sja1000p_enable_configuration+0x76>
+		{
+			// wait 1/10 ms
+			_delay_loop_2(((F_CPU) / 4e3) / 10);
+			__ticks --;
+ 7ec:	21 50       	subi	r18, 0x01	; 1
+ 7ee:	30 40       	sbci	r19, 0x00	; 0
+		__ticks = 1;
+	else if (__tmp > 65535)
+	{
+		//	__ticks = requested delay in 1/10 ms
+		__ticks = (uint16_t) (__ms * 10.0);
+		while(__ticks)
+ 7f0:	d1 f7       	brne	.-12     	; 0x7e6 <sja1000p_enable_configuration+0x74>
+ 7f2:	80 e0       	ldi	r24, 0x00	; 0
+  _delay_ms(1000);
+#endif
+  return 0;
+}
+ 7f4:	df 91       	pop	r29
+ 7f6:	cf 91       	pop	r28
+ 7f8:	1f 91       	pop	r17
+ 7fa:	08 95       	ret
+
+000007fc <sja1000p_pre_write_config>:
+ * into chip buffer in this function.
+ * Return Value: negative value reports error.
+ * File: src/sja1000p.c
+ */
+char sja1000p_pre_write_config(struct canmsg_t *msg)
+{
+ 7fc:	df 92       	push	r13
+ 7fe:	ef 92       	push	r14
+ 800:	ff 92       	push	r15
+ 802:	0f 93       	push	r16
+ 804:	1f 93       	push	r17
+ 806:	cf 93       	push	r28
+ 808:	df 93       	push	r29
+ 80a:	ec 01       	movw	r28, r24
+ 80c:	10 e0       	ldi	r17, 0x00	; 0
+    can be achieved.
+*/
+void
+_delay_loop_1(uint8_t __count)
+{
+	__asm__ volatile (
+ 80e:	0a e1       	ldi	r16, 0x1A	; 26
+ 810:	04 c0       	rjmp	.+8      	; 0x81a <sja1000p_pre_write_config+0x1e>
+  unsigned long id;
+  unsigned char status;
+  unsigned char len;
+
+  /* Wait until Transmit Buffer Status is released */
+  while ( !((status = can_read_reg(SJASR)) & sjaSR_TBS) && 
+ 812:	1f 5f       	subi	r17, 0xFF	; 255
+ 814:	80 2f       	mov	r24, r16
+ 816:	8a 95       	dec	r24
+ 818:	f1 f7       	brne	.-4      	; 0x816 <sja1000p_pre_write_config+0x1a>
+ 81a:	82 e0       	ldi	r24, 0x02	; 2
+ 81c:	0e 94 2f 02 	call	0x45e	; 0x45e <can_read_reg>
+ 820:	82 fd       	sbrc	r24, 2
+ 822:	02 c0       	rjmp	.+4      	; 0x828 <sja1000p_pre_write_config+0x2c>
+ 824:	1a 30       	cpi	r17, 0x0A	; 10
+ 826:	a9 f7       	brne	.-22     	; 0x812 <sja1000p_pre_write_config+0x16>
+            i++<MAX_TRANSMIT_WAIT_LOOPS) {
+    _delay_us(10);
+  }
+  
+  if(status & sjaSR_BS) {
+ 828:	87 fd       	sbrc	r24, 7
+ 82a:	94 c0       	rjmp	.+296    	; 0x954 <sja1000p_pre_write_config+0x158>
+    can_write_reg(0, SJARXERR);
+    can_write_reg(0, SJATXERR1);
+    can_read_reg(SJAECC);
+    sja1000p_disable_configuration();
+  }
+  if (!(can_read_reg(SJASR) & sjaSR_TBS)) {
+ 82c:	82 e0       	ldi	r24, 0x02	; 2
+ 82e:	0e 94 2f 02 	call	0x45e	; 0x45e <can_read_reg>
+ 832:	82 ff       	sbrs	r24, 2
+ 834:	58 c0       	rjmp	.+176    	; 0x8e6 <sja1000p_pre_write_config+0xea>
+      _delay_ms(1000);
+#endif
+      return -1;
+    }
+  }
+  len = msg->length;
+ 836:	dd 80       	ldd	r13, Y+5	; 0x05
+ 838:	88 e0       	ldi	r24, 0x08	; 8
+ 83a:	8d 15       	cp	r24, r13
+ 83c:	10 f4       	brcc	.+4      	; 0x842 <sja1000p_pre_write_config+0x46>
+ 83e:	98 e0       	ldi	r25, 0x08	; 8
+ 840:	d9 2e       	mov	r13, r25
+  if(len > CAN_MSG_LENGTH) len = CAN_MSG_LENGTH;
+  
+  /* len &= sjaFRM_DLC_M; ensured by above condition already */
+  can_write_reg(sjaFRM_FF |len, SJAFRM);
+ 842:	8d 2d       	mov	r24, r13
+ 844:	80 68       	ori	r24, 0x80	; 128
+ 846:	60 e1       	ldi	r22, 0x10	; 16
+ 848:	0e 94 49 02 	call	0x492	; 0x492 <can_write_reg>
+  
+  id = msg->id<<3;
+ 84c:	e9 80       	ldd	r14, Y+1	; 0x01
+ 84e:	fa 80       	ldd	r15, Y+2	; 0x02
+ 850:	0b 81       	ldd	r16, Y+3	; 0x03
+ 852:	1c 81       	ldd	r17, Y+4	; 0x04
+ 854:	ee 0c       	add	r14, r14
+ 856:	ff 1c       	adc	r15, r15
+ 858:	00 1f       	adc	r16, r16
+ 85a:	11 1f       	adc	r17, r17
+ 85c:	ee 0c       	add	r14, r14
+ 85e:	ff 1c       	adc	r15, r15
+ 860:	00 1f       	adc	r16, r16
+ 862:	11 1f       	adc	r17, r17
+ 864:	ee 0c       	add	r14, r14
+ 866:	ff 1c       	adc	r15, r15
+ 868:	00 1f       	adc	r16, r16
+ 86a:	11 1f       	adc	r17, r17
+  can_write_reg(id & 0xff, SJAID3);
+ 86c:	8e 2d       	mov	r24, r14
+ 86e:	64 e1       	ldi	r22, 0x14	; 20
+ 870:	0e 94 49 02 	call	0x492	; 0x492 <can_write_reg>
+  id >>= 8;
+ 874:	bb 27       	eor	r27, r27
+ 876:	a1 2f       	mov	r26, r17
+ 878:	90 2f       	mov	r25, r16
+ 87a:	8f 2d       	mov	r24, r15
+  can_write_reg(id & 0xff, SJAID2);
+ 87c:	63 e1       	ldi	r22, 0x13	; 19
+ 87e:	0e 94 49 02 	call	0x492	; 0x492 <can_write_reg>
+  id >>= 8;
+ 882:	c8 01       	movw	r24, r16
+ 884:	aa 27       	eor	r26, r26
+ 886:	bb 27       	eor	r27, r27
+  can_write_reg(id & 0xff, SJAID1);
+ 888:	62 e1       	ldi	r22, 0x12	; 18
+ 88a:	0e 94 49 02 	call	0x492	; 0x492 <can_write_reg>
+  id >>= 8;
+  can_write_reg(id, SJAID0);
+ 88e:	e1 2e       	mov	r14, r17
+ 890:	ff 24       	eor	r15, r15
+ 892:	00 27       	eor	r16, r16
+ 894:	11 27       	eor	r17, r17
+ 896:	8e 2d       	mov	r24, r14
+ 898:	61 e1       	ldi	r22, 0x11	; 17
+ 89a:	0e 94 49 02 	call	0x492	; 0x492 <can_write_reg>
+  
+  for(i=0; i < len; i++) {
+ 89e:	dd 20       	and	r13, r13
+ 8a0:	51 f0       	breq	.+20     	; 0x8b6 <sja1000p_pre_write_config+0xba>
+ 8a2:	10 e0       	ldi	r17, 0x00	; 0
+    can_write_reg(msg->data[i], SJADATE+i);
+ 8a4:	1b 5e       	subi	r17, 0xEB	; 235
+ 8a6:	8e 81       	ldd	r24, Y+6	; 0x06
+ 8a8:	61 2f       	mov	r22, r17
+ 8aa:	0e 94 49 02 	call	0x492	; 0x492 <can_write_reg>
+  id >>= 8;
+  can_write_reg(id & 0xff, SJAID1);
+  id >>= 8;
+  can_write_reg(id, SJAID0);
+  
+  for(i=0; i < len; i++) {
+ 8ae:	14 51       	subi	r17, 0x14	; 20
+ 8b0:	21 96       	adiw	r28, 0x01	; 1
+ 8b2:	1d 15       	cp	r17, r13
+ 8b4:	b8 f3       	brcs	.-18     	; 0x8a4 <sja1000p_pre_write_config+0xa8>
+    can_write_reg(msg->data[i], SJADATE+i);
+  }
+#ifdef DEBUG
+    CANMSG("Tx");
+ 8b6:	81 e0       	ldi	r24, 0x01	; 1
+ 8b8:	62 e2       	ldi	r22, 0x22	; 34
+ 8ba:	71 e0       	ldi	r23, 0x01	; 1
+ 8bc:	0e 94 e7 01 	call	0x3ce	; 0x3ce <lcd_puts_line>
+ 8c0:	20 e1       	ldi	r18, 0x10	; 16
+ 8c2:	37 e2       	ldi	r19, 0x27	; 39
+    milliseconds can be achieved.
+ */
+void
+_delay_loop_2(uint16_t __count)
+{
+	__asm__ volatile (
+ 8c4:	48 ec       	ldi	r20, 0xC8	; 200
+ 8c6:	50 e0       	ldi	r21, 0x00	; 0
+ 8c8:	ca 01       	movw	r24, r20
+ 8ca:	01 97       	sbiw	r24, 0x01	; 1
+ 8cc:	f1 f7       	brne	.-4      	; 0x8ca <sja1000p_pre_write_config+0xce>
+		{
+			// wait 1/10 ms
+			_delay_loop_2(((F_CPU) / 4e3) / 10);
+			__ticks --;
+ 8ce:	21 50       	subi	r18, 0x01	; 1
+ 8d0:	30 40       	sbci	r19, 0x00	; 0
+		__ticks = 1;
+	else if (__tmp > 65535)
+	{
+		//	__ticks = requested delay in 1/10 ms
+		__ticks = (uint16_t) (__ms * 10.0);
+		while(__ticks)
+ 8d2:	d1 f7       	brne	.-12     	; 0x8c8 <sja1000p_pre_write_config+0xcc>
+ 8d4:	80 e0       	ldi	r24, 0x00	; 0
+    _delay_ms(1000);
+#endif
+  return 0;
+}
+ 8d6:	df 91       	pop	r29
+ 8d8:	cf 91       	pop	r28
+ 8da:	1f 91       	pop	r17
+ 8dc:	0f 91       	pop	r16
+ 8de:	ff 90       	pop	r15
+ 8e0:	ef 90       	pop	r14
+ 8e2:	df 90       	pop	r13
+ 8e4:	08 95       	ret
+    can_read_reg(SJAECC);
+    sja1000p_disable_configuration();
+  }
+  if (!(can_read_reg(SJASR) & sjaSR_TBS)) {
+#ifdef DEBUG
+    CANMSG("TX timed out");
+ 8e6:	81 e0       	ldi	r24, 0x01	; 1
+ 8e8:	66 e0       	ldi	r22, 0x06	; 6
+ 8ea:	71 e0       	ldi	r23, 0x01	; 1
+ 8ec:	0e 94 e7 01 	call	0x3ce	; 0x3ce <lcd_puts_line>
+ 8f0:	20 e1       	ldi	r18, 0x10	; 16
+ 8f2:	37 e2       	ldi	r19, 0x27	; 39
+ 8f4:	48 ec       	ldi	r20, 0xC8	; 200
+ 8f6:	50 e0       	ldi	r21, 0x00	; 0
+ 8f8:	ca 01       	movw	r24, r20
+ 8fa:	01 97       	sbiw	r24, 0x01	; 1
+ 8fc:	f1 f7       	brne	.-4      	; 0x8fa <sja1000p_pre_write_config+0xfe>
+		{
+			// wait 1/10 ms
+			_delay_loop_2(((F_CPU) / 4e3) / 10);
+			__ticks --;
+ 8fe:	21 50       	subi	r18, 0x01	; 1
+ 900:	30 40       	sbci	r19, 0x00	; 0
+		__ticks = 1;
+	else if (__tmp > 65535)
+	{
+		//	__ticks = requested delay in 1/10 ms
+		__ticks = (uint16_t) (__ms * 10.0);
+		while(__ticks)
+ 902:	d1 f7       	brne	.-12     	; 0x8f8 <sja1000p_pre_write_config+0xfc>
+#endif
+// here we should check if there is no write/select waiting for this
+// transmit. If so, set error ret and wake up.
+// CHECKME: if we do not disable sjaIER_TIE (TX IRQ) here we get interrupt
+// immediately
+    can_write_reg(sjaCMR_AT, SJACMR);
+ 904:	82 e0       	ldi	r24, 0x02	; 2
+ 906:	61 e0       	ldi	r22, 0x01	; 1
+ 908:	0e 94 49 02 	call	0x492	; 0x492 <can_write_reg>
+ 90c:	10 e0       	ldi	r17, 0x00	; 0
+    can be achieved.
+*/
+void
+_delay_loop_1(uint8_t __count)
+{
+	__asm__ volatile (
+ 90e:	0a e1       	ldi	r16, 0x1A	; 26
+ 910:	04 c0       	rjmp	.+8      	; 0x91a <sja1000p_pre_write_config+0x11e>
+    i = 0;
+    while ( !(can_read_reg(SJASR) & sjaSR_TBS) &&
+ 912:	1f 5f       	subi	r17, 0xFF	; 255
+ 914:	80 2f       	mov	r24, r16
+ 916:	8a 95       	dec	r24
+ 918:	f1 f7       	brne	.-4      	; 0x916 <sja1000p_pre_write_config+0x11a>
+ 91a:	82 e0       	ldi	r24, 0x02	; 2
+ 91c:	0e 94 2f 02 	call	0x45e	; 0x45e <can_read_reg>
+ 920:	82 fd       	sbrc	r24, 2
+ 922:	02 c0       	rjmp	.+4      	; 0x928 <sja1000p_pre_write_config+0x12c>
+ 924:	1a 30       	cpi	r17, 0x0A	; 10
+ 926:	a9 f7       	brne	.-22     	; 0x912 <sja1000p_pre_write_config+0x116>
+            i++<MAX_TRANSMIT_WAIT_LOOPS) {
+      _delay_us(10);
+    }
+    if (!(can_read_reg(SJASR) & sjaSR_TBS)) {
+ 928:	82 e0       	ldi	r24, 0x02	; 2
+ 92a:	0e 94 2f 02 	call	0x45e	; 0x45e <can_read_reg>
+ 92e:	82 fd       	sbrc	r24, 2
+ 930:	82 cf       	rjmp	.-252    	; 0x836 <sja1000p_pre_write_config+0x3a>
+#ifdef DEBUG
+      CANMSG("Tx err. Reset!");
+ 932:	81 e0       	ldi	r24, 0x01	; 1
+ 934:	63 e1       	ldi	r22, 0x13	; 19
+ 936:	71 e0       	ldi	r23, 0x01	; 1
+ 938:	0e 94 e7 01 	call	0x3ce	; 0x3ce <lcd_puts_line>
+ 93c:	20 e1       	ldi	r18, 0x10	; 16
+ 93e:	37 e2       	ldi	r19, 0x27	; 39
+    milliseconds can be achieved.
+ */
+void
+_delay_loop_2(uint16_t __count)
+{
+	__asm__ volatile (
+ 940:	48 ec       	ldi	r20, 0xC8	; 200
+ 942:	50 e0       	ldi	r21, 0x00	; 0
+ 944:	ca 01       	movw	r24, r20
+ 946:	01 97       	sbiw	r24, 0x01	; 1
+ 948:	f1 f7       	brne	.-4      	; 0x946 <sja1000p_pre_write_config+0x14a>
+		{
+			// wait 1/10 ms
+			_delay_loop_2(((F_CPU) / 4e3) / 10);
+			__ticks --;
+ 94a:	21 50       	subi	r18, 0x01	; 1
+ 94c:	30 40       	sbci	r19, 0x00	; 0
+		__ticks = 1;
+	else if (__tmp > 65535)
+	{
+		//	__ticks = requested delay in 1/10 ms
+		__ticks = (uint16_t) (__ms * 10.0);
+		while(__ticks)
+ 94e:	d1 f7       	brne	.-12     	; 0x944 <sja1000p_pre_write_config+0x148>
+ 950:	8f ef       	ldi	r24, 0xFF	; 255
+ 952:	c1 cf       	rjmp	.-126    	; 0x8d6 <sja1000p_pre_write_config+0xda>
+  }
+  
+  if(status & sjaSR_BS) {
+    /* Try to recover from error condition */
+#ifdef DEBUG
+    CANMSG("Bus recovering");
+ 954:	81 e0       	ldi	r24, 0x01	; 1
+ 956:	67 ef       	ldi	r22, 0xF7	; 247
+ 958:	70 e0       	ldi	r23, 0x00	; 0
+ 95a:	0e 94 e7 01 	call	0x3ce	; 0x3ce <lcd_puts_line>
+ 95e:	20 e1       	ldi	r18, 0x10	; 16
+ 960:	37 e2       	ldi	r19, 0x27	; 39
+ 962:	48 ec       	ldi	r20, 0xC8	; 200
+ 964:	50 e0       	ldi	r21, 0x00	; 0
+ 966:	ca 01       	movw	r24, r20
+ 968:	01 97       	sbiw	r24, 0x01	; 1
+ 96a:	f1 f7       	brne	.-4      	; 0x968 <sja1000p_pre_write_config+0x16c>
+		{
+			// wait 1/10 ms
+			_delay_loop_2(((F_CPU) / 4e3) / 10);
+			__ticks --;
+ 96c:	21 50       	subi	r18, 0x01	; 1
+ 96e:	30 40       	sbci	r19, 0x00	; 0
+		__ticks = 1;
+	else if (__tmp > 65535)
+	{
+		//	__ticks = requested delay in 1/10 ms
+		__ticks = (uint16_t) (__ms * 10.0);
+		while(__ticks)
+ 970:	d1 f7       	brne	.-12     	; 0x966 <sja1000p_pre_write_config+0x16a>
+    _delay_ms(1000);
+#endif
+    sja1000p_enable_configuration();
+ 972:	0e 94 b9 03 	call	0x772	; 0x772 <sja1000p_enable_configuration>
+    can_write_reg(0, SJARXERR);
+ 976:	80 e0       	ldi	r24, 0x00	; 0
+ 978:	6e e0       	ldi	r22, 0x0E	; 14
+ 97a:	0e 94 49 02 	call	0x492	; 0x492 <can_write_reg>
+    can_write_reg(0, SJATXERR1);
+ 97e:	80 e0       	ldi	r24, 0x00	; 0
+ 980:	6f e0       	ldi	r22, 0x0F	; 15
+ 982:	0e 94 49 02 	call	0x492	; 0x492 <can_write_reg>
+    can_read_reg(SJAECC);
+ 986:	8c e0       	ldi	r24, 0x0C	; 12
+ 988:	0e 94 2f 02 	call	0x45e	; 0x45e <can_read_reg>
+    sja1000p_disable_configuration();
+ 98c:	0e 94 84 03 	call	0x708	; 0x708 <sja1000p_disable_configuration>
+ 990:	4d cf       	rjmp	.-358    	; 0x82c <sja1000p_pre_write_config+0x30>
+
+00000992 <sja1000p_baud_rate>:
+ *
+ * Return Value: negative value reports error.
+ * File: src/sja1000p.c
+ */
+char sja1000p_baud_rate(unsigned long rate, unsigned long clock, unsigned char sjw,unsigned char sampl_pt, unsigned char flags)
+{
+ 992:	2f 92       	push	r2
+ 994:	3f 92       	push	r3
+ 996:	4f 92       	push	r4
+ 998:	5f 92       	push	r5
+ 99a:	6f 92       	push	r6
+ 99c:	7f 92       	push	r7
+ 99e:	8f 92       	push	r8
+ 9a0:	9f 92       	push	r9
+ 9a2:	af 92       	push	r10
+ 9a4:	bf 92       	push	r11
+ 9a6:	cf 92       	push	r12
+ 9a8:	df 92       	push	r13
+ 9aa:	ef 92       	push	r14
+ 9ac:	ff 92       	push	r15
+ 9ae:	0f 93       	push	r16
+ 9b0:	1f 93       	push	r17
+ 9b2:	df 93       	push	r29
+ 9b4:	cf 93       	push	r28
+ 9b6:	cd b7       	in	r28, 0x3d	; 61
+ 9b8:	de b7       	in	r29, 0x3e	; 62
+ 9ba:	67 97       	sbiw	r28, 0x17	; 23
+ 9bc:	0f b6       	in	r0, 0x3f	; 63
+ 9be:	f8 94       	cli
+ 9c0:	de bf       	out	0x3e, r29	; 62
+ 9c2:	0f be       	out	0x3f, r0	; 63
+ 9c4:	cd bf       	out	0x3d, r28	; 61
+ 9c6:	69 8b       	std	Y+17, r22	; 0x11
+ 9c8:	7a 8b       	std	Y+18, r23	; 0x12
+ 9ca:	8b 8b       	std	Y+19, r24	; 0x13
+ 9cc:	9c 8b       	std	Y+20, r25	; 0x14
+ 9ce:	49 01       	movw	r8, r18
+ 9d0:	5a 01       	movw	r10, r20
+ 9d2:	0d 8b       	std	Y+21, r16	; 0x15
+ 9d4:	ee 8a       	std	Y+22, r14	; 0x16
+ 9d6:	cf 8a       	std	Y+23, r12	; 0x17
+  unsigned long best_error = 1000000000, error;
+  unsigned long best_tseg=0, best_brp=0, best_rate=0, brp=0;
+  unsigned long tseg=0, tseg1=0, tseg2=0;
+  
+  if (sja1000p_enable_configuration())
+ 9d8:	0e 94 b9 03 	call	0x772	; 0x772 <sja1000p_enable_configuration>
+ 9dc:	88 23       	and	r24, r24
+ 9de:	09 f0       	breq	.+2      	; 0x9e2 <sja1000p_baud_rate+0x50>
+ 9e0:	4f c1       	rjmp	.+670    	; 0xc80 <sja1000p_baud_rate+0x2ee>
+    return -1;
+
+  clock /=2;
+ 9e2:	a5 01       	movw	r20, r10
+ 9e4:	94 01       	movw	r18, r8
+ 9e6:	56 95       	lsr	r21
+ 9e8:	47 95       	ror	r20
+ 9ea:	37 95       	ror	r19
+ 9ec:	27 95       	ror	r18
+ 9ee:	29 87       	std	Y+9, r18	; 0x09
+ 9f0:	3a 87       	std	Y+10, r19	; 0x0a
+ 9f2:	4b 87       	std	Y+11, r20	; 0x0b
+ 9f4:	5c 87       	std	Y+12, r21	; 0x0c
+ 9f6:	80 e0       	ldi	r24, 0x00	; 0
+ 9f8:	9a ec       	ldi	r25, 0xCA	; 202
+ 9fa:	aa e9       	ldi	r26, 0x9A	; 154
+ 9fc:	bb e3       	ldi	r27, 0x3B	; 59
+ 9fe:	8d 87       	std	Y+13, r24	; 0x0d
+ a00:	9e 87       	std	Y+14, r25	; 0x0e
+ a02:	af 87       	std	Y+15, r26	; 0x0f
+ a04:	b8 8b       	std	Y+16, r27	; 0x10
+ a06:	1d 82       	std	Y+5, r1	; 0x05
+ a08:	1e 82       	std	Y+6, r1	; 0x06
+ a0a:	1f 82       	std	Y+7, r1	; 0x07
+ a0c:	18 86       	std	Y+8, r1	; 0x08
+ a0e:	19 82       	std	Y+1, r1	; 0x01
+ a10:	1a 82       	std	Y+2, r1	; 0x02
+ a12:	1b 82       	std	Y+3, r1	; 0x03
+ a14:	1c 82       	std	Y+4, r1	; 0x04
+ a16:	54 e0       	ldi	r21, 0x04	; 4
+ a18:	e5 2e       	mov	r14, r21
+ a1a:	f1 2c       	mov	r15, r1
+ a1c:	01 2d       	mov	r16, r1
+ a1e:	11 2d       	mov	r17, r1
+ a20:	38 c0       	rjmp	.+112    	; 0xa92 <sja1000p_baud_rate+0x100>
+  /* tseg even = round down, odd = round up */
+  for (tseg=(0+0+2)*2; tseg<=(sjaMAX_TSEG2+sjaMAX_TSEG1+2)*2+1; tseg++) {
+    brp = clock/((1+tseg/2)*rate)+tseg%2;
+    if (brp == 0 || brp > 64)
+      continue;
+    error = rate - clock/(brp*(1+tseg/2));
+ a22:	ca 01       	movw	r24, r20
+ a24:	b9 01       	movw	r22, r18
+ a26:	a4 01       	movw	r20, r8
+ a28:	93 01       	movw	r18, r6
+ a2a:	0e 94 09 07 	call	0xe12	; 0xe12 <__mulsi3>
+ a2e:	9b 01       	movw	r18, r22
+ a30:	ac 01       	movw	r20, r24
+ a32:	69 85       	ldd	r22, Y+9	; 0x09
+ a34:	7a 85       	ldd	r23, Y+10	; 0x0a
+ a36:	8b 85       	ldd	r24, Y+11	; 0x0b
+ a38:	9c 85       	ldd	r25, Y+12	; 0x0c
+ a3a:	0e 94 28 07 	call	0xe50	; 0xe50 <__udivmodsi4>
+ a3e:	89 89       	ldd	r24, Y+17	; 0x11
+ a40:	9a 89       	ldd	r25, Y+18	; 0x12
+ a42:	ab 89       	ldd	r26, Y+19	; 0x13
+ a44:	bc 89       	ldd	r27, Y+20	; 0x14
+ a46:	82 1b       	sub	r24, r18
+ a48:	93 0b       	sbc	r25, r19
+ a4a:	a4 0b       	sbc	r26, r20
+ a4c:	b5 0b       	sbc	r27, r21
+    
+    if (error < 0)
+      error = -error;
+    
+    if (error <= best_error) {
+ a4e:	2d 85       	ldd	r18, Y+13	; 0x0d
+ a50:	3e 85       	ldd	r19, Y+14	; 0x0e
+ a52:	4f 85       	ldd	r20, Y+15	; 0x0f
+ a54:	58 89       	ldd	r21, Y+16	; 0x10
+ a56:	28 17       	cp	r18, r24
+ a58:	39 07       	cpc	r19, r25
+ a5a:	4a 07       	cpc	r20, r26
+ a5c:	5b 07       	cpc	r21, r27
+ a5e:	08 f4       	brcc	.+2      	; 0xa62 <sja1000p_baud_rate+0xd0>
+ a60:	4d c0       	rjmp	.+154    	; 0xafc <sja1000p_baud_rate+0x16a>
+ a62:	8d 87       	std	Y+13, r24	; 0x0d
+ a64:	9e 87       	std	Y+14, r25	; 0x0e
+ a66:	af 87       	std	Y+15, r26	; 0x0f
+ a68:	b8 8b       	std	Y+16, r27	; 0x10
+    return -1;
+
+  clock /=2;
+
+  /* tseg even = round down, odd = round up */
+  for (tseg=(0+0+2)*2; tseg<=(sjaMAX_TSEG2+sjaMAX_TSEG1+2)*2+1; tseg++) {
+ a6a:	08 94       	sec
+ a6c:	e1 1c       	adc	r14, r1
+ a6e:	f1 1c       	adc	r15, r1
+ a70:	01 1d       	adc	r16, r1
+ a72:	11 1d       	adc	r17, r1
+ a74:	32 e3       	ldi	r19, 0x32	; 50
+ a76:	e3 16       	cp	r14, r19
+ a78:	f1 04       	cpc	r15, r1
+ a7a:	01 05       	cpc	r16, r1
+ a7c:	11 05       	cpc	r17, r1
+ a7e:	09 f4       	brne	.+2      	; 0xa82 <sja1000p_baud_rate+0xf0>
+ a80:	46 c0       	rjmp	.+140    	; 0xb0e <sja1000p_baud_rate+0x17c>
+ a82:	ad 82       	std	Y+5, r10	; 0x05
+ a84:	be 82       	std	Y+6, r11	; 0x06
+ a86:	cf 82       	std	Y+7, r12	; 0x07
+ a88:	d8 86       	std	Y+8, r13	; 0x08
+ a8a:	29 82       	std	Y+1, r2	; 0x01
+ a8c:	3a 82       	std	Y+2, r3	; 0x02
+ a8e:	4b 82       	std	Y+3, r4	; 0x03
+ a90:	5c 82       	std	Y+4, r5	; 0x04
+    brp = clock/((1+tseg/2)*rate)+tseg%2;
+ a92:	57 01       	movw	r10, r14
+ a94:	68 01       	movw	r12, r16
+ a96:	d6 94       	lsr	r13
+ a98:	c7 94       	ror	r12
+ a9a:	b7 94       	ror	r11
+ a9c:	a7 94       	ror	r10
+ a9e:	35 01       	movw	r6, r10
+ aa0:	46 01       	movw	r8, r12
+ aa2:	08 94       	sec
+ aa4:	61 1c       	adc	r6, r1
+ aa6:	71 1c       	adc	r7, r1
+ aa8:	81 1c       	adc	r8, r1
+ aaa:	91 1c       	adc	r9, r1
+ aac:	c4 01       	movw	r24, r8
+ aae:	b3 01       	movw	r22, r6
+ ab0:	29 89       	ldd	r18, Y+17	; 0x11
+ ab2:	3a 89       	ldd	r19, Y+18	; 0x12
+ ab4:	4b 89       	ldd	r20, Y+19	; 0x13
+ ab6:	5c 89       	ldd	r21, Y+20	; 0x14
+ ab8:	0e 94 09 07 	call	0xe12	; 0xe12 <__mulsi3>
+ abc:	9b 01       	movw	r18, r22
+ abe:	ac 01       	movw	r20, r24
+ ac0:	69 85       	ldd	r22, Y+9	; 0x09
+ ac2:	7a 85       	ldd	r23, Y+10	; 0x0a
+ ac4:	8b 85       	ldd	r24, Y+11	; 0x0b
+ ac6:	9c 85       	ldd	r25, Y+12	; 0x0c
+ ac8:	0e 94 28 07 	call	0xe50	; 0xe50 <__udivmodsi4>
+ acc:	d8 01       	movw	r26, r16
+ ace:	c7 01       	movw	r24, r14
+ ad0:	81 70       	andi	r24, 0x01	; 1
+ ad2:	90 70       	andi	r25, 0x00	; 0
+ ad4:	a0 70       	andi	r26, 0x00	; 0
+ ad6:	b0 70       	andi	r27, 0x00	; 0
+ ad8:	28 0f       	add	r18, r24
+ ada:	39 1f       	adc	r19, r25
+ adc:	4a 1f       	adc	r20, r26
+ ade:	5b 1f       	adc	r21, r27
+    if (brp == 0 || brp > 64)
+ ae0:	19 01       	movw	r2, r18
+ ae2:	2a 01       	movw	r4, r20
+ ae4:	08 94       	sec
+ ae6:	21 08       	sbc	r2, r1
+ ae8:	31 08       	sbc	r3, r1
+ aea:	41 08       	sbc	r4, r1
+ aec:	51 08       	sbc	r5, r1
+ aee:	90 e4       	ldi	r25, 0x40	; 64
+ af0:	29 16       	cp	r2, r25
+ af2:	31 04       	cpc	r3, r1
+ af4:	41 04       	cpc	r4, r1
+ af6:	51 04       	cpc	r5, r1
+ af8:	08 f4       	brcc	.+2      	; 0xafc <sja1000p_baud_rate+0x16a>
+ afa:	93 cf       	rjmp	.-218    	; 0xa22 <sja1000p_baud_rate+0x90>
+    error = rate - clock/(brp*(1+tseg/2));
+    
+    if (error < 0)
+      error = -error;
+    
+    if (error <= best_error) {
+ afc:	ad 80       	ldd	r10, Y+5	; 0x05
+ afe:	be 80       	ldd	r11, Y+6	; 0x06
+ b00:	cf 80       	ldd	r12, Y+7	; 0x07
+ b02:	d8 84       	ldd	r13, Y+8	; 0x08
+ b04:	29 80       	ldd	r2, Y+1	; 0x01
+ b06:	3a 80       	ldd	r3, Y+2	; 0x02
+ b08:	4b 80       	ldd	r4, Y+3	; 0x03
+ b0a:	5c 80       	ldd	r5, Y+4	; 0x04
+ b0c:	ae cf       	rjmp	.-164    	; 0xa6a <sja1000p_baud_rate+0xd8>
+      best_tseg = tseg/2;
+      best_brp = brp-1;
+      best_rate = clock/(brp*(1+tseg/2));
+    }
+  }
+  if (best_error && (rate/best_error < 10)) {
+ b0e:	8d 85       	ldd	r24, Y+13	; 0x0d
+ b10:	9e 85       	ldd	r25, Y+14	; 0x0e
+ b12:	af 85       	ldd	r26, Y+15	; 0x0f
+ b14:	b8 89       	ldd	r27, Y+16	; 0x10
+ b16:	00 97       	sbiw	r24, 0x00	; 0
+ b18:	a1 05       	cpc	r26, r1
+ b1a:	b1 05       	cpc	r27, r1
+ b1c:	81 f0       	breq	.+32     	; 0xb3e <sja1000p_baud_rate+0x1ac>
+ b1e:	69 89       	ldd	r22, Y+17	; 0x11
+ b20:	7a 89       	ldd	r23, Y+18	; 0x12
+ b22:	8b 89       	ldd	r24, Y+19	; 0x13
+ b24:	9c 89       	ldd	r25, Y+20	; 0x14
+ b26:	2d 85       	ldd	r18, Y+13	; 0x0d
+ b28:	3e 85       	ldd	r19, Y+14	; 0x0e
+ b2a:	4f 85       	ldd	r20, Y+15	; 0x0f
+ b2c:	58 89       	ldd	r21, Y+16	; 0x10
+ b2e:	0e 94 28 07 	call	0xe50	; 0xe50 <__udivmodsi4>
+ b32:	2a 30       	cpi	r18, 0x0A	; 10
+ b34:	31 05       	cpc	r19, r1
+ b36:	41 05       	cpc	r20, r1
+ b38:	51 05       	cpc	r21, r1
+ b3a:	08 f4       	brcc	.+2      	; 0xb3e <sja1000p_baud_rate+0x1ac>
+ b3c:	92 c0       	rjmp	.+292    	; 0xc62 <sja1000p_baud_rate+0x2d0>
+    CANMSG("Baud rate error");
+    _delay_ms(1000);
+#endif
+    return -1;
+  }
+  tseg2 = best_tseg-(sampl_pt*(best_tseg+1))/100;
+ b3e:	c6 01       	movw	r24, r12
+ b40:	b5 01       	movw	r22, r10
+ b42:	6f 5f       	subi	r22, 0xFF	; 255
+ b44:	7f 4f       	sbci	r23, 0xFF	; 255
+ b46:	8f 4f       	sbci	r24, 0xFF	; 255
+ b48:	9f 4f       	sbci	r25, 0xFF	; 255
+ b4a:	ae 89       	ldd	r26, Y+22	; 0x16
+ b4c:	2a 2f       	mov	r18, r26
+ b4e:	30 e0       	ldi	r19, 0x00	; 0
+ b50:	40 e0       	ldi	r20, 0x00	; 0
+ b52:	50 e0       	ldi	r21, 0x00	; 0
+ b54:	0e 94 09 07 	call	0xe12	; 0xe12 <__mulsi3>
+ b58:	24 e6       	ldi	r18, 0x64	; 100
+ b5a:	30 e0       	ldi	r19, 0x00	; 0
+ b5c:	40 e0       	ldi	r20, 0x00	; 0
+ b5e:	50 e0       	ldi	r21, 0x00	; 0
+ b60:	0e 94 28 07 	call	0xe50	; 0xe50 <__udivmodsi4>
+ b64:	35 01       	movw	r6, r10
+ b66:	46 01       	movw	r8, r12
+ b68:	62 1a       	sub	r6, r18
+ b6a:	73 0a       	sbc	r7, r19
+ b6c:	84 0a       	sbc	r8, r20
+ b6e:	95 0a       	sbc	r9, r21
+ b70:	b8 e0       	ldi	r27, 0x08	; 8
+ b72:	6b 16       	cp	r6, r27
+ b74:	71 04       	cpc	r7, r1
+ b76:	81 04       	cpc	r8, r1
+ b78:	91 04       	cpc	r9, r1
+ b7a:	08 f0       	brcs	.+2      	; 0xb7e <sja1000p_baud_rate+0x1ec>
+ b7c:	6c c0       	rjmp	.+216    	; 0xc56 <sja1000p_baud_rate+0x2c4>
+    tseg2 = 0;
+  
+  if (tseg2 > sjaMAX_TSEG2)
+    tseg2 = sjaMAX_TSEG2;
+  
+  tseg1 = best_tseg-tseg2-2;
+ b7e:	2e ef       	ldi	r18, 0xFE	; 254
+ b80:	3f ef       	ldi	r19, 0xFF	; 255
+ b82:	4f ef       	ldi	r20, 0xFF	; 255
+ b84:	5f ef       	ldi	r21, 0xFF	; 255
+ b86:	a2 0e       	add	r10, r18
+ b88:	b3 1e       	adc	r11, r19
+ b8a:	c4 1e       	adc	r12, r20
+ b8c:	d5 1e       	adc	r13, r21
+ b8e:	d6 01       	movw	r26, r12
+ b90:	c5 01       	movw	r24, r10
+ b92:	86 19       	sub	r24, r6
+ b94:	97 09       	sbc	r25, r7
+ b96:	a8 09       	sbc	r26, r8
+ b98:	b9 09       	sbc	r27, r9
+ b9a:	22 e0       	ldi	r18, 0x02	; 2
+ b9c:	30 e0       	ldi	r19, 0x00	; 0
+ b9e:	40 e0       	ldi	r20, 0x00	; 0
+ ba0:	50 e0       	ldi	r21, 0x00	; 0
+ ba2:	a2 0e       	add	r10, r18
+ ba4:	b3 1e       	adc	r11, r19
+ ba6:	c4 1e       	adc	r12, r20
+ ba8:	d5 1e       	adc	r13, r21
+  
+  if (tseg1>sjaMAX_TSEG1) {
+ baa:	80 31       	cpi	r24, 0x10	; 16
+ bac:	91 05       	cpc	r25, r1
+ bae:	a1 05       	cpc	r26, r1
+ bb0:	b1 05       	cpc	r27, r1
+ bb2:	08 f0       	brcs	.+2      	; 0xbb6 <sja1000p_baud_rate+0x224>
+ bb4:	42 c0       	rjmp	.+132    	; 0xc3a <sja1000p_baud_rate+0x2a8>
+ bb6:	18 2f       	mov	r17, r24
+    tseg1 = sjaMAX_TSEG1;
+    tseg2 = best_tseg-tseg1-2;
+  }
+
+  can_write_reg(sjw<<6 | best_brp, SJABTR0);
+ bb8:	3d 89       	ldd	r19, Y+21	; 0x15
+ bba:	32 95       	swap	r19
+ bbc:	33 0f       	add	r19, r19
+ bbe:	33 0f       	add	r19, r19
+ bc0:	30 7c       	andi	r19, 0xC0	; 192
+ bc2:	83 2f       	mov	r24, r19
+ bc4:	82 29       	or	r24, r2
+ bc6:	66 e0       	ldi	r22, 0x06	; 6
+ bc8:	0e 94 49 02 	call	0x492	; 0x492 <can_write_reg>
+  can_write_reg(((flags & BTR1_SAM) != 0)<<7 | (tseg2<<4) 
+ bcc:	4f 89       	ldd	r20, Y+23	; 0x17
+ bce:	41 fd       	sbrc	r20, 1
+ bd0:	59 c0       	rjmp	.+178    	; 0xc84 <sja1000p_baud_rate+0x2f2>
+ bd2:	90 e0       	ldi	r25, 0x00	; 0
+ bd4:	86 2d       	mov	r24, r6
+ bd6:	82 95       	swap	r24
+ bd8:	80 7f       	andi	r24, 0xF0	; 240
+ bda:	81 2b       	or	r24, r17
+ bdc:	89 2b       	or	r24, r25
+ bde:	67 e0       	ldi	r22, 0x07	; 7
+ be0:	0e 94 49 02 	call	0x492	; 0x492 <can_write_reg>
+          | tseg1, SJABTR1);
+
+  sja1000p_disable_configuration();
+ be4:	0e 94 84 03 	call	0x708	; 0x708 <sja1000p_disable_configuration>
+  
+#ifdef DEBUG 
+  CANMSG("Baud rate OK");
+ be8:	81 e0       	ldi	r24, 0x01	; 1
+ bea:	65 e3       	ldi	r22, 0x35	; 53
+ bec:	71 e0       	ldi	r23, 0x01	; 1
+ bee:	0e 94 e7 01 	call	0x3ce	; 0x3ce <lcd_puts_line>
+ bf2:	20 e1       	ldi	r18, 0x10	; 16
+ bf4:	37 e2       	ldi	r19, 0x27	; 39
+ bf6:	48 ec       	ldi	r20, 0xC8	; 200
+ bf8:	50 e0       	ldi	r21, 0x00	; 0
+ bfa:	ca 01       	movw	r24, r20
+ bfc:	01 97       	sbiw	r24, 0x01	; 1
+ bfe:	f1 f7       	brne	.-4      	; 0xbfc <sja1000p_baud_rate+0x26a>
+		{
+			// wait 1/10 ms
+			_delay_loop_2(((F_CPU) / 4e3) / 10);
+			__ticks --;
+ c00:	21 50       	subi	r18, 0x01	; 1
+ c02:	30 40       	sbci	r19, 0x00	; 0
+		__ticks = 1;
+	else if (__tmp > 65535)
+	{
+		//	__ticks = requested delay in 1/10 ms
+		__ticks = (uint16_t) (__ms * 10.0);
+		while(__ticks)
+ c04:	d1 f7       	brne	.-12     	; 0xbfa <sja1000p_baud_rate+0x268>
+ c06:	80 e0       	ldi	r24, 0x00	; 0
+  _delay_ms(1000);
+#endif  
+  return 0;
+}
+ c08:	67 96       	adiw	r28, 0x17	; 23
+ c0a:	0f b6       	in	r0, 0x3f	; 63
+ c0c:	f8 94       	cli
+ c0e:	de bf       	out	0x3e, r29	; 62
+ c10:	0f be       	out	0x3f, r0	; 63
+ c12:	cd bf       	out	0x3d, r28	; 61
+ c14:	cf 91       	pop	r28
+ c16:	df 91       	pop	r29
+ c18:	1f 91       	pop	r17
+ c1a:	0f 91       	pop	r16
+ c1c:	ff 90       	pop	r15
+ c1e:	ef 90       	pop	r14
+ c20:	df 90       	pop	r13
+ c22:	cf 90       	pop	r12
+ c24:	bf 90       	pop	r11
+ c26:	af 90       	pop	r10
+ c28:	9f 90       	pop	r9
+ c2a:	8f 90       	pop	r8
+ c2c:	7f 90       	pop	r7
+ c2e:	6f 90       	pop	r6
+ c30:	5f 90       	pop	r5
+ c32:	4f 90       	pop	r4
+ c34:	3f 90       	pop	r3
+ c36:	2f 90       	pop	r2
+ c38:	08 95       	ret
+  
+  tseg1 = best_tseg-tseg2-2;
+  
+  if (tseg1>sjaMAX_TSEG1) {
+    tseg1 = sjaMAX_TSEG1;
+    tseg2 = best_tseg-tseg1-2;
+ c3a:	2f ee       	ldi	r18, 0xEF	; 239
+ c3c:	62 2e       	mov	r6, r18
+ c3e:	2f ef       	ldi	r18, 0xFF	; 255
+ c40:	72 2e       	mov	r7, r18
+ c42:	2f ef       	ldi	r18, 0xFF	; 255
+ c44:	82 2e       	mov	r8, r18
+ c46:	2f ef       	ldi	r18, 0xFF	; 255
+ c48:	92 2e       	mov	r9, r18
+ c4a:	6a 0c       	add	r6, r10
+ c4c:	7b 1c       	adc	r7, r11
+ c4e:	8c 1c       	adc	r8, r12
+ c50:	9d 1c       	adc	r9, r13
+ c52:	1f e0       	ldi	r17, 0x0F	; 15
+ c54:	b1 cf       	rjmp	.-158    	; 0xbb8 <sja1000p_baud_rate+0x226>
+    CANMSG("Baud rate error");
+    _delay_ms(1000);
+#endif
+    return -1;
+  }
+  tseg2 = best_tseg-(sampl_pt*(best_tseg+1))/100;
+ c56:	37 e0       	ldi	r19, 0x07	; 7
+ c58:	63 2e       	mov	r6, r19
+ c5a:	71 2c       	mov	r7, r1
+ c5c:	81 2c       	mov	r8, r1
+ c5e:	91 2c       	mov	r9, r1
+ c60:	8e cf       	rjmp	.-228    	; 0xb7e <sja1000p_baud_rate+0x1ec>
+      best_rate = clock/(brp*(1+tseg/2));
+    }
+  }
+  if (best_error && (rate/best_error < 10)) {
+#ifdef DEBUG
+    CANMSG("Baud rate error");
+ c62:	81 e0       	ldi	r24, 0x01	; 1
+ c64:	65 e2       	ldi	r22, 0x25	; 37
+ c66:	71 e0       	ldi	r23, 0x01	; 1
+ c68:	0e 94 e7 01 	call	0x3ce	; 0x3ce <lcd_puts_line>
+ c6c:	20 e1       	ldi	r18, 0x10	; 16
+ c6e:	37 e2       	ldi	r19, 0x27	; 39
+ c70:	48 ec       	ldi	r20, 0xC8	; 200
+ c72:	50 e0       	ldi	r21, 0x00	; 0
+ c74:	ca 01       	movw	r24, r20
+ c76:	01 97       	sbiw	r24, 0x01	; 1
+ c78:	f1 f7       	brne	.-4      	; 0xc76 <sja1000p_baud_rate+0x2e4>
+		{
+			// wait 1/10 ms
+			_delay_loop_2(((F_CPU) / 4e3) / 10);
+			__ticks --;
+ c7a:	21 50       	subi	r18, 0x01	; 1
+ c7c:	30 40       	sbci	r19, 0x00	; 0
+		__ticks = 1;
+	else if (__tmp > 65535)
+	{
+		//	__ticks = requested delay in 1/10 ms
+		__ticks = (uint16_t) (__ms * 10.0);
+		while(__ticks)
+ c7e:	d1 f7       	brne	.-12     	; 0xc74 <sja1000p_baud_rate+0x2e2>
+ c80:	8f ef       	ldi	r24, 0xFF	; 255
+ c82:	c2 cf       	rjmp	.-124    	; 0xc08 <sja1000p_baud_rate+0x276>
+    tseg1 = sjaMAX_TSEG1;
+    tseg2 = best_tseg-tseg1-2;
+  }
+
+  can_write_reg(sjw<<6 | best_brp, SJABTR0);
+  can_write_reg(((flags & BTR1_SAM) != 0)<<7 | (tseg2<<4) 
+ c84:	90 e8       	ldi	r25, 0x80	; 128
+ c86:	a6 cf       	rjmp	.-180    	; 0xbd4 <sja1000p_baud_rate+0x242>
+
+00000c88 <sja1000p_extended_mask>:
+ *
+ * Return Value: negative value reports error.
+ * File: src/sja1000p.c
+ */
+char sja1000p_extended_mask(unsigned long code, unsigned  long mask)
+{
+ c88:	9f 92       	push	r9
+ c8a:	af 92       	push	r10
+ c8c:	bf 92       	push	r11
+ c8e:	cf 92       	push	r12
+ c90:	df 92       	push	r13
+ c92:	ef 92       	push	r14
+ c94:	ff 92       	push	r15
+ c96:	0f 93       	push	r16
+ c98:	1f 93       	push	r17
+ c9a:	5b 01       	movw	r10, r22
+ c9c:	6c 01       	movw	r12, r24
+ c9e:	79 01       	movw	r14, r18
+ ca0:	8a 01       	movw	r16, r20
+   char i;
+
+  if (sja1000p_enable_configuration())
+ ca2:	0e 94 b9 03 	call	0x772	; 0x772 <sja1000p_enable_configuration>
+ ca6:	88 23       	and	r24, r24
+ ca8:	31 f5       	brne	.+76     	; 0xcf6 <sja1000p_extended_mask+0x6e>
+ caa:	f3 e1       	ldi	r31, 0x13	; 19
+ cac:	9f 2e       	mov	r9, r31
+    return -1;
+
+// LSB to +3, MSB to +0 
+  for(i=SJA_PeliCAN_AC_LEN; --i>=0;) {
+    can_write_reg(code&0xff,SJAACR0+i);
+ cae:	8a 2d       	mov	r24, r10
+ cb0:	69 2d       	mov	r22, r9
+ cb2:	0e 94 49 02 	call	0x492	; 0x492 <can_write_reg>
+    can_write_reg(mask&0xff,SJAAMR0+i);
+ cb6:	84 e0       	ldi	r24, 0x04	; 4
+ cb8:	98 0e       	add	r9, r24
+ cba:	8e 2d       	mov	r24, r14
+ cbc:	69 2d       	mov	r22, r9
+ cbe:	0e 94 49 02 	call	0x492	; 0x492 <can_write_reg>
+    code >>= 8;
+ cc2:	ab 2c       	mov	r10, r11
+ cc4:	bc 2c       	mov	r11, r12
+ cc6:	cd 2c       	mov	r12, r13
+ cc8:	dd 24       	eor	r13, r13
+    mask >>= 8;
+ cca:	ef 2c       	mov	r14, r15
+ ccc:	f0 2e       	mov	r15, r16
+ cce:	01 2f       	mov	r16, r17
+ cd0:	11 27       	eor	r17, r17
+ cd2:	8b ef       	ldi	r24, 0xFB	; 251
+ cd4:	98 0e       	add	r9, r24
+
+  if (sja1000p_enable_configuration())
+    return -1;
+
+// LSB to +3, MSB to +0 
+  for(i=SJA_PeliCAN_AC_LEN; --i>=0;) {
+ cd6:	8f e0       	ldi	r24, 0x0F	; 15
+ cd8:	98 16       	cp	r9, r24
+ cda:	49 f7       	brne	.-46     	; 0xcae <sja1000p_extended_mask+0x26>
+    can_write_reg(mask&0xff,SJAAMR0+i);
+    code >>= 8;
+    mask >>= 8;
+  }
+
+  sja1000p_disable_configuration();  
+ cdc:	0e 94 84 03 	call	0x708	; 0x708 <sja1000p_disable_configuration>
+ ce0:	80 e0       	ldi	r24, 0x00	; 0
+
+  return 0;
+}
+ ce2:	1f 91       	pop	r17
+ ce4:	0f 91       	pop	r16
+ ce6:	ff 90       	pop	r15
+ ce8:	ef 90       	pop	r14
+ cea:	df 90       	pop	r13
+ cec:	cf 90       	pop	r12
+ cee:	bf 90       	pop	r11
+ cf0:	af 90       	pop	r10
+ cf2:	9f 90       	pop	r9
+ cf4:	08 95       	ret
+ */
+char sja1000p_extended_mask(unsigned long code, unsigned  long mask)
+{
+   char i;
+
+  if (sja1000p_enable_configuration())
+ cf6:	8f ef       	ldi	r24, 0xFF	; 255
+ cf8:	f4 cf       	rjmp	.-24     	; 0xce2 <sja1000p_extended_mask+0x5a>
+
+00000cfa <sja1000p_chip_config>:
+ * computes and sets baudrate with use of function sja1000p_baud_rate().
+ * Return Value: negative value reports error.
+ * File: src/sja1000p.c
+ */
+char sja1000p_chip_config(struct canchip_t *chip)
+{
+ cfa:	cf 92       	push	r12
+ cfc:	ef 92       	push	r14
+ cfe:	0f 93       	push	r16
+ d00:	1f 93       	push	r17
+ d02:	cf 93       	push	r28
+ d04:	df 93       	push	r29
+ d06:	ec 01       	movw	r28, r24
+  unsigned char i;
+  unsigned char n, r;
+  
+  if (sja1000p_enable_configuration())
+ d08:	0e 94 b9 03 	call	0x772	; 0x772 <sja1000p_enable_configuration>
+ d0c:	88 23       	and	r24, r24
+ d0e:	41 f0       	breq	.+16     	; 0xd20 <sja1000p_chip_config+0x26>
+ d10:	8f ef       	ldi	r24, 0xFF	; 255
+#ifdef DEBUG  
+  CANMSG("Config OK");
+  _delay_ms(1000);
+#endif
+  return 0;
+}
+ d12:	df 91       	pop	r29
+ d14:	cf 91       	pop	r28
+ d16:	1f 91       	pop	r17
+ d18:	0f 91       	pop	r16
+ d1a:	ef 90       	pop	r14
+ d1c:	cf 90       	pop	r12
+ d1e:	08 95       	ret
+  
+  if (sja1000p_enable_configuration())
+    return -1;
+
+  /* Set mode, clock out, comparator */
+  can_write_reg(sjaCDR_PELICAN|chip->sja_cdr_reg,SJACDR); 
+ d20:	89 85       	ldd	r24, Y+9	; 0x09
+ d22:	80 68       	ori	r24, 0x80	; 128
+ d24:	6f e1       	ldi	r22, 0x1F	; 31
+ d26:	0e 94 49 02 	call	0x492	; 0x492 <can_write_reg>
+
+  /* Ensure, that interrupts are disabled even on the chip level now */
+  can_write_reg(sjaDISABLE_INTERRUPTS, SJAIER);
+ d2a:	80 e0       	ldi	r24, 0x00	; 0
+ d2c:	64 e0       	ldi	r22, 0x04	; 4
+ d2e:	0e 94 49 02 	call	0x492	; 0x492 <can_write_reg>
+
+  /* Set driver output configuration */
+  can_write_reg(chip->sja_ocr_reg,SJAOCR); 
+ d32:	8a 85       	ldd	r24, Y+10	; 0x0a
+ d34:	68 e0       	ldi	r22, 0x08	; 8
+ d36:	0e 94 49 02 	call	0x492	; 0x492 <can_write_reg>
+ d3a:	0a e5       	ldi	r16, 0x5A	; 90
+ d3c:	10 e1       	ldi	r17, 0x10	; 16
+  
+  /* Simple check for chip presence */
+  for (i=0, n=0x5a; i<8; i++, n+=0xf) {
+    can_write_reg(n,SJAACR0+i);
+ d3e:	80 2f       	mov	r24, r16
+ d40:	61 2f       	mov	r22, r17
+ d42:	0e 94 49 02 	call	0x492	; 0x492 <can_write_reg>
+
+  /* Set driver output configuration */
+  can_write_reg(chip->sja_ocr_reg,SJAOCR); 
+  
+  /* Simple check for chip presence */
+  for (i=0, n=0x5a; i<8; i++, n+=0xf) {
+ d46:	01 5f       	subi	r16, 0xF1	; 241
+ d48:	1f 5f       	subi	r17, 0xFF	; 255
+ d4a:	02 3d       	cpi	r16, 0xD2	; 210
+ d4c:	c1 f7       	brne	.-16     	; 0xd3e <sja1000p_chip_config+0x44>
+ d4e:	1a e5       	ldi	r17, 0x5A	; 90
+ d50:	00 e1       	ldi	r16, 0x10	; 16
+ d52:	01 c0       	rjmp	.+2      	; 0xd56 <sja1000p_chip_config+0x5c>
+    can_write_reg(n,SJAACR0+i);
+  }
+
+  for (i=0, n=0x5a; i<8; i++, n+=0xf) {
+ d54:	11 5f       	subi	r17, 0xF1	; 241
+    r = n^can_read_reg(SJAACR0+i);
+ d56:	80 2f       	mov	r24, r16
+ d58:	0e 94 2f 02 	call	0x45e	; 0x45e <can_read_reg>
+    if (r) {
+ d5c:	18 17       	cp	r17, r24
+ d5e:	09 f0       	breq	.+2      	; 0xd62 <sja1000p_chip_config+0x68>
+ d60:	48 c0       	rjmp	.+144    	; 0xdf2 <sja1000p_chip_config+0xf8>
+ d62:	0f 5f       	subi	r16, 0xFF	; 255
+  /* Simple check for chip presence */
+  for (i=0, n=0x5a; i<8; i++, n+=0xf) {
+    can_write_reg(n,SJAACR0+i);
+  }
+
+  for (i=0, n=0x5a; i<8; i++, n+=0xf) {
+ d64:	13 3c       	cpi	r17, 0xC3	; 195
+ d66:	b1 f7       	brne	.-20     	; 0xd54 <sja1000p_chip_config+0x5a>
+#endif
+      return -1;
+    }
+  }
+
+  if (sja1000p_extended_mask(0x0000000, 0xfffffff))
+ d68:	60 e0       	ldi	r22, 0x00	; 0
+ d6a:	70 e0       	ldi	r23, 0x00	; 0
+ d6c:	80 e0       	ldi	r24, 0x00	; 0
+ d6e:	90 e0       	ldi	r25, 0x00	; 0
+ d70:	2f ef       	ldi	r18, 0xFF	; 255
+ d72:	3f ef       	ldi	r19, 0xFF	; 255
+ d74:	4f ef       	ldi	r20, 0xFF	; 255
+ d76:	5f e0       	ldi	r21, 0x0F	; 15
+ d78:	0e 94 44 06 	call	0xc88	; 0xc88 <sja1000p_extended_mask>
+ d7c:	88 23       	and	r24, r24
+ d7e:	41 f6       	brne	.-112    	; 0xd10 <sja1000p_chip_config+0x16>
+    return -1;
+  
+  if (!chip->baudrate)
+ d80:	6d 81       	ldd	r22, Y+5	; 0x05
+ d82:	7e 81       	ldd	r23, Y+6	; 0x06
+ d84:	8f 81       	ldd	r24, Y+7	; 0x07
+ d86:	98 85       	ldd	r25, Y+8	; 0x08
+ d88:	61 15       	cp	r22, r1
+ d8a:	71 05       	cpc	r23, r1
+ d8c:	81 05       	cpc	r24, r1
+ d8e:	91 05       	cpc	r25, r1
+ d90:	61 f4       	brne	.+24     	; 0xdaa <sja1000p_chip_config+0xb0>
+    chip->baudrate=1000000;
+ d92:	80 e4       	ldi	r24, 0x40	; 64
+ d94:	92 e4       	ldi	r25, 0x42	; 66
+ d96:	af e0       	ldi	r26, 0x0F	; 15
+ d98:	b0 e0       	ldi	r27, 0x00	; 0
+ d9a:	8d 83       	std	Y+5, r24	; 0x05
+ d9c:	9e 83       	std	Y+6, r25	; 0x06
+ d9e:	af 83       	std	Y+7, r26	; 0x07
+ da0:	b8 87       	std	Y+8, r27	; 0x08
+ da2:	60 e4       	ldi	r22, 0x40	; 64
+ da4:	72 e4       	ldi	r23, 0x42	; 66
+ da6:	8f e0       	ldi	r24, 0x0F	; 15
+ da8:	90 e0       	ldi	r25, 0x00	; 0
+  
+  if (sja1000p_baud_rate(chip->baudrate,chip->clock,0,75,0))
+ daa:	29 81       	ldd	r18, Y+1	; 0x01
+ dac:	3a 81       	ldd	r19, Y+2	; 0x02
+ dae:	4b 81       	ldd	r20, Y+3	; 0x03
+ db0:	5c 81       	ldd	r21, Y+4	; 0x04
+ db2:	00 e0       	ldi	r16, 0x00	; 0
+ db4:	ab e4       	ldi	r26, 0x4B	; 75
+ db6:	ea 2e       	mov	r14, r26
+ db8:	cc 24       	eor	r12, r12
+ dba:	0e 94 c9 04 	call	0x992	; 0x992 <sja1000p_baud_rate>
+ dbe:	88 23       	and	r24, r24
+ dc0:	09 f0       	breq	.+2      	; 0xdc4 <sja1000p_chip_config+0xca>
+ dc2:	a6 cf       	rjmp	.-180    	; 0xd10 <sja1000p_chip_config+0x16>
+    return -1;
+
+  /* Enable hardware interrupts */
+  can_write_reg(sjaENABLE_INTERRUPTS, SJAIER); 
+ dc4:	8f ea       	ldi	r24, 0xAF	; 175
+ dc6:	64 e0       	ldi	r22, 0x04	; 4
+ dc8:	0e 94 49 02 	call	0x492	; 0x492 <can_write_reg>
+
+  sja1000p_disable_configuration();
+ dcc:	0e 94 84 03 	call	0x708	; 0x708 <sja1000p_disable_configuration>
+  
+#ifdef DEBUG  
+  CANMSG("Config OK");
+ dd0:	81 e0       	ldi	r24, 0x01	; 1
+ dd2:	6f e4       	ldi	r22, 0x4F	; 79
+ dd4:	71 e0       	ldi	r23, 0x01	; 1
+ dd6:	0e 94 e7 01 	call	0x3ce	; 0x3ce <lcd_puts_line>
+ dda:	20 e1       	ldi	r18, 0x10	; 16
+ ddc:	37 e2       	ldi	r19, 0x27	; 39
+ dde:	48 ec       	ldi	r20, 0xC8	; 200
+ de0:	50 e0       	ldi	r21, 0x00	; 0
+ de2:	ca 01       	movw	r24, r20
+ de4:	01 97       	sbiw	r24, 0x01	; 1
+ de6:	f1 f7       	brne	.-4      	; 0xde4 <sja1000p_chip_config+0xea>
+		{
+			// wait 1/10 ms
+			_delay_loop_2(((F_CPU) / 4e3) / 10);
+			__ticks --;
+ de8:	21 50       	subi	r18, 0x01	; 1
+ dea:	30 40       	sbci	r19, 0x00	; 0
+		__ticks = 1;
+	else if (__tmp > 65535)
+	{
+		//	__ticks = requested delay in 1/10 ms
+		__ticks = (uint16_t) (__ms * 10.0);
+		while(__ticks)
+ dec:	d1 f7       	brne	.-12     	; 0xde2 <sja1000p_chip_config+0xe8>
+ dee:	80 e0       	ldi	r24, 0x00	; 0
+ df0:	90 cf       	rjmp	.-224    	; 0xd12 <sja1000p_chip_config+0x18>
+
+  for (i=0, n=0x5a; i<8; i++, n+=0xf) {
+    r = n^can_read_reg(SJAACR0+i);
+    if (r) {
+#ifdef DEBUG
+      CANMSG("Config error");
+ df2:	81 e0       	ldi	r24, 0x01	; 1
+ df4:	62 e4       	ldi	r22, 0x42	; 66
+ df6:	71 e0       	ldi	r23, 0x01	; 1
+ df8:	0e 94 e7 01 	call	0x3ce	; 0x3ce <lcd_puts_line>
+ dfc:	20 e1       	ldi	r18, 0x10	; 16
+ dfe:	37 e2       	ldi	r19, 0x27	; 39
+ e00:	48 ec       	ldi	r20, 0xC8	; 200
+ e02:	50 e0       	ldi	r21, 0x00	; 0
+ e04:	ca 01       	movw	r24, r20
+ e06:	01 97       	sbiw	r24, 0x01	; 1
+ e08:	f1 f7       	brne	.-4      	; 0xe06 <sja1000p_chip_config+0x10c>
+		{
+			// wait 1/10 ms
+			_delay_loop_2(((F_CPU) / 4e3) / 10);
+			__ticks --;
+ e0a:	21 50       	subi	r18, 0x01	; 1
+ e0c:	30 40       	sbci	r19, 0x00	; 0
+		__ticks = 1;
+	else if (__tmp > 65535)
+	{
+		//	__ticks = requested delay in 1/10 ms
+		__ticks = (uint16_t) (__ms * 10.0);
+		while(__ticks)
+ e0e:	d1 f7       	brne	.-12     	; 0xe04 <sja1000p_chip_config+0x10a>
+ e10:	7f cf       	rjmp	.-258    	; 0xd10 <sja1000p_chip_config+0x16>
+
+00000e12 <__mulsi3>:
+ e12:	62 9f       	mul	r22, r18
+ e14:	d0 01       	movw	r26, r0
+ e16:	73 9f       	mul	r23, r19
+ e18:	f0 01       	movw	r30, r0
+ e1a:	82 9f       	mul	r24, r18
+ e1c:	e0 0d       	add	r30, r0
+ e1e:	f1 1d       	adc	r31, r1
+ e20:	64 9f       	mul	r22, r20
+ e22:	e0 0d       	add	r30, r0
+ e24:	f1 1d       	adc	r31, r1
+ e26:	92 9f       	mul	r25, r18
+ e28:	f0 0d       	add	r31, r0
+ e2a:	83 9f       	mul	r24, r19
+ e2c:	f0 0d       	add	r31, r0
+ e2e:	74 9f       	mul	r23, r20
+ e30:	f0 0d       	add	r31, r0
+ e32:	65 9f       	mul	r22, r21
+ e34:	f0 0d       	add	r31, r0
+ e36:	99 27       	eor	r25, r25
+ e38:	72 9f       	mul	r23, r18
+ e3a:	b0 0d       	add	r27, r0
+ e3c:	e1 1d       	adc	r30, r1
+ e3e:	f9 1f       	adc	r31, r25
+ e40:	63 9f       	mul	r22, r19
+ e42:	b0 0d       	add	r27, r0
+ e44:	e1 1d       	adc	r30, r1
+ e46:	f9 1f       	adc	r31, r25
+ e48:	bd 01       	movw	r22, r26
+ e4a:	cf 01       	movw	r24, r30
+ e4c:	11 24       	eor	r1, r1
+ e4e:	08 95       	ret
+
+00000e50 <__udivmodsi4>:
+ e50:	a1 e2       	ldi	r26, 0x21	; 33
+ e52:	1a 2e       	mov	r1, r26
+ e54:	aa 1b       	sub	r26, r26
+ e56:	bb 1b       	sub	r27, r27
+ e58:	fd 01       	movw	r30, r26
+ e5a:	0d c0       	rjmp	.+26     	; 0xe76 <__udivmodsi4_ep>
+
+00000e5c <__udivmodsi4_loop>:
+ e5c:	aa 1f       	adc	r26, r26
+ e5e:	bb 1f       	adc	r27, r27
+ e60:	ee 1f       	adc	r30, r30
+ e62:	ff 1f       	adc	r31, r31
+ e64:	a2 17       	cp	r26, r18
+ e66:	b3 07       	cpc	r27, r19
+ e68:	e4 07       	cpc	r30, r20
+ e6a:	f5 07       	cpc	r31, r21
+ e6c:	20 f0       	brcs	.+8      	; 0xe76 <__udivmodsi4_ep>
+ e6e:	a2 1b       	sub	r26, r18
+ e70:	b3 0b       	sbc	r27, r19
+ e72:	e4 0b       	sbc	r30, r20
+ e74:	f5 0b       	sbc	r31, r21
+
+00000e76 <__udivmodsi4_ep>:
+ e76:	66 1f       	adc	r22, r22
+ e78:	77 1f       	adc	r23, r23
+ e7a:	88 1f       	adc	r24, r24
+ e7c:	99 1f       	adc	r25, r25
+ e7e:	1a 94       	dec	r1
+ e80:	69 f7       	brne	.-38     	; 0xe5c <__udivmodsi4_loop>
+ e82:	60 95       	com	r22
+ e84:	70 95       	com	r23
+ e86:	80 95       	com	r24
+ e88:	90 95       	com	r25
+ e8a:	9b 01       	movw	r18, r22
+ e8c:	ac 01       	movw	r20, r24
+ e8e:	bd 01       	movw	r22, r26
+ e90:	cf 01       	movw	r24, r30
+ e92:	08 95       	ret
+
+00000e94 <itoa>:
+ e94:	fb 01       	movw	r30, r22
+ e96:	9f 01       	movw	r18, r30
+ e98:	e8 94       	clt
+ e9a:	42 30       	cpi	r20, 0x02	; 2
+ e9c:	c4 f0       	brlt	.+48     	; 0xece <itoa+0x3a>
+ e9e:	45 32       	cpi	r20, 0x25	; 37
+ ea0:	b4 f4       	brge	.+44     	; 0xece <itoa+0x3a>
+ ea2:	4a 30       	cpi	r20, 0x0A	; 10
+ ea4:	29 f4       	brne	.+10     	; 0xeb0 <itoa+0x1c>
+ ea6:	97 fb       	bst	r25, 7
+ ea8:	1e f4       	brtc	.+6      	; 0xeb0 <itoa+0x1c>
+ eaa:	90 95       	com	r25
+ eac:	81 95       	neg	r24
+ eae:	9f 4f       	sbci	r25, 0xFF	; 255
+ eb0:	64 2f       	mov	r22, r20
+ eb2:	77 27       	eor	r23, r23
+ eb4:	0e 94 7b 07 	call	0xef6	; 0xef6 <__udivmodhi4>
+ eb8:	80 5d       	subi	r24, 0xD0	; 208
+ eba:	8a 33       	cpi	r24, 0x3A	; 58
+ ebc:	0c f0       	brlt	.+2      	; 0xec0 <itoa+0x2c>
+ ebe:	89 5d       	subi	r24, 0xD9	; 217
+ ec0:	81 93       	st	Z+, r24
+ ec2:	cb 01       	movw	r24, r22
+ ec4:	00 97       	sbiw	r24, 0x00	; 0
+ ec6:	a1 f7       	brne	.-24     	; 0xeb0 <itoa+0x1c>
+ ec8:	16 f4       	brtc	.+4      	; 0xece <itoa+0x3a>
+ eca:	5d e2       	ldi	r21, 0x2D	; 45
+ ecc:	51 93       	st	Z+, r21
+ ece:	10 82       	st	Z, r1
+ ed0:	c9 01       	movw	r24, r18
+ ed2:	0c 94 6b 07 	jmp	0xed6	; 0xed6 <strrev>
+
+00000ed6 <strrev>:
+ ed6:	dc 01       	movw	r26, r24
+ ed8:	fc 01       	movw	r30, r24
+ eda:	67 2f       	mov	r22, r23
+ edc:	71 91       	ld	r23, Z+
+ ede:	77 23       	and	r23, r23
+ ee0:	e1 f7       	brne	.-8      	; 0xeda <strrev+0x4>
+ ee2:	32 97       	sbiw	r30, 0x02	; 2
+ ee4:	04 c0       	rjmp	.+8      	; 0xeee <strrev+0x18>
+ ee6:	7c 91       	ld	r23, X
+ ee8:	6d 93       	st	X+, r22
+ eea:	70 83       	st	Z, r23
+ eec:	62 91       	ld	r22, -Z
+ eee:	ae 17       	cp	r26, r30
+ ef0:	bf 07       	cpc	r27, r31
+ ef2:	c8 f3       	brcs	.-14     	; 0xee6 <strrev+0x10>
+ ef4:	08 95       	ret
+
+00000ef6 <__udivmodhi4>:
+ ef6:	aa 1b       	sub	r26, r26
+ ef8:	bb 1b       	sub	r27, r27
+ efa:	51 e1       	ldi	r21, 0x11	; 17
+ efc:	07 c0       	rjmp	.+14     	; 0xf0c <__udivmodhi4_ep>
+
+00000efe <__udivmodhi4_loop>:
+ efe:	aa 1f       	adc	r26, r26
+ f00:	bb 1f       	adc	r27, r27
+ f02:	a6 17       	cp	r26, r22
+ f04:	b7 07       	cpc	r27, r23
+ f06:	10 f0       	brcs	.+4      	; 0xf0c <__udivmodhi4_ep>
+ f08:	a6 1b       	sub	r26, r22
+ f0a:	b7 0b       	sbc	r27, r23
+
+00000f0c <__udivmodhi4_ep>:
+ f0c:	88 1f       	adc	r24, r24
+ f0e:	99 1f       	adc	r25, r25
+ f10:	5a 95       	dec	r21
+ f12:	a9 f7       	brne	.-22     	; 0xefe <__udivmodhi4_loop>
+ f14:	80 95       	com	r24
+ f16:	90 95       	com	r25
+ f18:	bc 01       	movw	r22, r24
+ f1a:	cd 01       	movw	r24, r26
+ f1c:	08 95       	ret
+
+00000f1e <_exit>:
+ f1e:	f8 94       	cli
+
+00000f20 <__stop_program>:
+ f20:	ff cf       	rjmp	.-2      	; 0xf20 <__stop_program>

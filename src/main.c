@@ -6,14 +6,14 @@
  * Version avrCAN-0.1 13/10/2010
  */
 
-#include "F_CPU.h"
+#include "../include/F_CPU.h"
 #include <avr/interrupt.h>
 #include <avr/io.h>
-#include "display.h"
-#include "lcd.h"
-#include "avr_sja1000p.h"
-#include "sja_control.h"
-#include "avr_can.h"
+#include "../include/display.h"
+#include "../include/lcd.h"
+#include "../include/avr_sja1000p.h"
+#include "../include/sja_control.h"
+#include "../include/avr_can.h"
 #include <util/delay.h>
 
 #define DEBUG
