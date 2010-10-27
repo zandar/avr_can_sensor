@@ -7,20 +7,24 @@
  */
 
 #include "../include/F_CPU.h"
+#include <util/delay.h>
 #include <avr/interrupt.h>
 #include <avr/io.h>
+
 #include "../include/display.h"
 #include "../include/lcd.h"
 #include "../include/avr_sja1000p.h"
 #include "../include/sja_control.h"
 #include "../include/avr_can.h"
-#include <util/delay.h>
+#include "../include/sensor.h"
 
 #define DEBUG
 
 struct canchip_t chip;
 
 struct canmsg_t tx_msg,rx_msg;
+
+struct sensor sensor;
 
 char sja_status = 0;
 
@@ -52,14 +56,6 @@ int main(void)
   chip.sja_cdr_reg = sjaCDR_CLK_OFF;
   chip.sja_ocr_reg = sjaOCR_MODE_NORMAL|sjaOCR_TX0_LH;
   
-  
-  tx_msg.id = 1;
-  tx_msg.length = 8;
-  tx_msg.flags = MSG_EXT;
-  
-  for (;i< tx_msg.length;i++)
-    tx_msg.data[i] = i*10;
-  
   if(sja1000p_chip_config(&chip))
   {
     CANMSG("Config error!");
@@ -67,11 +63,21 @@ int main(void)
     CANMSG("Restarting...");
     _delay_ms(1000);
     while (1); // proved sw reset nejak
-  } 
+  }
+  
+  sensor_config(&sensor);
+
+#ifdef DEBUG
+  tx_msg.id = 1;
+  tx_msg.length = 8;
+  tx_msg.flags = MSG_EXT;
+  
+  for (;i< tx_msg.length;i++)
+    tx_msg.data[i] = i*10;
   
   sja1000p_pre_write_config(&tx_msg);
   sja1000p_send_msg();
- 
+#endif
   
   while(1) {
     

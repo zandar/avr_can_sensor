@@ -21,5 +21,7 @@ struct sensor {
   unsigned char samples[3];
 };
 
+char sensor_config(struct sensor *cfg);
+
 #endif
 
