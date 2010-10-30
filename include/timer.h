@@ -9,8 +9,11 @@
 #ifndef TIMER_H
 #define TIMER_H
 
-void timer0_delay_ms(unsigned int delay);
-void timer0_delay_us(unsigned int delay);
-void timer1_delay_ms(unsigned int delay);
+#include "../include/def.h"
+
+extern volatile timer timer0_msec;
+
+void timer0_init_1khz();
+void delay_ms(unsigned int delay);
 
 #endif

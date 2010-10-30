@@ -17,16 +17,14 @@
 #include "../include/sja_control.h"
 #include "../include/avr_can.h"
 #include "../include/sensor.h"
+#include "../include/def.h"
+#include "../include/timer.h"
 
 #define DEBUG
 
 struct canchip_t chip;
 
-struct canmsg_t tx_msg,rx_msg;
-
-struct sensor sensor;
-
-char sja_status = 0;
+struct canmsg_t rx_msg;
 
 /*
  * SJA interrupt service routine
@@ -34,6 +32,8 @@ char sja_status = 0;
 ISR(INT0_vect)
 {
   sja1000p_irq_handler(&rx_msg);
+  
+  sensor_config(&rx_msg);
 }
 
 /*
@@ -41,8 +41,9 @@ ISR(INT0_vect)
  */
 int main(void)
 {
-  unsigned char i = 0;
+  timer sensor_time = timer0_msec;
   
+  timer0_init_1khz();
   init_ports();
   
   sei();      // globalni povoleni preruseni
@@ -64,23 +65,18 @@ int main(void)
     _delay_ms(1000);
     while (1); // proved sw reset nejak
   }
-  
-  sensor_config(&sensor);
 
-#ifdef DEBUG
-  tx_msg.id = 1;
-  tx_msg.length = 8;
-  tx_msg.flags = MSG_EXT;
+  sensor_init();
   
-  for (;i< tx_msg.length;i++)
-    tx_msg.data[i] = i*10;
-  
-  sja1000p_pre_write_config(&tx_msg);
-  sja1000p_send_msg();
-#endif
+  CANMSG("Time: ms");
   
   while(1) {
     
+    if (timer0_msec >= (sensor_time + 10000)) {
+      sensor_time = timer0_msec;
+      
+      debug(1,timer0_msec);
+    }
   }
   
   return 0;
