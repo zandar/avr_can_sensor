@@ -1,6 +1,10 @@
 #ifndef SENSOR_H
 #define SENSOR_H
 
+#define LAST_ADC  2
+#define FIRST_ADC 0
+#define ADC_VREF_TYPE 0x60
+
 #define SENSOR_ID   (1 << ID)
 #define IDN_RQ      (0xff << ID)
 #define SENSOR_IDN  "vokacmic"
@@ -8,9 +12,8 @@
 #define TRESHOLD_MAX 255
 #define TRESHOLD_MIN 0
 
-#define ADC_CONTINUAL 1000 /* delay in ms between sending messages with samples */
-
 #include "../include/avr_can.h"
+#include "../include/fsm.h"
 
 enum sensor_id_cfg {
   ID = 21,
@@ -33,10 +36,9 @@ enum averaging {
 };
 
 struct sensor_cfg {
-  unsigned char delivery; /* shot & continual */
-  unsigned char channel_avrg[3]; /* */
-  unsigned char samples[3];
-  unsigned char treshold;
+  unsigned char delivery; /* shot = 1, continual = 0 */
+  unsigned char channel_avrg[3]; /* 0 = no data, 1 = no avrg. else = avrg. samples number */
+  unsigned char treshold; /* channel 0 treshold signalization */
 };
 
 struct sensor_data {
@@ -44,9 +46,11 @@ struct sensor_data {
   unsigned char overflow;
 };
 
-char sensor_config(struct canmsg_t *rx_msg);
-void decode_msg(struct canmsg_t *rx_msg);
+char sensor_config(struct canmsg_t *rx_msg, struct fsm *fsm);
 char sensor_init();
+
+void fsm_sensor_init(struct fsm *fsm, enum event event);
+
 
 #endif
 

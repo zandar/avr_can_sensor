@@ -246,7 +246,7 @@ char sja1000p_baud_rate(unsigned long rate, unsigned long clock, unsigned char s
           | tseg1, SJABTR1);
 
   sja1000p_disable_configuration();
-  
+
 #ifdef DEBUG 
   CANMSG("Baud rate OK");
   _delay_ms(1000);
@@ -291,6 +291,8 @@ void sja1000p_read(struct canmsg_t *rx_msg) {
   for(i = 0; i < len; i++) {
     rx_msg->data[i] = can_read_reg(SJADATE+i);
   }
+  
+  rx_msg->status = NEW;
 
   can_write_reg(sjaCMR_RRB, SJACMR);
 
@@ -416,7 +418,7 @@ char sja1000p_irq_handler(struct canmsg_t *rx_msg)
   irq_register = can_read_reg(SJAIR);
 
 #ifdef DEBUG
-    lcd_puts_line(0,"Interrupt");
+    CANMSG("Interrupt");
     debug(1,irq_register);
     _delay_ms(1000);
 #endif  

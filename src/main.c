@@ -19,12 +19,14 @@
 #include "../include/sensor.h"
 #include "../include/def.h"
 #include "../include/timer.h"
+#include "../include/fsm.h"
 
 #define DEBUG
 
 struct canchip_t chip;
-
 struct canmsg_t rx_msg;
+
+struct fsm fsm_sensor;
 
 /*
  * SJA interrupt service routine
@@ -33,7 +35,10 @@ ISR(INT0_vect)
 {
   sja1000p_irq_handler(&rx_msg);
   
-  sensor_config(&rx_msg);
+  if (rx_msg.status == NEW) {
+    rx_msg.status = NONE;
+    sensor_config(&rx_msg,&fsm_sensor);
+  }
 }
 
 /*
@@ -68,14 +73,15 @@ int main(void)
 
   sensor_init();
   
-  CANMSG("Time: ms");
+  init_fsm(&fsm_sensor,&fsm_sensor_init);
   
   while(1) {
     
-    if (timer0_msec >= (sensor_time + 10000)) {
+    if (timer0_msec >= (sensor_time + 10)) {
       sensor_time = timer0_msec;
       
-      debug(1,timer0_msec);
+      /* run fsm every 10ms*/
+      run_fsm(&fsm_sensor);
     }
   }
   

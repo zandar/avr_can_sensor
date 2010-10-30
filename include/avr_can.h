@@ -21,6 +21,9 @@
 /* Can message ID mask */
 #define MSG_ID_MASK ((1l<<29)-1)
 
+#define NONE 0
+#define NEW  1
+
 /**
  * struct canmsg_t - structure representing CAN message
  * @flags:  message flags
@@ -33,6 +36,7 @@ struct canmsg_t {
 	unsigned long id;
 	unsigned char length;
 	unsigned char data[CAN_MSG_LENGTH];
+  unsigned char status;
 };
 
 /**

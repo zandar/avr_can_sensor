@@ -28,12 +28,7 @@ ISR(TIMER0_COMP_vect)
 void timer0_init_1khz()
 {
   TCNT0 = 0;
-  OCR0 = 122;
+  OCR0 = 124;
   TIMSK |= 0x02;    /* interrupt enable when OC */
   TCCR0 |= 0x0B;     /* CTC mode, delicka 64x, normal port op. */
-}
-
-delay_ms(unsigned int delay)
-{
-  
 }

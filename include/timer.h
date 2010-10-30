@@ -14,6 +14,5 @@
 extern volatile timer timer0_msec;
 
 void timer0_init_1khz();
-void delay_ms(unsigned int delay);
 
 #endif
