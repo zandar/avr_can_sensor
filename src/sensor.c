@@ -7,20 +7,24 @@
 
 #include "../include/sensor.h"
 #include "../include/avr_sja1000p.h"
+#include "../include/sja_control.h"
 #include "../include/fsm.h"
 #include "../include/timer.h"
 #include "../include/display.h"
 
-#define treshold(id)              ((id >> TRESHOLD) & 0xff)
-#define channel_avrg(id,channel)  ((id >> channel) & 0x07)
-#define delivery(id)              ((id >> DELIVERY) & 0x01)
+#define adc_channels_in ADC_DIRECTION |= (1 << ADC_CHANNEL_0)|(1 << ADC_CHANNEL_1)|(1 << ADC_CHANNEL_2)
 
-#define adc_start   ADCSRA |= (1 << 7)
-#define adc_stop    ADCSRA &= ~(1 << 7)
+#define treshold(id)              ((id >> SHIFT_TRESHOLD) & 0xff)
+#define treshold_channel(id)      ((id >> SHIFT_TRESHOLD_CHANNEL) & 0x03)
+#define channel_avrg(id,channel)  ((id >> channel) & 0x07)
+#define delivery(id)              ((id >> SHIFT_DELIVERY) & 0x01)
+
+#define adc_start   ADCSRA |= (1 << 6)
+#define adc_stop    ADCSRA &= ~(1 << 6)
 
 #define DEBUG
 
-static struct sensor_cfg sen_cfg;
+static struct sensor_cfg sen_cfg, sen_cfg_lock;
 static struct sensor_data sen_data;
 static struct canmsg_t idn_msg;
 static struct canmsg_t tx_msg;
@@ -29,18 +33,18 @@ volatile unsigned char adc_data[3];
 
 static void wait_for_cmd(struct fsm *fsm, enum event event);
 static void sensor_capture_data(struct fsm *fsm, enum event event);
-//static void sensor_send_data(struct fsm *fsm, enum event event);
+static void sensor_send_data(struct fsm *fsm, enum event event);
 
 static unsigned char shift(unsigned char channel)
 {
   
   switch (channel) {
     case 0:
-      return CHANNEL_0;
+      return SHIFT_CHANNEL_0;
     case 1:
-      return CHANNEL_1;
+      return SHIFT_CHANNEL_1;
     case 2:
-      return CHANNEL_2;
+      return SHIFT_CHANNEL_2;
       
     default:
       return 0;
@@ -82,7 +86,7 @@ static unsigned char averaging(unsigned char avrg)
 
 ISR(ADC_vect)
 {
-  unsigned char channel = 0;
+  static unsigned char channel = 0;
   
   adc_data[channel] = ADCH;
   
@@ -91,8 +95,6 @@ ISR(ADC_vect)
     channel = 0;
   
   ADMUX = (FIRST_ADC | (ADC_VREF_TYPE & 0xff)) + channel;
-  
-  _delay_us(10);
   
   adc_start;
 }
@@ -116,20 +118,21 @@ char sensor_init()
    * channel 0 - 2 enabled, no averaging, continual delivery
    * no treshold */
   for (i = 0;i < 3; i++) {
-    sen_cfg.channel_avrg[i] = 1;
+    sen_cfg.samples[i] = AVRG_1;
   }
   
   sen_cfg.delivery = 1;
   sen_cfg.treshold = 0;
+  sen_cfg.treshold_channel = 0;
   
-  ADCSRA = 0x88;  /* ADC enabled. interrupt enabled, no prescaler */
+  ADCSRA = 0xCF;  /* ADC enabled. interrupt enabled, 128x prescaler ~4kHz */
   ADMUX = 0x60;   /*  Vref = Vcc, ADC output in ADCH */
   
+  //adc_channels_in;
   adc_start;
   
 #ifdef DEBUG
   CANMSG("Sensor init OK");
-  _delay_ms(1000);
 #endif
 
   return 0;
@@ -148,58 +151,95 @@ char sensor_config(struct canmsg_t *rx_msg, struct fsm *fsm)
     
 #ifdef DEBUG
     CANMSG("IDN? answer OK");
-    _delay_ms(1000);
 #endif
   }
   else {
     /* if recived message is ADC configuration */
     sen_cfg.treshold = treshold(rx_msg->id);
+    sen_cfg.treshold_channel = treshold_channel(rx_msg->id);
     
     for (;i < 3;i++) {
-      sen_cfg.channel_avrg[i] = channel_avrg(rx_msg->id,shift(i));
+      sen_cfg.samples[i] = averaging(channel_avrg(rx_msg->id,shift(i)));
     }
     
     sen_cfg.delivery = delivery(rx_msg->id);
     
-    fsm->measurement_start = true;
-  }
-  
+    if (sen_cfg.samples[0] || sen_cfg.samples[1] || sen_cfg.samples[2])
+      fsm->measurement_start = true;
+    
 #ifdef DEBUG
-  CANMSG("Sensor config OK");
-  _delay_ms(1000);
+    CANMSG("Sensor config OK");
 #endif
+  }
   
   return 0;
 }
 
 
-static void save_samples(struct fsm *fsm)
+static void save_samples()
 {
-   static timer adc_time = 0;
-   static int counter = 0;
+  timer adc_time = 0;
+  unsigned char counter = 0, i = 0;
+  unsigned int average = 0;
 
-  if(timer0_msec >= adc_time + 1000)   // save ADC sample every ADC_PERIOD us
-  {
-    adc_time = timer0_msec;
-    debug(1,counter++);
+  for (i = 0; i < (LAST_ADC - FIRST_ADC + 1); i++) {
     
-//     if(counter == 0)  // when first sample, time = 0
-//       time_base = 0;
-//     else
-//       time_base = timer_usec - adc_time;  // else time = time betwen samples
-//     
-//     adc_time = timer_usec;
-//     
-//     fsm->adc_data[ADC_DATA][counter] = adc_val[0];
-//     fsm->adc_data[ADC_TIME][counter] = time_base;
-//     counter++;
-//     
-    if(counter >= 10)
-    {
-      counter = 0;
-      fsm->send_samples = true;
+    while (counter < sen_cfg_lock.samples[i]) {
+      /* save sample every 1ms = 1kHz  */
+      if (timer_msec >= adc_time + 1) {
+        adc_time = timer_msec;
+        average += adc_data[i];
+        counter++;
+      }
     }
-   }
+    
+    /* avoid dividing by zero */
+    if (sen_cfg_lock.samples[i])
+      sen_data.channel_data[i] = average / sen_cfg_lock.samples[i];
+    
+    counter = 0;
+  }
+  
+  #ifdef DEBUG
+    CANMSG("ADC data");
+    
+    for (i = 0;i<3;i++) {
+     debug(1,sen_data.channel_data[i]);
+     _delay_ms(500);
+    }
+#endif
+  
+  if (sen_cfg_lock.treshold_channel
+    && (sen_data.channel_data[sen_cfg_lock.treshold_channel - 1] >= sen_cfg_lock.treshold))
+      sen_data.overflow = 1;
+  else
+    sen_data.overflow = 0;
+}
+
+static char send_samples()
+{
+  unsigned char i = 0;
+  
+  //TODO v ID nastavit priznak pro treshold a jake kanly posilam
+  tx_msg.id = SENSOR_ID;
+  
+  for (;i < 3;i++) {
+    if (sen_cfg_lock.samples[i]) {
+      tx_msg.data[tx_msg.length] = sen_data.channel_data[i];
+      tx_msg.length++;
+    }
+  }
+  
+  if (sja1000p_pre_write_config(&tx_msg)) {
+#ifdef DEBUG    
+    CANMSG("Send samples err");
+#endif    
+    return -1;
+  }
+  
+  sja1000p_send_msg();
+  
+  return 0;
 }
 
 void fsm_sensor_init(struct fsm *fsm, enum event event)
@@ -209,14 +249,11 @@ void fsm_sensor_init(struct fsm *fsm, enum event event)
     break;
   case EVENT_DO:
     fsm->measurement_start = true;
-    fsm->send_samples = false;
-    fsm->sensor_ready = true;
     fsm->current_state = wait_for_cmd;
     break;
   case EVENT_EXIT:
 #ifdef DEBUG    
     CANMSG("FSM init OK");
-    _delay_ms(1000);
 #endif
     break;
   }
@@ -226,20 +263,22 @@ static void wait_for_cmd(struct fsm *fsm, enum event event)
 {  
   switch (event) {
   case EVENT_ENTRY:
-    break;
-  case EVENT_DO:
 #ifdef DEBUG
     CANMSG("FSM wait for cmd");
-    _delay_ms(1000);
 #endif
+    break;
+  case EVENT_DO:
     /* waiting to start adc sampling */
-    if (fsm->measurement_start && (sen_cfg.channel_avrg[0]
-      || sen_cfg.channel_avrg[1] || sen_cfg.channel_avrg[2]) )
-       fsm->current_state = sensor_capture_data;
+    if (fsm->measurement_start) {
+      /* disable AVR interrupt, so the sen_cfg structure is propperly copied */
+      can_disable_irq();
+      sen_cfg_lock = sen_cfg;
+      can_enable_irq();
+      fsm->current_state = sensor_capture_data;
+    }
     break;
   case EVENT_EXIT:
-    fsm->sensor_ready = false;
-    fsm->measurement_start = sen_cfg.delivery;
+    fsm->measurement_start = sen_cfg_lock.delivery;
     break;
   }
 }
@@ -250,17 +289,30 @@ static void sensor_capture_data(struct fsm *fsm, enum event event)
   case EVENT_ENTRY:
 #ifdef DEBUG
     CANMSG("FSM capture data");
-    _delay_ms(1000);
 #endif
     break;
   case EVENT_DO:
     save_samples(fsm);
-    
-    if (fsm->send_samples)
-      fsm->current_state = wait_for_cmd;
+    fsm->current_state = sensor_send_data;
     break;
   case EVENT_EXIT:
-    fsm->measurement_start = false;
+    break;
+  }
+}
+
+static void sensor_send_data(struct fsm *fsm, enum event event)
+{
+  switch (event) {
+  case EVENT_ENTRY:
+#ifdef DEBUG
+    CANMSG("FSM send data");
+#endif
+    break;
+  case EVENT_DO:
+    send_samples();
+    fsm->current_state = wait_for_cmd;
+    break;
+  case EVENT_EXIT:
     break;
   }
 }

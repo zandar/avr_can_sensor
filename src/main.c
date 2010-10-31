@@ -46,16 +46,16 @@ ISR(INT0_vect)
  */
 int main(void)
 {
-  timer sensor_time = timer0_msec;
+  timer sensor_time = timer_msec;
+  
+  sei();      // global interrupt enable
   
   timer0_init_1khz();
-  init_ports();
-  
-  sei();      // globalni povoleni preruseni
+  sja_init_ports();
   
   lcd_init(LCD_DISP_ON);
   
-  lcd_puts_line(0,"CAN senzor");
+  CANMSG("CAN senzor");
   
   chip.baudrate = SJA_BAUD;
   chip.clock = SJA_CLOCK;
@@ -65,10 +65,9 @@ int main(void)
   if(sja1000p_chip_config(&chip))
   {
     CANMSG("Config error!");
-    _delay_ms(1000);
     CANMSG("Restarting...");
-    _delay_ms(1000);
-    while (1); // proved sw reset nejak
+    
+    while (1); // TODO execute sw reset
   }
 
   sensor_init();
@@ -77,10 +76,10 @@ int main(void)
   
   while(1) {
     
-    if (timer0_msec >= (sensor_time + 10)) {
-      sensor_time = timer0_msec;
+    if (timer_msec >= (sensor_time + 100)) {
+      sensor_time = timer_msec;
       
-      /* run fsm every 10ms*/
+      /* run fsm every x ms*/
       run_fsm(&fsm_sensor);
     }
   }

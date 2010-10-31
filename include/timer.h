@@ -14,5 +14,6 @@
 extern volatile timer timer0_msec;
 
 void timer0_init_1khz();
+void timer2_init_100khz();
 
 #endif

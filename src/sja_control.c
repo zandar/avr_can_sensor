@@ -11,11 +11,6 @@
 #include <util/delay.h>
 #include "../include/sja_control.h"
 
-// #include "../include/can.h"
-// #include "../include/can_sysdep.h"
-// #include "../include/main.h"
-// #include "../include/sja1000.h"
-
 /* Macros for low level hw. control */
 #define sja_bus_out   SJA_BUS_DIR = 0xff   /* set bus lines in DDR register as output */
 #define sja_bus_in    SJA_BUS_PORT = 0xff,SJA_BUS_DIR = 0x00   /* set bus lines in DDR register as input */
@@ -40,7 +35,7 @@
 #define sja_disable_irq GICR &= ~(1 << SJA_INT_BIT) /* AVR interrupt from SJA disabled */
 #define sja_enable_irq  GICR |= (1 << SJA_INT_BIT)  /* AVR interrupt from SJA enabled */
 
-void init_ports()
+void sja_init_ports()
 {
   sja_bus_out;
   sja_ctrl_out;

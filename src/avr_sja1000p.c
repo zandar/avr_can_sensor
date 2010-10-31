@@ -41,14 +41,12 @@ char sja1000p_enable_configuration()
   if (i >= 10) {
 #ifdef DEBUG
     CANMSG("Reset mode error");
-    _delay_ms(1000);
 #endif
     can_enable_irq();
     return -1;
   }
 #ifdef DEBUG
   CANMSG("Reset mode OK");
-  _delay_ms(1000);
 #endif
   return 0;
 }
@@ -74,7 +72,6 @@ char sja1000p_disable_configuration()
   if (i >= 10) {
 #ifdef DEBUG
     CANMSG("Err. exit reset");
-    _delay_ms(1000);
 #endif
     return -1;
   }
@@ -123,7 +120,6 @@ char sja1000p_chip_config(struct canchip_t *chip)
     if (r) {
 #ifdef DEBUG
       CANMSG("Config error");
-      _delay_ms(1000);
 #endif
       return -1;
     }
@@ -145,7 +141,6 @@ char sja1000p_chip_config(struct canchip_t *chip)
   
 #ifdef DEBUG  
   CANMSG("Config OK");
-  _delay_ms(1000);
 #endif
   return 0;
 }
@@ -222,7 +217,6 @@ char sja1000p_baud_rate(unsigned long rate, unsigned long clock, unsigned char s
   if (best_error && (rate/best_error < 10)) {
 #ifdef DEBUG
     CANMSG("Baud rate error");
-    _delay_ms(1000);
 #endif
     return -1;
   }
@@ -249,7 +243,6 @@ char sja1000p_baud_rate(unsigned long rate, unsigned long clock, unsigned char s
 
 #ifdef DEBUG 
   CANMSG("Baud rate OK");
-  _delay_ms(1000);
 #endif  
   return 0;
 }
@@ -328,7 +321,6 @@ char sja1000p_pre_write_config(struct canmsg_t *msg)
     /* Try to recover from error condition */
 #ifdef DEBUG
     CANMSG("Bus recovering");
-    _delay_ms(1000);
 #endif
     sja1000p_enable_configuration();
     can_write_reg(0, SJARXERR);
@@ -339,7 +331,6 @@ char sja1000p_pre_write_config(struct canmsg_t *msg)
   if (!(can_read_reg(SJASR) & sjaSR_TBS)) {
 #ifdef DEBUG
     CANMSG("TX timed out");
-    _delay_ms(1000);
 #endif
 // here we should check if there is no write/select waiting for this
 // transmit. If so, set error ret and wake up.
@@ -354,7 +345,6 @@ char sja1000p_pre_write_config(struct canmsg_t *msg)
     if (!(can_read_reg(SJASR) & sjaSR_TBS)) {
 #ifdef DEBUG
       CANMSG("Tx err. Reset!");
-      _delay_ms(1000);
 #endif
       return -1;
     }
@@ -378,8 +368,7 @@ char sja1000p_pre_write_config(struct canmsg_t *msg)
     can_write_reg(msg->data[i], SJADATE+i);
   }
 #ifdef DEBUG
-    CANMSG("Tx");
-    _delay_ms(1000);
+    CANMSG("Tx OK");
 #endif
   return 0;
 }
@@ -420,13 +409,12 @@ char sja1000p_irq_handler(struct canmsg_t *rx_msg)
 #ifdef DEBUG
     CANMSG("Interrupt");
     debug(1,irq_register);
-    _delay_ms(1000);
+    _delay_ms(500);
 #endif  
 
   if ((irq_register & (sjaIR_BEI|sjaIR_EPI|sjaIR_DOI|sjaIR_EI|sjaIR_TI|sjaIR_RI)) == 0) {
 #ifdef DEBUG
     CANMSG("None int. flag");
-    _delay_ms(1000);
 #endif
     return 0;
   }
@@ -438,7 +426,6 @@ char sja1000p_irq_handler(struct canmsg_t *rx_msg)
   if (status & sjaSR_RBS) {
 #ifdef DEBUG
     CANMSG("IRQ: RI or RBS");
-    _delay_ms(1000);
 #endif
     sja1000p_read(rx_msg);
   }
@@ -449,9 +436,7 @@ char sja1000p_irq_handler(struct canmsg_t *rx_msg)
     if(status & sjaSR_BS) {
 #ifdef DEBUG
       CANMSG("bus-off");
-      _delay_ms(1000);
       CANMSG("resetting chip");
-      _delay_ms(1000);
 #endif
       can_write_reg(0, SJAMOD);
     }

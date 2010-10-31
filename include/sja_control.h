@@ -44,6 +44,6 @@ unsigned char can_read_reg(unsigned char address);
 void can_write_reg(unsigned char data, unsigned char address);
 void can_enable_irq(void);
 void can_disable_irq(void);
-void init_ports(void);
+void sja_init_ports(void);
 
 #endif
