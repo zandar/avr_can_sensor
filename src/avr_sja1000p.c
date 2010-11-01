@@ -5,18 +5,22 @@
  * T.Motylewski@bfad.de
  * Rewritten for new CAN queues by Pavel Pisa - OCERA team member
  * email:pisa@cmp.felk.cvut.cz
+ * Rewritten for AVR microcontroler by Michal Vokac
+ * email:vokac.m@gmail.com
  * This software is released under the GPL-License.
  * Version lincan-0.3  17 Jun 2004
+ * Version avrCAN-0.1  1/11/2010
  */
 
 #include "../include/avr_sja1000p.h"
 #include "../include/sja_control.h"
 #include "../include/display.h"
 #include "../include/avr_can.h"
+#include "../include/timer.h"
 #include "../include/F_CPU.h"
 #include <util/delay.h>
 
-#define DEBUG
+//#define DEBUG
 
 
 /**
@@ -40,13 +44,13 @@ char sja1000p_enable_configuration()
   }
   if (i >= 10) {
 #ifdef DEBUG
-    CANMSG("Reset mode error");
+    CANMSG("SJA rst mode err");
 #endif
     can_enable_irq();
     return -1;
   }
 #ifdef DEBUG
-  CANMSG("Reset mode OK");
+  CANMSG("SJA rst mode OK");
 #endif
   return 0;
 }
@@ -71,7 +75,7 @@ char sja1000p_disable_configuration()
   }
   if (i >= 10) {
 #ifdef DEBUG
-    CANMSG("Err. exit reset");
+    CANMSG("SJA err exit rst");
 #endif
     return -1;
   }
@@ -118,14 +122,12 @@ char sja1000p_chip_config(struct canchip_t *chip)
   for (i=0, n=0x5a; i<8; i++, n+=0xf) {
     r = n^can_read_reg(SJAACR0+i);
     if (r) {
-#ifdef DEBUG
-      CANMSG("Config error");
-#endif
+      CANMSG("SJA config error");
       return -1;
     }
   }
 
-  if (sja1000p_extended_mask(0x0000000, 0xfffffff))
+  if (sja1000p_extended_mask(chip->filter_code, chip->filter_mask))
     return -1;
   
   if (!chip->baudrate)
@@ -139,9 +141,8 @@ char sja1000p_chip_config(struct canchip_t *chip)
 
   sja1000p_disable_configuration();
   
-#ifdef DEBUG  
-  CANMSG("Config OK");
-#endif
+  CANMSG("SJA config OK");
+  
   return 0;
 }
 
@@ -162,7 +163,7 @@ char sja1000p_extended_mask(unsigned long code, unsigned  long mask)
     return -1;
 
 // LSB to +3, MSB to +0 
-  for(i=SJA_PeliCAN_AC_LEN; --i>=0;) {
+  for(i = SJA_PeliCAN_AC_LEN; --i >= 0;) {
     can_write_reg(code&0xff,SJAACR0+i);
     can_write_reg(mask&0xff,SJAAMR0+i);
     code >>= 8;
@@ -215,9 +216,7 @@ char sja1000p_baud_rate(unsigned long rate, unsigned long clock, unsigned char s
     }
   }
   if (best_error && (rate/best_error < 10)) {
-#ifdef DEBUG
-    CANMSG("Baud rate error");
-#endif
+    CANMSG("SAJ b-r error");
     return -1;
   }
   tseg2 = best_tseg-(sampl_pt*(best_tseg+1))/100;
@@ -241,9 +240,8 @@ char sja1000p_baud_rate(unsigned long rate, unsigned long clock, unsigned char s
 
   sja1000p_disable_configuration();
 
-#ifdef DEBUG 
-  CANMSG("Baud rate OK");
-#endif  
+  CANMSG("SJA baud rate OK");
+
   return 0;
 }
 
@@ -320,7 +318,7 @@ char sja1000p_pre_write_config(struct canmsg_t *msg)
   if(status & sjaSR_BS) {
     /* Try to recover from error condition */
 #ifdef DEBUG
-    CANMSG("Bus recovering");
+    CANMSG("SJA bus recover");
 #endif
     sja1000p_enable_configuration();
     can_write_reg(0, SJARXERR);
@@ -328,9 +326,10 @@ char sja1000p_pre_write_config(struct canmsg_t *msg)
     can_read_reg(SJAECC);
     sja1000p_disable_configuration();
   }
+  
   if (!(can_read_reg(SJASR) & sjaSR_TBS)) {
 #ifdef DEBUG
-    CANMSG("TX timed out");
+    CANMSG("SJA TX timed out");
 #endif
 // here we should check if there is no write/select waiting for this
 // transmit. If so, set error ret and wake up.
@@ -344,7 +343,8 @@ char sja1000p_pre_write_config(struct canmsg_t *msg)
     }
     if (!(can_read_reg(SJASR) & sjaSR_TBS)) {
 #ifdef DEBUG
-      CANMSG("Tx err. Reset!");
+      CANMSG("SJA TX error");
+      CANMSG("Reset SJA chip!");
 #endif
       return -1;
     }
@@ -368,7 +368,7 @@ char sja1000p_pre_write_config(struct canmsg_t *msg)
     can_write_reg(msg->data[i], SJADATE+i);
   }
 #ifdef DEBUG
-    CANMSG("Tx OK");
+    CANMSG("SJA TX...");
 #endif
   return 0;
 }
@@ -404,18 +404,12 @@ char sja1000p_irq_handler(struct canmsg_t *rx_msg)
 {
   unsigned char irq_register, status;
 
-  irq_register = can_read_reg(SJAIR);
-
-#ifdef DEBUG
-    CANMSG("Interrupt");
-    debug(1,irq_register);
-    _delay_ms(500);
-#endif  
+  irq_register = can_read_reg(SJAIR);  
 
   if ((irq_register & (sjaIR_BEI|sjaIR_EPI|sjaIR_DOI|sjaIR_EI|sjaIR_TI|sjaIR_RI)) == 0) {
-#ifdef DEBUG
-    CANMSG("None int. flag");
-#endif
+// #ifdef DEBUG
+//     CANMSG("SJA none int flg");
+// #endif
     return 0;
   }
 
@@ -424,9 +418,9 @@ char sja1000p_irq_handler(struct canmsg_t *rx_msg)
   /* (irq_register & sjaIR_RI) */
   /*  old variant using SJAIR, collides with intended use with irq_accept */
   if (status & sjaSR_RBS) {
-#ifdef DEBUG
-    CANMSG("IRQ: RI or RBS");
-#endif
+// #ifdef DEBUG
+//     CANMSG("SJA IRQ RI, RBS");
+// #endif
     sja1000p_read(rx_msg);
   }
   
@@ -434,10 +428,10 @@ char sja1000p_irq_handler(struct canmsg_t *rx_msg)
     // Some error happened
     
     if(status & sjaSR_BS) {
-#ifdef DEBUG
-      CANMSG("bus-off");
-      CANMSG("resetting chip");
-#endif
+// #ifdef DEBUG
+//       CANMSG("SJA bus-off");
+//       CANMSG("SJA resetting..");
+// #endif
       can_write_reg(0, SJAMOD);
     }
   }

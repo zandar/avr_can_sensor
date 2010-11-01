@@ -1,3 +1,5 @@
+/* Functoins for executing FSM */
+
 #include "../include/fsm.h"
 
 void init_fsm(struct fsm *fsm, state_fcn initial_state)

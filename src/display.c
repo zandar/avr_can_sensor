@@ -1,3 +1,11 @@
+/* display.c
+ * LCD diaply "hi-level" functions
+ * Written by Michal Vokac
+ * email: vokac.m@gmail.com
+ * This software is released under the GPL-License.
+ * 13/10/2010
+ */
+
 #include "../include/lcd.h"
 #include "../include/display.h"
 #include <stdlib.h>
@@ -26,7 +34,7 @@ void debug(unsigned char line_nr,unsigned long num)
 {
   char string[11];
   
-  ltoa(num,string,10);
+  ultoa(num,string,10);
   
   lcd_puts_line(line_nr,string);
 }
