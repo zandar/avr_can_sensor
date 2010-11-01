@@ -20,7 +20,7 @@
 #include "../include/F_CPU.h"
 #include <util/delay.h>
 
-//#define DEBUG
+#define DEBUG
 
 
 /**
@@ -407,9 +407,10 @@ char sja1000p_irq_handler(struct canmsg_t *rx_msg)
   irq_register = can_read_reg(SJAIR);  
 
   if ((irq_register & (sjaIR_BEI|sjaIR_EPI|sjaIR_DOI|sjaIR_EI|sjaIR_TI|sjaIR_RI)) == 0) {
-// #ifdef DEBUG
-//     CANMSG("SJA none int flg");
-// #endif
+#ifdef DEBUG
+     lcd_puts_line(0,"SJA none int flg");
+     _delay_ms(1000);
+ #endif
     return 0;
   }
 
@@ -418,9 +419,10 @@ char sja1000p_irq_handler(struct canmsg_t *rx_msg)
   /* (irq_register & sjaIR_RI) */
   /*  old variant using SJAIR, collides with intended use with irq_accept */
   if (status & sjaSR_RBS) {
-// #ifdef DEBUG
-//     CANMSG("SJA IRQ RI, RBS");
-// #endif
+#ifdef DEBUG
+    lcd_puts_line(0,"SJA IRQ RI, RBS");
+    _delay_ms(1000);
+#endif
     sja1000p_read(rx_msg);
   }
   
@@ -428,10 +430,12 @@ char sja1000p_irq_handler(struct canmsg_t *rx_msg)
     // Some error happened
     
     if(status & sjaSR_BS) {
-// #ifdef DEBUG
-//       CANMSG("SJA bus-off");
-//       CANMSG("SJA resetting..");
-// #endif
+#ifdef DEBUG
+      lcd_puts_line(0,"SJA bus-off");
+      _delay_ms(1000);
+      lcd_puts_line(0,"SJA resetting..");
+      _delay_ms(1000);
+#endif
       can_write_reg(0, SJAMOD);
     }
   }

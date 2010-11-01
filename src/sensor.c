@@ -34,7 +34,7 @@
 #define adc_on      ADCSRA |= (3 << 6)  /* enable ADC, start conversion  */
 #define adc_off     ADCSRA &= ~(1 << 7) /* disable ADC */
 
-//#define DEBUG
+#define DEBUG
 
 static struct sensor_cfg sen_cfg, sen_cfg_lock;
 static struct sensor_data sen_data;
@@ -268,9 +268,11 @@ static char send_samples()
   /* set msg ID to rx_msg ID */
   tx_msg.id = sen_cfg_lock.rx_msg_id;
   
+  tx_msg.length = 0;
+  
   /* fill msg data bytes with captured samples
      only this channels with samples[i] != 0 will be transmited */
-  for (;i < 3;i++) {
+  for (i = 0; i < 3; i++) {
     if (sen_cfg_lock.samples[i]) {
       tx_msg.data[tx_msg.length] = sen_data.channel_data[i];
       tx_msg.length++;
@@ -278,11 +280,12 @@ static char send_samples()
   }
   
   /* if overflow occure, set appropriate bit in msg ID */
-  tx_msg.id += sen_data.overflow;
+  if (sen_data.overflow)
+    tx_msg.id++;
   
   if (sja1000p_pre_write_config(&tx_msg)) {
 #ifdef DEBUG    
-    CANMSG("FSM msg TX error");
+    CANMSG("FSM TX data err");
 #endif    
     return -1;
   }
@@ -366,7 +369,7 @@ static void sensor_send_data(struct fsm *fsm, enum event event)
   switch (event) {
   case EVENT_ENTRY:
 #ifdef DEBUG
-    CANMSG("FSM send data");
+    CANMSG("FSM TX data");
 #endif
     break;
   case EVENT_DO:

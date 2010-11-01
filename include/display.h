@@ -9,6 +9,7 @@
 #ifndef DISPLAY_H
 #define DISPLAY_H
 
+/* TODO dont use canmsg for print in interrupt, delay_ms is not reentrant!!! */
 #define CANMSG(string) lcd_puts_line(0,string);delay_ms(1000)
 
 void lcd_puts_line(unsigned char line_nr,const char *string);

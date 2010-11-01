@@ -40,7 +40,6 @@ ISR(INT0_vect)
 int main(void)
 {
   timer sensor_time = timer_msec;
-  unsigned int i = 0;
   
   sei();  /* global interrupt enable */
   
@@ -54,9 +53,9 @@ int main(void)
   
   while(1) {
     
-    if (timer_msec >= (sensor_time + 50)) {
+    if (timer_msec >= (sensor_time + 100)) {
       sensor_time = timer_msec;
-      debug(1,++i);
+      debug(1,timer_msec);
       /* run fsm every x ms*/
       run_fsm(&fsm_sensor);
     }
