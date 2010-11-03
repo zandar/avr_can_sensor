@@ -20,7 +20,7 @@
 #include "../include/F_CPU.h"
 #include <util/delay.h>
 
-#define DEBUG
+//#define DEBUG
 
 
 /**
@@ -255,18 +255,13 @@ char sja1000p_baud_rate(unsigned long rate, unsigned long clock, unsigned char s
 void sja1000p_read(struct canmsg_t *rx_msg) {
 
   unsigned char i, flags, len;
-  unsigned long pom;
 
   flags = can_read_reg(SJAFRM);
-
-  pom = (can_read_reg(SJAID0)<<10);
-  pom = pom<<11;
   
-  rx_msg->id =
-    pom +
-    (can_read_reg(SJAID1)<<13) +
-    (can_read_reg(SJAID2)<<5) +
-    (can_read_reg(SJAID3)>>3);
+  rx_msg->id[0] = can_read_reg(SJAID0);
+  rx_msg->id[1] = can_read_reg(SJAID1);
+  rx_msg->id[2] = can_read_reg(SJAID2);
+  rx_msg->id[3] = can_read_reg(SJAID3) >> 3;
   
   rx_msg->flags =
     ((flags & sjaFRM_RTR) ? MSG_RTR : 0) |
@@ -305,7 +300,6 @@ void sja1000p_read(struct canmsg_t *rx_msg) {
 char sja1000p_pre_write_config(struct canmsg_t *msg)
 {
   unsigned char i = 0; 
-  unsigned long id;
   unsigned char status;
   unsigned char len;
 
@@ -355,14 +349,10 @@ char sja1000p_pre_write_config(struct canmsg_t *msg)
   /* len &= sjaFRM_DLC_M; ensured by above condition already */
   can_write_reg(sjaFRM_FF |len, SJAFRM);
   
-  id = msg->id<<3;
-  can_write_reg(id & 0xff, SJAID3);
-  id >>= 8;
-  can_write_reg(id & 0xff, SJAID2);
-  id >>= 8;
-  can_write_reg(id & 0xff, SJAID1);
-  id >>= 8;
-  can_write_reg(id, SJAID0);
+  can_write_reg(msg->id[3] << 3, SJAID3);
+  can_write_reg(msg->id[2], SJAID2);
+  can_write_reg(msg->id[1], SJAID1);
+  can_write_reg(msg->id[0], SJAID0);
   
   for(i=0; i < len; i++) {
     can_write_reg(msg->data[i], SJADATE+i);

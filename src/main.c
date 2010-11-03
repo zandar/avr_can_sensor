@@ -29,11 +29,6 @@ struct fsm fsm_sensor;
 ISR(INT0_vect)
 {
   sja1000p_irq_handler(&rx_msg);
-  
-  if (rx_msg.status == NEW) {
-    rx_msg.status = NONE;
-    sensor_config(&rx_msg,&fsm_sensor);
-  }
 }
 
 /* MAIN */
@@ -51,14 +46,23 @@ int main(void)
   
   init_fsm(&fsm_sensor,&fsm_sensor_init);
   
+  
   while(1) {
     
-    if (timer_msec >= (sensor_time + 100)) {
+    if (timer_msec >= (sensor_time + 10)) {
       sensor_time = timer_msec;
       debug(1,timer_msec);
+      
       /* run fsm every x ms*/
       run_fsm(&fsm_sensor);
     }
+    
+    if (rx_msg.status == NEW) {
+      rx_msg.status = NONE;
+      sensor_config(&rx_msg,&fsm_sensor);
+    }
+    
+    
   }
   
   return 0;

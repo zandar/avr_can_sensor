@@ -18,9 +18,7 @@
 
 #define ADC_VREF_TYPE 0x60
 
-#define MY_ID 1l /* my sensor id, 2^N possible values, N <0,8>*/
-#define SENSOR_ID   (MY_ID << SHIFT_ID)
-#define SENSOR_MASK (MY_ID << 24)
+#define MY_ID 1 /* my sensor id, 2^N possible values, N <0,8>*/
 #define IDN 0xffl
 #define IDN_RQ      (IDN << SHIFT_ID)  /* 0x1FE00000 */
 #define SENSOR_IDN  "vokacmic"
@@ -55,7 +53,7 @@ struct sensor_cfg {
   unsigned char samples[3]; /* 0 = no measurement, 1 = measurement,no avrg., else = avrg. samples number */
   unsigned char treshold; /* channel number with treshold signalization */
   unsigned char treshold_channel;
-  unsigned long rx_msg_id;
+  unsigned char rx_msg_id[4];
 };
 
 struct sensor_data {

@@ -34,7 +34,7 @@
 #define adc_on      ADCSRA |= (3 << 6)  /* enable ADC, start conversion  */
 #define adc_off     ADCSRA &= ~(1 << 7) /* disable ADC */
 
-#define DEBUG
+//#define DEBUG
 
 static struct sensor_cfg sen_cfg, sen_cfg_lock;
 static struct sensor_data sen_data;
@@ -49,22 +49,6 @@ static void sensor_capture_data(struct fsm *fsm, enum event event);
 static void sensor_send_data(struct fsm *fsm, enum event event);
 static char sensor_init(struct fsm *fsm);
 
-/* returns bit position of LSB bit for particular channel settings in msg ID */
-static unsigned char shift(unsigned char channel)
-{
-  
-  switch (channel) {
-    case 0:
-      return SHIFT_CHANNEL_0;
-    case 1:
-      return SHIFT_CHANNEL_1;
-    case 2:
-      return SHIFT_CHANNEL_2;
-      
-    default:
-      return 0;
-  }
-}
 
 /* returns number of samples from patameter of 3bit length */
 static unsigned char averaging(unsigned char avrg)
@@ -126,8 +110,8 @@ static char sensor_init(struct fsm *fsm)
   /* fill chip structure with config values */
   chip.baudrate = SJA_BAUD;
   chip.clock = SJA_CLOCK;
-  chip.filter_mask = ~SENSOR_MASK;
-  chip.filter_code = SENSOR_MASK;
+  chip.filter_mask = 0xffffffff;//~SENSOR_MASK;
+  chip.filter_code = 0xffffffff;//SENSOR_MASK;
   chip.sja_cdr_reg = sjaCDR_CLK_OFF;
   chip.sja_ocr_reg = sjaOCR_MODE_NORMAL|sjaOCR_TX0_LH;
   
@@ -141,7 +125,11 @@ static char sensor_init(struct fsm *fsm)
   
   /* prepaire message for IDN request */
   idn_msg.flags = MSG_EXT;
-  idn_msg.id = SENSOR_ID;
+  idn_msg.id[0] = MY_ID;
+  idn_msg.id[1] = 0;
+  idn_msg.id[2] = 0;
+  idn_msg.id[3] = 0;
+  
   idn_msg.length = strlen(idn);
   
   /* fill msg data bytes with my sensor ID chars  */
@@ -154,20 +142,6 @@ static char sensor_init(struct fsm *fsm)
   
   fsm->measurement_start = false;
   
-//#ifdef DEBUG
-  /* initialize sen_cfg structure with default values
-     channel 0 - 2 enabled, no averaging, continual delivery, no treshold */
-  for (i = 0;i < 3; i++) {
-    sen_cfg.samples[i] = AVRG_1;
-  }
-  
-  sen_cfg.delivery = 1;
-  sen_cfg.treshold = 0;
-  sen_cfg.treshold_channel = 0;
-  
-  fsm->measurement_start = true;
-//#endif
-
   CANMSG("Sensor init OK");
 
   return 0;
@@ -178,7 +152,7 @@ char sensor_config(struct canmsg_t *rx_msg, struct fsm *fsm)
   unsigned char i = 0;
   
   /* if recived message is IDN request, send idn_msg */
-  if (rx_msg->id == IDN_RQ) {  
+  if (rx_msg->id[0] == 0xff) {  
     if (sja1000p_pre_write_config(&idn_msg))
       return -1;
     
@@ -188,36 +162,38 @@ char sensor_config(struct canmsg_t *rx_msg, struct fsm *fsm)
     CANMSG("IDN? answer OK");
 #endif
   }
-  else {
-    /* if recived message is ADC configuration */
+  else if (rx_msg->id[0] == MY_ID) {
+    /* if recived message is MY_ID = ADC configuration */
     
     /* decode and save number of samples for every channel from msg ID */
-    for (;i < 3;i++) {
-      sen_cfg.samples[i] = averaging(channel_avrg(rx_msg->id,shift(i)));
-    }
+      sen_cfg.samples[0] = averaging((rx_msg->id[2] >> 3) & 7);
+      sen_cfg.samples[1] = averaging(rx_msg->id[2] & 7);
+      sen_cfg.samples[2] = averaging((rx_msg->id[3] >> 2) & 7);
     
     /* if at least one sample for one channel will measured, continue in decoding */
     if (sen_cfg.samples[0] || sen_cfg.samples[1] || sen_cfg.samples[2]) {
       
-        /* save RX msg ID */
-      sen_cfg.rx_msg_id = rx_msg->id;
+      /* save RX msg ID */
+      for (i = 0; i < 4; i++) {
+        sen_cfg.rx_msg_id[i] = rx_msg->id[i];
+      }
       
       /* decode and save treshold value from msg ID */
-      sen_cfg.treshold = treshold(rx_msg->id);
+      sen_cfg.treshold = rx_msg->id[1];
       
       /* decode and save channel with overflow control from msg ID */
-      sen_cfg.treshold_channel = treshold_channel(rx_msg->id);
+      sen_cfg.treshold_channel = (rx_msg->id[2] >> 6) & 0x03;
       
       /* decode and save delivery parameter from msg ID */
-      sen_cfg.delivery = delivery(rx_msg->id);
+      sen_cfg.delivery = (rx_msg->id[3] >> 1) & 0x01;
       
       /* start FSM measurement */
       fsm->measurement_start = true;
-    }
-    
+      
 #ifdef DEBUG
-    CANMSG("Sensor config OK");
+      CANMSG("Sensor config OK");
 #endif
+    }
   }
   
   return 0;
@@ -266,7 +242,9 @@ static char send_samples()
   unsigned char i = 0;
   
   /* set msg ID to rx_msg ID */
-  tx_msg.id = sen_cfg_lock.rx_msg_id;
+  for (i = 0; i < 4; i++) {
+    tx_msg.id[i] = sen_cfg_lock.rx_msg_id[i];
+  }
   
   tx_msg.length = 0;
   
@@ -281,7 +259,7 @@ static char send_samples()
   
   /* if overflow occure, set appropriate bit in msg ID */
   if (sen_data.overflow)
-    tx_msg.id++;
+    tx_msg.id[3]++;
   
   if (sja1000p_pre_write_config(&tx_msg)) {
 #ifdef DEBUG    
@@ -317,7 +295,9 @@ void fsm_sensor_init(struct fsm *fsm, enum event event)
 
 /* FSM state, waiting for coniguration message recive */
 static void wait_for_cmd(struct fsm *fsm, enum event event)
-{ 
+{
+  static timer measurement_time = 0;
+  
   switch (event) {
   case EVENT_ENTRY:
 #ifdef DEBUG
@@ -326,7 +306,8 @@ static void wait_for_cmd(struct fsm *fsm, enum event event)
     break;
   case EVENT_DO:
     /* waiting to start measurement via rx_msg */
-    if (fsm->measurement_start) {
+    if (fsm->measurement_start && (timer_msec >= measurement_time + 1000)) {
+      measurement_time = timer_msec;
       /* disable AVR interrupt, so the sen_cfg structure is propperly copied
          sen_cfg copy needed to perform proper measurement if new config recived */
       can_disable_irq();

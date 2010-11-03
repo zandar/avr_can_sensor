@@ -36,9 +36,17 @@
  * @data:   data bytes buffer
  * @status: status of message, NEW & NONE
  */
+
+struct msg_id {
+  unsigned char id0;
+  unsigned char id1;
+  unsigned char id2;
+  unsigned char id3;
+};
+
 struct canmsg_t {
 	unsigned char flags;
-	unsigned long id;
+	unsigned char id[4];
 	unsigned char length;
 	unsigned char data[CAN_MSG_LENGTH];
   unsigned char status;
