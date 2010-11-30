@@ -6,6 +6,8 @@
  * Version AVR CAN sensor 13/10/2010
  */
 
+/*@{*/
+
 #include <avr/interrupt.h>
 #include <avr/io.h>
 #include <string.h>
@@ -21,21 +23,23 @@
 #include "../include/timer.h"
 #include "../include/display.h"
 
-/* extract trshold value from msg ID */
+/** extract trshold value from msg ID */
 #define treshold(id)              ((id >> SHIFT_TRESHOLD) & 0xff)
-/* extract trshold channel from msg ID */
+/** extract trshold channel from msg ID */
 #define treshold_channel(id)      ((id >> SHIFT_TRESHOLD_CHANNEL) & 0x03)
-/* extract 3bits value with particular channel settings from msg ID */
+/** extract 3bits value with particular channel settings from msg ID */
 #define channel_avrg(id,channel)  ((id >> channel) & 0x07)
-/* extract delivery value from msg ID */
+/** extract delivery value from msg ID */
 #define delivery(id)              ((id >> SHIFT_DELIVERY) & 0x01)
 
-#define adc_start   ADCSRA |= (1 << 6)  /* starts new ADC conversion */
-#define adc_on      ADCSRA |= (3 << 6)  /* enable ADC, start conversion  */
-#define adc_off     ADCSRA &= ~(1 << 7) /* disable ADC */
+#define adc_start   ADCSRA |= (1 << 6)  /**< starts new ADC conversion */
+#define adc_on      ADCSRA |= (3 << 6)  /**< enable ADC, start conversion  */
+#define adc_off     ADCSRA &= ~(1 << 7) /**< disable ADC */
 
 //#define DEBUG
-
+/** 
+  @name Global variables
+*/
 static struct sensor_cfg sen_cfg, sen_cfg_lock;
 static struct sensor_data sen_data;
 static struct canmsg_t idn_msg;
@@ -50,7 +54,14 @@ static void sensor_send_data(struct fsm *fsm, enum event event);
 static char sensor_init(struct fsm *fsm);
 
 
-/* returns number of samples from patameter of 3bit length */
+/**
+  @brief Function for decoding number of samples to be averaged
+  @param avrg 3bit value
+  @return number of sampes
+  
+  Function gets 3bit value of particular channel averaging configuration
+  and returns number of samples to be averaged for this channel.
+*/
 static unsigned char averaging(unsigned char avrg)
 {
   switch (avrg) {
@@ -83,7 +94,7 @@ static unsigned char averaging(unsigned char avrg)
   }
 }
 
-/* ADC interrupt service routine */
+/** ADC interrupt service routine */
 ISR(ADC_vect)
 {
   static unsigned char channel = 0;
@@ -99,6 +110,7 @@ ISR(ADC_vect)
   adc_start;
 }
 
+/** Initialize sensor parametes */
 static char sensor_init(struct fsm *fsm)
 {
   unsigned char i = 0;
@@ -107,7 +119,7 @@ static char sensor_init(struct fsm *fsm)
   
   sja_init_ports();
   
-  /* fill chip structure with config values */
+  /** fill chip structure with config values */
   chip.baudrate = SJA_BAUD;
   chip.clock = SJA_CLOCK;
   chip.filter_mask = 0xffffffff;//~SENSOR_MASK;
@@ -115,6 +127,7 @@ static char sensor_init(struct fsm *fsm)
   chip.sja_cdr_reg = sjaCDR_CLK_OFF;
   chip.sja_ocr_reg = sjaOCR_MODE_NORMAL|sjaOCR_TX0_LH;
   
+  /** configure the SJA chip*/
   if(sja1000p_chip_config(&chip))
   {
     CANMSG("SJA config error");
@@ -123,7 +136,7 @@ static char sensor_init(struct fsm *fsm)
     return -1;
   }
   
-  /* prepaire message for IDN request */
+  /** prepaire message for IDN request */
   idn_msg.flags = MSG_EXT;
   idn_msg.id[0] = MY_ID;
   idn_msg.id[1] = 0;
@@ -132,13 +145,13 @@ static char sensor_init(struct fsm *fsm)
   
   idn_msg.length = strlen(idn);
   
-  /* fill msg data bytes with my sensor ID chars  */
+  /** fill msg data bytes with my sensor ID chars  */
   for (;i < strlen(idn);i++) {
     idn_msg.data[i] = idn[i];
   }
   
-  ADCSRA = 0x0F;  /* ADC disabled. interrupt enabled, 128x prescaler ~4kHz */
-  ADMUX = 0x60;   /*  Vref = Vcc, ADC output in ADCH */
+  ADCSRA = 0x0F;  /**< ADC disabled. interrupt enabled, 128x prescaler ~4kHz */
+  ADMUX = 0x60;   /**<  Vref = Vcc, ADC output in ADCH */
   
   fsm->measurement_start = false;
   
@@ -147,12 +160,13 @@ static char sensor_init(struct fsm *fsm)
   return 0;
 }
 
+/** Function for setting sensor measurement parameters */
 char sensor_config(struct canmsg_t *rx_msg, struct fsm *fsm)
 {
   unsigned char i = 0;
   
   /* if recived message is IDN request, send idn_msg */
-  if (rx_msg->id[0] == 0xff) {  
+  if (rx_msg->id[0] == IDN_RQ) {  
     if (sja1000p_pre_write_config(&idn_msg))
       return -1;
     
@@ -199,7 +213,7 @@ char sensor_config(struct canmsg_t *rx_msg, struct fsm *fsm)
   return 0;
 }
 
-
+/** Function for saving ADC samples */
 static void save_samples()
 {
   timer adc_time = 0;
@@ -237,6 +251,7 @@ static void save_samples()
     sen_data.overflow = 0;
 }
 
+/** Function for transmiting captured samples */
 static char send_samples()
 {
   unsigned char i = 0;
@@ -273,7 +288,7 @@ static char send_samples()
   return 0;
 }
 
-/* FSM initial state */
+/** FSM initial state */
 void fsm_sensor_init(struct fsm *fsm, enum event event)
 {
   switch (event) {
@@ -283,6 +298,8 @@ void fsm_sensor_init(struct fsm *fsm, enum event event)
     }
     break;
   case EVENT_DO:
+    sja1000p_pre_write_config(&idn_msg);
+    sja1000p_send_msg();
     fsm->current_state = wait_for_cmd;
     break;
   case EVENT_EXIT:
@@ -293,16 +310,14 @@ void fsm_sensor_init(struct fsm *fsm, enum event event)
   }
 }
 
-/* FSM state, waiting for coniguration message recive */
+/** FSM state, waiting for coniguration message recive */
 static void wait_for_cmd(struct fsm *fsm, enum event event)
 {
-  static timer measurement_time = 0;
+  static timer measurement_time = 0, display_time = 0;
   
   switch (event) {
   case EVENT_ENTRY:
-#ifdef DEBUG
     CANMSG("FSM wait for cmd");
-#endif
     break;
   case EVENT_DO:
     /* waiting to start measurement via rx_msg */
@@ -315,6 +330,10 @@ static void wait_for_cmd(struct fsm *fsm, enum event event)
       can_enable_irq();
       fsm->current_state = sensor_capture_data;
     }
+    if (timer_msec >= display_time + 1000) {
+      display_time = timer_msec;
+      lcd_puts_line(0,"FSM wait for cmd");
+    }
     break;
   case EVENT_EXIT:
     /* sets condition for next FSM start with aspect to delivery setting
@@ -325,7 +344,7 @@ static void wait_for_cmd(struct fsm *fsm, enum event event)
   }
 }
 
-/* FSM state for capturing ADC samples */
+/** FSM state for capturing ADC samples */
 static void sensor_capture_data(struct fsm *fsm, enum event event)
 {
   switch (event) {
@@ -344,7 +363,7 @@ static void sensor_capture_data(struct fsm *fsm, enum event event)
   }
 }
 
-/* FSM state for transmiting captured samples */
+/** FSM state for transmiting captured samples */
 static void sensor_send_data(struct fsm *fsm, enum event event)
 {
   switch (event) {
@@ -361,3 +380,5 @@ static void sensor_send_data(struct fsm *fsm, enum event event)
     break;
   }
 }
+
+/*@}*/

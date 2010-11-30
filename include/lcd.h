@@ -17,6 +17,9 @@
  Originally based on Volker Oth's LCD library,
  changed lcd_init(), added additional constants for lcd_command(), 
  added 4-bit I/O mode, improved and optimized code.
+ 
+ Rewritten by Michal Vokac,
+ added defines for connecting command lines and data lines to separate ports.
        
  Library can be operated in memory mapped mode (LCD_IO_MODE=0) or in 
  4-bit IO port mode (LCD_IO_MODE=1). 8-bit IO port mode not supported.
@@ -83,8 +86,8 @@
  *  ports by adapting the LCD_DATAx_PORT and LCD_DATAx_PIN definitions.
  *  
  */
-#define LCD_DATA_PORT    PORTD            /**< port for the LCD lines   */
-#define LCD_CTRL_PORT    PORTB            /**< port for the LCD lines   */
+#define LCD_DATA_PORT    PORTD            /**< port for the LCD data lines */
+#define LCD_CTRL_PORT    PORTB            /**< port for the LCD control lines */
 
 #define LCD_DATA0_PORT   LCD_DATA_PORT    /**< port for 4bit data bit 0 */
 #define LCD_DATA1_PORT   LCD_DATA_PORT    /**< port for 4bit data bit 1 */

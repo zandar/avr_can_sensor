@@ -11,29 +11,37 @@
 #include <util/delay.h>
 #include "../include/sja_control.h"
 
-/* Macros for low level hw. control */
-#define sja_bus_out   SJA_BUS_DIR = 0xff   /* set bus lines in DDR register as output */
-#define sja_bus_in    SJA_BUS_PORT = 0xff,SJA_BUS_DIR = 0x00   /* set bus lines in DDR register as input */
+/**
+  @name Macros for low level hw. control
+*/
+
+/** set bus lines in DDR register as output */
+#define sja_bus_out   SJA_BUS_DIR = 0xff
+ /** set bus lines in DDR register as input */
+#define sja_bus_in    SJA_BUS_PORT = 0xff,SJA_BUS_DIR = 0x00
+/** set control lines in DDR register as output */
 #define sja_ctrl_out  SJA_CTRL_DIR |= (1 << SJA_ALE_PIN)|(1 << SJA_CS_PIN)\
-                      |(1 << SJA_RD_PIN)|(1 << SJA_WR_PIN)  /* set control lines in DDR register as output */
+                      |(1 << SJA_RD_PIN)|(1 << SJA_WR_PIN)
+/** initialize AVR external interrupt from SJA chip */
 #define sja_int_init  SJA_INT_DIR &= ~(1 << SJA_INT_PIN)\
                       ,SJA_INT_PORT |= (1 << SJA_INT_PIN)\
                       ,MCUCR |= (SJA_INT_ISC_BIT << SJA_INTERRUPT)
-
+/** writes data value to SJA bus */
 #define sja_bus_write(data) sja_bus_out,SJA_BUS_PORT = data
+/** returns data value on SJA bus */
 #define sja_bus_read        SJA_BUS_DATA 
 
-#define sja_ale_high SJA_CTRL_PORT |= (1 << SJA_ALE_PIN)  /* AVR pin to SJA ALE pin high */
-#define sja_ale_low  SJA_CTRL_PORT &= ~(1 << SJA_ALE_PIN) /* AVR pin to SJA ALE pin low */
-#define sja_cs_high  SJA_CTRL_PORT |= (1 << SJA_CS_PIN)   /* AVR pin to SJA CS pin high */
-#define sja_cs_low   SJA_CTRL_PORT &= ~(1 << SJA_CS_PIN)  /* AVR pin to SJA CS pin low */
-#define sja_rd_high  SJA_CTRL_PORT |= (1 << SJA_RD_PIN)   /* AVR pin to SJA RD pin high */
-#define sja_rd_low   SJA_CTRL_PORT &= ~(1 << SJA_RD_PIN)  /* AVR pin to SJA RD pin low */
-#define sja_wr_high  SJA_CTRL_PORT |= (1 << SJA_WR_PIN)   /* AVR pin to SJA WR pin high */
-#define sja_wr_low   SJA_CTRL_PORT &= ~(1 << SJA_WR_PIN)  /* AVR pin to SJA WR pin low */
+#define sja_ale_high SJA_CTRL_PORT |= (1 << SJA_ALE_PIN)  /**< AVR pin to SJA ALE pin high */
+#define sja_ale_low  SJA_CTRL_PORT &= ~(1 << SJA_ALE_PIN) /**< AVR pin to SJA ALE pin low */
+#define sja_cs_high  SJA_CTRL_PORT |= (1 << SJA_CS_PIN)   /**< AVR pin to SJA CS pin high */
+#define sja_cs_low   SJA_CTRL_PORT &= ~(1 << SJA_CS_PIN)  /**< AVR pin to SJA CS pin low */
+#define sja_rd_high  SJA_CTRL_PORT |= (1 << SJA_RD_PIN)   /**< AVR pin to SJA RD pin high */
+#define sja_rd_low   SJA_CTRL_PORT &= ~(1 << SJA_RD_PIN)  /**< AVR pin to SJA RD pin low */
+#define sja_wr_high  SJA_CTRL_PORT |= (1 << SJA_WR_PIN)   /**< AVR pin to SJA WR pin high */
+#define sja_wr_low   SJA_CTRL_PORT &= ~(1 << SJA_WR_PIN)  /**< AVR pin to SJA WR pin low */
 
-#define sja_disable_irq GICR &= ~(1 << SJA_INT_BIT) /* AVR interrupt from SJA disabled */
-#define sja_enable_irq  GICR |= (1 << SJA_INT_BIT)  /* AVR interrupt from SJA enabled */
+#define sja_disable_irq GICR &= ~(1 << SJA_INT_BIT) /**< AVR interrupt from SJA disabled */
+#define sja_enable_irq  GICR |= (1 << SJA_INT_BIT)  /**< AVR interrupt from SJA enabled */
 
 void sja_init_ports()
 {

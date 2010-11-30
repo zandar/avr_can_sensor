@@ -25,13 +25,13 @@ struct canmsg_t rx_msg;
 
 struct fsm fsm_sensor;
 
-/* SJA interrupt service routine */
+/** SJA interrupt service routine */
 ISR(INT0_vect)
 {
   sja1000p_irq_handler(&rx_msg);
 }
 
-/* MAIN */
+/** MAIN */
 int main(void)
 {
   timer sensor_time = timer_msec;
@@ -49,7 +49,7 @@ int main(void)
   
   while(1) {
     
-    if (timer_msec >= (sensor_time + 10)) {
+    if (timer_msec >= (sensor_time + 100)) {
       sensor_time = timer_msec;
       debug(1,timer_msec);
       
@@ -60,9 +60,7 @@ int main(void)
     if (rx_msg.status == NEW) {
       rx_msg.status = NONE;
       sensor_config(&rx_msg,&fsm_sensor);
-    }
-    
-    
+    }    
   }
   
   return 0;

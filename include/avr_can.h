@@ -9,22 +9,33 @@
  * Version avrCAN-0.1  1/11/2010
  */
 
+/**
+ @defgroup sja_control SJA1000 control library
+ 
+ @brief CAN message and SJA chip config. structures
+       
+ @author Michal Vokac vokac.m@gmail.com http://destruktor.borec.cz
+
+*/
+
+/*@{*/
+
 #ifndef _CANMSG_T_H
 #define _CANMSG_T_H
 
-/* Number of data bytes in one CAN message */
+/** Max number of data bytes in one CAN message */
 #define CAN_MSG_LENGTH 8
 
-/* Definitions to use for canmsg_t flags */
+/** Definitions to use for canmsg_t flags */
 #define MSG_RTR   (1<<0)
 #define MSG_OVR   (1<<1)
 #define MSG_EXT   (1<<2)
 #define MSG_LOCAL (1<<3)
 
-/* Can message ID mask */
+/** Can message ID mask */
 #define MSG_ID_MASK ((1l<<29)-1)
 
-/* Definitions to use for canmsg_t status */
+/** Definitions to use for canmsg_t status */
 #define NONE 0
 #define NEW  1
 
@@ -36,14 +47,6 @@
  * @data:   data bytes buffer
  * @status: status of message, NEW & NONE
  */
-
-struct msg_id {
-  unsigned char id0;
-  unsigned char id1;
-  unsigned char id2;
-  unsigned char id3;
-};
-
 struct canmsg_t {
 	unsigned char flags;
 	unsigned char id[4];
@@ -69,5 +72,6 @@ struct canchip_t {
 };
 
 
+/*@}*/
 
 #endif /*_CANMSG_T_H*/

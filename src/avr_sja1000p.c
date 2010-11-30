@@ -20,7 +20,7 @@
 #include "../include/F_CPU.h"
 #include <util/delay.h>
 
-//#define DEBUG
+#define DEBUG
 
 
 /**
@@ -393,8 +393,13 @@ char sja1000p_send_msg()
 char sja1000p_irq_handler(struct canmsg_t *rx_msg)
 {
   unsigned char irq_register, status;
+  
+  lcd_puts_line(0,"interrupt");
 
   irq_register = can_read_reg(SJAIR);  
+  
+  debug(1,irq_register);
+  _delay_ms(1000);
 
   if ((irq_register & (sjaIR_BEI|sjaIR_EPI|sjaIR_DOI|sjaIR_EI|sjaIR_TI|sjaIR_RI)) == 0) {
 #ifdef DEBUG
@@ -420,14 +425,15 @@ char sja1000p_irq_handler(struct canmsg_t *rx_msg)
     // Some error happened
     
     if(status & sjaSR_BS) {
-#ifdef DEBUG
       lcd_puts_line(0,"SJA bus-off");
       _delay_ms(1000);
       lcd_puts_line(0,"SJA resetting..");
       _delay_ms(1000);
-#endif
       can_write_reg(0, SJAMOD);
     }
+    
+    lcd_puts_line(0,"SJA reset OK");
+     _delay_ms(1000);
   }
 
   return 1;

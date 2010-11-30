@@ -1,5 +1,5 @@
 OPTIMIZE= -O2
-MCU_TARGET=atmega16
+MCU_TARGET=atmega32
 
 DEFS=
 LIBS=
