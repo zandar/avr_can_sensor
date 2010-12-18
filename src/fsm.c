@@ -1,5 +1,6 @@
 /* Functoins for executing FSM */
 
+/*@{*/
 #include "../include/fsm.h"
 
 void init_fsm(struct fsm *fsm, state_fcn initial_state)
@@ -17,5 +18,7 @@ void run_fsm(struct fsm *fsm){
 		fsm->current_state(fsm, EVENT_ENTRY); 	// initialize the new state
 	}
 }
+
+/*@}*/
 
 

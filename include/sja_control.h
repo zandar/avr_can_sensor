@@ -34,11 +34,11 @@
 #define SJA_INT_PORT  PORTD   /**< AVR port for SJA interrupt line */
 #define SJA_INT_DIR   DDRD    /**< AVR data direction register for SJA interrupt line */
 
-#define SJA_ALE_PIN 7   /**< AVR pin for SJA ALE pin */
-#define SJA_CS_PIN  6   /**< AVR pin for SJA CS pin */
-#define SJA_RD_PIN  5   /**< AVR pin for SJA RD pin */
-#define SJA_WR_PIN  4   /**< AVR pin for SJA WR pin */
-#define SJA_INT_PIN 2   /**< AVR pin for SJA INT pin */
+#define SJA_ALE_PIN 7   /**< AVR port pin for SJA ALE pin */
+#define SJA_CS_PIN  6   /**< AVR port pin for SJA CS pin */
+#define SJA_RD_PIN  5   /**< AVR port pin for SJA RD pin */
+#define SJA_WR_PIN  4   /**< AVR port pin for SJA WR pin */
+#define SJA_INT_PIN 2   /**< AVR port pin for SJA INT pin */
 #define SJA_INT_BIT 6   /**< Bit in AVR GICR register for interrupt control */
 
 #define SJA_INT_ISC_BIT 0   /**< Defines first bit in MCUCR register for interrupt sense control */

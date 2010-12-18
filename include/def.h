@@ -5,7 +5,7 @@
 
 typedef unsigned long timer;
 
-/* contains time in ms from AVR start */
+/** contains time in ms from AVR startup */
 extern volatile timer timer_msec;
 
 #endif

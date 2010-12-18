@@ -6,11 +6,17 @@
  * 13/10/2010
  */
 
+/*@{*/
+
 #include "../include/lcd.h"
 #include "../include/display.h"
 #include <stdlib.h>
 
-/* Print string parameter to line specified by line_nr */
+/**
+ * lcd_puts_line: - print string to display line
+ * @line_nr: number of line to print the string in
+ * @string: max. 16 characters to print on the display
+ */
 void lcd_puts_line(unsigned char line_nr,const char *string)
 {
     lcd_clear_line(line_nr);
@@ -18,7 +24,10 @@ void lcd_puts_line(unsigned char line_nr,const char *string)
     lcd_puts(string);
 }
 
-/* Clear line specified by line_nr */
+/**
+ * lcd_clear_line: - clear display line
+ * @line_nr: number of line to clear
+ */
 void lcd_clear_line(unsigned char line_nr)
 {
   unsigned char i = 0;
@@ -30,6 +39,11 @@ void lcd_clear_line(unsigned char line_nr)
   }
 }
 
+/**
+ * debug: - print float number to diplay line
+ * @line_nr: number of line to print the number in
+ * @num: number to print, max. 10 digits
+ */
 void debug(unsigned char line_nr,unsigned long num)
 {
   char string[11];
@@ -38,3 +52,5 @@ void debug(unsigned char line_nr,unsigned long num)
   
   lcd_puts_line(line_nr,string);
 }
+
+/*@}*/

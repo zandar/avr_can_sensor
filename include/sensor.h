@@ -6,6 +6,8 @@
  * Version AVR CAN sensor 13/10/2010
  */
 
+/*@{*/
+
 /**
  @defgroup can_sensor CAN sensor
  
@@ -14,7 +16,6 @@
  @author Michal Vokac vokac.m@gmail.com http:destruktor.borec.cz
 
 */
-/*@{*/
 
 #ifndef _SENSOR_H
 #define _SENSOR_H
@@ -25,21 +26,23 @@
 /**
   @name Defines of ADC setting
 */
-#define ADC_PORT      PORTA /**< define port register with ADC input */
-#define ADC_DIRECTION DDRA  /**< define port direction register with ADC input */
+#define ADC_PORT      PORTA /* define port register with ADC input */
+#define ADC_DIRECTION DDRA  /* define port direction register with ADC input */
 
-#define ADC_CHANNEL_0 0 /**< define ADC input number */
-#define ADC_CHANNEL_1 1 /**< define ADC input number */
-#define ADC_CHANNEL_2 2 /**< define ADC input number */
+#define ADC_CHANNEL_0 0 /* define ADC input number */
+#define ADC_CHANNEL_1 1 /* define ADC input number */
+#define ADC_CHANNEL_2 2 /* define ADC input number */
 
-#define ADC_VREF_TYPE 0x60  /**< define ADC voltage reference type @see ATMEL datasheet */
+#define ADC_VREF_TYPE 0x60  /* define ADC voltage reference type */
 
 /**
   @name Defines of sensor setting
 */
-#define MY_ID 1   /**< my sensor ID, possible values are 2^N, N <0,8>*/
-#define IDN_RQ 0xff /**< IDN request value */
-#define SENSOR_IDN  "vokacmic"  /**< my identification string */
+#define MY_ID 1   /* my sensor ID, possible values are 2^N, N <0,8>*/
+#define IDN_RQ 0xff /* IDN request value */
+#define SENSOR_IDN  "vokacmic"  /* my identification string */
+#define MEASUREMENT_PERIOD 1000 /* define min. time between two measurements in ms. */
+
 
 /**
  @brief Enum with bit positions of particular parameters in recived msg. identificator
@@ -73,19 +76,19 @@ enum averaging {
  @brief Structure with sensor configuration parameters extracted from recived msg. identificator  
 */
 struct sensor_cfg {
-  unsigned char delivery; /**< defines delivery on measured channels, shot = 0, continual = 1 */
-  unsigned char samples[3]; /**< defines number of samples to be measured on particular chanel before averaging, 0 = no measurement, 1 = measurement,no avrg., else = avrg. samples number */
-  unsigned char treshold; /**< deifnes treshold value */
-  unsigned char treshold_channel; /**< defines channel number for overflow signalization */
-  unsigned char rx_msg_id[4];  /**< field for storing ID of Rx message*/
+  unsigned char delivery; /* defines delivery on measured channels, shot = 0, continual = 1 */
+  unsigned char samples[3]; /* defines number of samples to be measured on particular chanel before averaging, 0 = no measurement, 1 = measurement,no avrg., else = avrg. samples number */
+  unsigned char treshold; /* deifnes treshold value */
+  unsigned char treshold_channel; /* defines channel number for overflow signalization */
+  unsigned char rx_msg_id[4];  /* field for storing ID of Rx message */
 };
 
 /**
  @brief Structure with sensor captured data
 */
 struct sensor_data {
-  unsigned char channel_data[3];  /**< field with measured/averaged samples on particular channels */
-  unsigned char overflow; /**< overflow signalization if required by rx config. */
+  unsigned char channel_data[3];  /* field with measured/averaged samples on particular channels */
+  unsigned char overflow; /* overflow signalization if required by rx config. */
 };
 
 /**
@@ -112,6 +115,6 @@ char sensor_config(struct canmsg_t *rx_msg, struct fsm *fsm);
 */
 void fsm_sensor_init(struct fsm *fsm, enum event event);
 
-/*@}*/
 #endif
 
+/*@}*/

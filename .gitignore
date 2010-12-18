@@ -1,6 +1,6 @@
 *~
 doc
-*.map
-*.bin
-*.lst
-*.pdf
+*map
+*bin
+*lst
+*pdf

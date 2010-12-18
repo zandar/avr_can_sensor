@@ -12,6 +12,8 @@
  * Version avrCAN-0.1  1/11/2010
  */
 
+/*@{*/
+
 #include "../include/avr_sja1000p.h"
 #include "../include/sja_control.h"
 #include "../include/display.h"
@@ -20,12 +22,19 @@
 #include "../include/F_CPU.h"
 #include <util/delay.h>
 
+/**
+ * If DEBUG defined, LCD display used to print CANMSG debug messages.
+ * This is used because of compatibility with linCAN documentation.
+ *
+ * When no display connected:
+ * - undefine DEBUG or
+ * - change CANMSG macro in display.c appropriate to your display, or
+ * - define your own CANMSG macro/function (print to serial port atc.)
+ */
 #define DEBUG
-
 
 /**
  * sja1000p_enable_configuration - enable chip configuration mode
- * @chip: pointer to chip state structure
  */
 char sja1000p_enable_configuration()
 {
@@ -36,12 +45,14 @@ char sja1000p_enable_configuration()
 
   flags = can_read_reg(SJAMOD);
 
+  /* write reset to reset mode register, try while not in reset, max. 10times*/
   while ((!(flags & sjaMOD_RM)) && (i <= 10)) {
     can_write_reg(sjaMOD_RM, SJAMOD);
     _delay_us(100);
     i++;
     flags = can_read_reg(SJAMOD);
   }
+  
   if (i >= 10) {
 #ifdef DEBUG
     CANMSG("SJA rst mode err");
@@ -57,7 +68,6 @@ char sja1000p_enable_configuration()
 
 /**
  * sja1000p_disable_configuration - disable chip configuration mode
- * @chip: pointer to chip state structure
  */
 char sja1000p_disable_configuration()
 {
@@ -65,14 +75,15 @@ char sja1000p_disable_configuration()
   enum sja1000_PeliCAN_MOD flags;
 
   flags = can_read_reg(SJAMOD);
-
+  
   while ( (flags & sjaMOD_RM) && (i<=50) ) {
-// could be as long as 11*128 bit times after buss-off
+    // could be as long as 11*128 bit times after buss-off
     can_write_reg(0, SJAMOD);
     _delay_us(100);
     i++;
     flags = can_read_reg(SJAMOD);
   }
+  
   if (i >= 10) {
 #ifdef DEBUG
     CANMSG("SJA err exit rst");
@@ -86,16 +97,15 @@ char sja1000p_disable_configuration()
 }
 
 /**
- * sja1000p_chip_config: - can chip configuration
- * @chip: pointer to chip state structure
+ * @brief Can chip configuration seqence.
+ * @param chip pointer to chip state structure
+ * @return negative value reports error
  *
  * This function configures chip and prepares it for message
  * transmission and reception. The function resets chip,
  * resets mask for acceptance of all messages by call to
  * sja1000p_extended_mask() function and then 
  * computes and sets baudrate with use of function sja1000p_baud_rate().
- * Return Value: negative value reports error.
- * File: src/sja1000p.c
  */
 char sja1000p_chip_config(struct canchip_t *chip)
 {
@@ -122,7 +132,9 @@ char sja1000p_chip_config(struct canchip_t *chip)
   for (i=0, n=0x5a; i<8; i++, n+=0xf) {
     r = n^can_read_reg(SJAACR0+i);
     if (r) {
+#ifdef DEBUG
       CANMSG("SJA config error");
+#endif
       return -1;
     }
   }
@@ -140,20 +152,19 @@ char sja1000p_chip_config(struct canchip_t *chip)
   can_write_reg(sjaENABLE_INTERRUPTS, SJAIER); 
 
   sja1000p_disable_configuration();
-  
+#ifdef DEBUG  
   CANMSG("SJA config OK");
+#endif
   
   return 0;
 }
 
 /**
  * sja1000p_extended_mask: - setup of extended mask for message filtering
- * @chip: pointer to chip state structure
- * @code: can message acceptance code
- * @mask: can message acceptance mask
+ * @param code can message acceptance code
+ * @param mask can message acceptance mask
  *
- * Return Value: negative value reports error.
- * File: src/sja1000p.c
+ * @return negative value reports error
  */
 char sja1000p_extended_mask(unsigned long code, unsigned  long mask)
 {
@@ -177,9 +188,8 @@ char sja1000p_extended_mask(unsigned long code, unsigned  long mask)
 
 /**
  * sja1000p_baud_rate: - set communication parameters.
- * @chip: pointer to chip state structure
  * @rate: baud rate in Hz
- * @clock: frequency of sja1000 clock in Hz (ISA osc is 14318000)
+ * @clock: frequency of sja1000 clock in Hz
  * @sjw: synchronization jump width (0-3) prescaled clock cycles
  * @sampl_pt: sample point in % (0-100) sets (TSEG1+1)/(TSEG1+TSEG2+2) ratio
  * @flags: fields %BTR1_SAM, %OCMODE, %OCPOL, %OCTP, %OCTN, %CLK_OFF, %CBP
@@ -215,8 +225,11 @@ char sja1000p_baud_rate(unsigned long rate, unsigned long clock, unsigned char s
       best_rate = clock/(brp*(1+tseg/2));
     }
   }
+  
   if (best_error && (rate/best_error < 10)) {
-    CANMSG("SAJ b-r error");
+#ifdef DEBUG
+    CANMSG("SAJ BR error");
+#endif
     return -1;
   }
   tseg2 = best_tseg-(sampl_pt*(best_tseg+1))/100;
@@ -239,17 +252,15 @@ char sja1000p_baud_rate(unsigned long rate, unsigned long clock, unsigned char s
           | tseg1, SJABTR1);
 
   sja1000p_disable_configuration();
-
+#ifdef DEBUG
   CANMSG("SJA baud rate OK");
-
+#endif
   return 0;
 }
 
 /**
- * sja1000p_read: - reads and distributes one or more received messages
- * @chip: pointer to chip state structure
- * @obj: pinter to CAN message queue information
- *
+ * sja1000p_read: - reads and distributes received message
+ * @rx_msg: pointer to recived message structure
  * File: src/sja1000p.c
  */
 void sja1000p_read(struct canmsg_t *rx_msg) {
@@ -284,11 +295,12 @@ void sja1000p_read(struct canmsg_t *rx_msg) {
 
 }
 
+/** */
 #define MAX_TRANSMIT_WAIT_LOOPS 10
 
 /**
  * sja1000p_pre_write_config: - prepares message object for message transmission
- * @msg: pointer to CAN message
+ * @msg: pointer to CAN message structure
  *
  * This function prepares selected message object for future initiation
  * of message transmission by sja1000p_send_msg() function.
@@ -343,7 +355,9 @@ char sja1000p_pre_write_config(struct canmsg_t *msg)
       return -1;
     }
   }
+  
   len = msg->length;
+  
   if(len > CAN_MSG_LENGTH) len = CAN_MSG_LENGTH;
   
   /* len &= sjaFRM_DLC_M; ensured by above condition already */
@@ -380,26 +394,27 @@ char sja1000p_send_msg()
 
 /**
  * sja1000p_irq_handler: - interrupt service routine
- * @irq: interrupt vector number, this value is system specific
- * @chip: pointer to chip state structure
+ * @rx_msg: pointer recived message structure
  * 
  * Interrupt handler is activated when state of CAN controller chip changes,
  * there is message to be read or there is more space for new messages or
  * error occurs. The receive events results in reading of the message from
- * CAN controller chip and distribution of message through attached
- * message queues.
+ * CAN controller chip.
  * File: src/sja1000p.c
  */
 char sja1000p_irq_handler(struct canmsg_t *rx_msg)
 {
   unsigned char irq_register, status;
-  
+#ifdef DEBUG  
   lcd_puts_line(0,"interrupt");
+#endif
 
   irq_register = can_read_reg(SJAIR);  
   
+#ifdef DEBUG   
   debug(1,irq_register);
   _delay_ms(1000);
+#endif
 
   if ((irq_register & (sjaIR_BEI|sjaIR_EPI|sjaIR_DOI|sjaIR_EI|sjaIR_TI|sjaIR_RI)) == 0) {
 #ifdef DEBUG
@@ -422,19 +437,24 @@ char sja1000p_irq_handler(struct canmsg_t *rx_msg)
   }
   
   if ((irq_register & (sjaIR_EI|sjaIR_BEI|sjaIR_EPI|sjaIR_DOI)) != 0) { 
-    // Some error happened
+    /* error occured */
     
     if(status & sjaSR_BS) {
+#ifdef DEBUG
       lcd_puts_line(0,"SJA bus-off");
       _delay_ms(1000);
       lcd_puts_line(0,"SJA resetting..");
       _delay_ms(1000);
+#endif
       can_write_reg(0, SJAMOD);
     }
-    
+#ifdef DEBUG
     lcd_puts_line(0,"SJA reset OK");
      _delay_ms(1000);
+#endif
   }
 
   return 1;
 }
+
+/*@}*/

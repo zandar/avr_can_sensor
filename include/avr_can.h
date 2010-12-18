@@ -71,7 +71,6 @@ struct canchip_t {
   unsigned char sja_ocr_reg;
 };
 
+#endif /*_CANMSG_T_H*/
 
 /*@}*/
-
-#endif /*_CANMSG_T_H*/

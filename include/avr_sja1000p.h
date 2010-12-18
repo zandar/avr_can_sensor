@@ -5,6 +5,8 @@
  * See app. note an97076.pdf from Philips Semiconductors 
  * and SJA1000 data sheet
  * PELICAN mode
+ * Rewritten for AVR microcontroler by Michal Vokac
+ * email:vokac.m@gmail.com
  * This software is released under the GPL-License.
  * Version lincan-0.3  17 Jun 2004
  */

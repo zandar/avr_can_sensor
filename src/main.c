@@ -6,6 +6,8 @@
  * Version avrCAN-0.1 13/10/2010
  */
 
+/*@{*/
+
 #include "../include/F_CPU.h"
 #include <util/delay.h>
 #include <avr/interrupt.h>
@@ -25,19 +27,24 @@ struct canmsg_t rx_msg;
 
 struct fsm fsm_sensor;
 
-/** SJA interrupt service routine */
+/**
+ * SJA interrupt service routine
+ */
 ISR(INT0_vect)
 {
   sja1000p_irq_handler(&rx_msg);
 }
 
-/** MAIN */
+/**
+ * MAIN
+ */
 int main(void)
 {
   timer sensor_time = timer_msec;
   
   sei();  /* global interrupt enable */
   
+  /* start timing function */
   timer0_init_1khz();
   
   lcd_init(LCD_DISP_ON);
@@ -57,6 +64,7 @@ int main(void)
       run_fsm(&fsm_sensor);
     }
     
+    /* if new msg recived, configure sensor according to new parameters */
     if (rx_msg.status == NEW) {
       rx_msg.status = NONE;
       sensor_config(&rx_msg,&fsm_sensor);
@@ -65,3 +73,5 @@ int main(void)
   
   return 0;
 }
+
+/*@}*/

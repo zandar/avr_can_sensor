@@ -2,6 +2,8 @@
  * AVR ATmega16 timer control
  */
 
+/*@{*/
+
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include "../include/timer.h"
@@ -9,7 +11,9 @@
 
 volatile timer timer_msec = 0 , delay_time;
 
-/* Timer 0 interrupt service routine */
+/**
+ * Timer 0 interrupt service routine
+ */
 ISR(TIMER0_COMP_vect)
 {
   /* increment msec @1kHz */
@@ -17,7 +21,9 @@ ISR(TIMER0_COMP_vect)
 }
 
 
-
+/**
+ * timer0_init_1khz: - initialization of AVR timer0 with 1kHz freqency interrupt
+ */
 void timer0_init_1khz()
 {
   TCNT0 = 0;
@@ -26,6 +32,10 @@ void timer0_init_1khz()
   TCCR0 |= 0x0B;  /* CTC mode, delicka 64x, normal port op. */
 }
 
+/**
+ * delay_ms: - delay function
+ * @delay: number of miliseconds to wait
+ */
 void delay_ms(unsigned int delay)
 {
   delay_time = timer_msec;
@@ -33,3 +43,5 @@ void delay_ms(unsigned int delay)
   while (timer_msec <= delay_time + delay);
   
 }
+
+/*@}*/
