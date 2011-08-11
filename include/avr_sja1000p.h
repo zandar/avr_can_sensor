@@ -2,7 +2,7 @@
  * Header file for the Linux CAN-bus driver.
  * Written by Arnaud Westenberg email:arnaud@wanadoo.nl
  * Added by T.Motylewski@bfad.de
- * See app. note an97076.pdf from Philips Semiconductors 
+ * See app. note an97076.pdf from Philips Semiconductors
  * and SJA1000 data sheet
  * PELICAN mode
  * Rewritten for AVR microcontroler by Michal Vokac
@@ -10,6 +10,24 @@
  * This software is released under the GPL-License.
  * Version lincan-0.3  17 Jun 2004
  */
+
+/*
+ * This file is part of avr_can_sensor.
+ *
+ * Avr_can_sensor is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * Avr_can_sensor is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with avr_can_sensor.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #ifndef AVR_SJA1000P_H
 #define AVR_SJA1000P_H
 
@@ -21,7 +39,7 @@ char sja1000p_chip_config(struct canchip_t *chip);
 char sja1000p_extended_mask(unsigned long code, unsigned long mask);
 char sja1000p_baud_rate(unsigned long rate, unsigned long clock,unsigned char sjw,
 		unsigned char sampl_pt, unsigned char flags);
-    
+
 char sja1000p_pre_write_config(struct canmsg_t *msg);
 char sja1000p_send_msg();
 char sja1000p_irq_handler(struct canmsg_t *rx_msg);
@@ -62,7 +80,7 @@ enum SJA1000_PeliCAN_regs {
 /// Transmit Buffer (write) Receive Buffer (read) Frame Information
 	SJAFRM = 0x10,
 /// ID bytes (11 bits in 0 and 1 or 16 bits in 0,1 and 13 bits in 2,3 (extended))
-	SJAID0 = 0x11, SJAID1 = 0x12, 
+	SJAID0 = 0x11, SJAID1 = 0x12,
 /// ID cont. for extended frames
 	SJAID2 = 0x13, SJAID3 = 0x14,
 /// Data start standard frame
@@ -74,7 +92,7 @@ enum SJA1000_PeliCAN_regs {
 /// Acceptance Mask (4 bytes) in RESET mode
 	SJAAMR0	= 0x14,
 /// 4 bytes
-	SJA_PeliCAN_AC_LEN = 4, 
+	SJA_PeliCAN_AC_LEN = 4,
 /// Clock Divider
 	SJACDR = 0x1f
 };
@@ -89,7 +107,7 @@ enum sja1000_PeliCAN_MOD {
 };
 
 /** Command Register 0x01 */
-enum sja1000_PeliCAN_CMR { 
+enum sja1000_PeliCAN_CMR {
 	sjaCMR_SRR= 1<<4,  // Self Reception Request (GoToSleep in BASIC mode)
 	sjaCMR_CDO= 1<<3,  // Clear Data Overrun
 	sjaCMR_RRB= 1<<2,  // Release Receive Buffer
@@ -119,7 +137,7 @@ enum sja1000_PeliCAN_IER {
 	sjaIER_RIE = 1,    // Receive Interrupt Enable
 	sjaENABLE_INTERRUPTS = sjaIER_BEIE|sjaIER_EPIE|sjaIER_DOIE|sjaIER_EIE|sjaIER_TIE|sjaIER_RIE,
 	sjaDISABLE_INTERRUPTS = 0
-// WARNING: the chip automatically enters RESET (bus off) mode when 
+// WARNING: the chip automatically enters RESET (bus off) mode when
 	// error counter > 255
 };
 

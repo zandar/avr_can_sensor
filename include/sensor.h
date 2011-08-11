@@ -6,13 +6,30 @@
  * Version AVR CAN sensor 13/10/2010
  */
 
+/*
+ * This file is part of avr_can_sensor.
+ *
+ * Avr_can_sensor is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * Avr_can_sensor is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with avr_can_sensor.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 /*@{*/
 
 /**
  @defgroup can_sensor CAN sensor
- 
+
  @brief Defines and structures for setting sensor measurement parameters.
-       
+
  @author Michal Vokac vokac.m@gmail.com http:destruktor.borec.cz
 
 */
@@ -73,7 +90,7 @@ enum averaging {
 };
 
 /**
- @brief Structure with sensor configuration parameters extracted from recived msg. identificator  
+ @brief Structure with sensor configuration parameters extracted from recived msg. identificator
 */
 struct sensor_cfg {
   unsigned char delivery; /* defines delivery on measured channels, shot = 0, continual = 1 */
@@ -98,15 +115,15 @@ struct sensor_data {
 /**
  @brief Function for setting sensor measurement parameters
  @param rx_msg new message with sensor configuration
- @param fsm structure with FSM parameters 
+ @param fsm structure with FSM parameters
  @return Negative value reports error
- 
+
  If new message is recived, sensor_config is executed.
- 
+
  If Rx message ID is IDN request, MY_ID and SENSOR_IDN is transmited.
- 
+
  If Rx message ID is MY_ID, decode sensor configuration from message.
- 
+
 */
 char sensor_config(struct canmsg_t *rx_msg, struct fsm *fsm);
 
