@@ -1,9 +1,9 @@
 /** 
 @mainpage AVR CAN sensor documentation
 
-This document contains programmer documentation of software for conecting
+This document contains programmer documentation of software for connecting
 SJA1000 CAN contoller to AVR ATmega chip. Developed by Michal Vokac, FEE, Czech
-Technical University.
+Technical University in Prague.
 
 Currently, these modules are documented:
 - \subpage compilation
